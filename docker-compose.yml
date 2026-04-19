@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: solo-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: solodev
+      POSTGRES_PASSWORD: solodevpass
+      POSTGRES_DB: solo
+    # Host port must be free (avoid 5432 if Homebrew Postgres uses it).
+    ports:
+      - "5434:5432"
+    volumes:
+      - solo_pgdata:/var/lib/postgresql/data
+
+volumes:
+  solo_pgdata:

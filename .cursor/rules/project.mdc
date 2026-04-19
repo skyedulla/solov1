@@ -1,0 +1,90 @@
+---
+description: SOLO — Swift & TS feature structure, layered API (routes→controller→service→repo)
+alwaysApply: true
+---
+
+# SOLO project rules
+
+## Stack (summary)
+
+| Layer | Choice |
+|-------|--------|
+| Client | Swift (iOS/macOS), **URLSession** for HTTP to this API |
+| API | TypeScript, run in **Docker** |
+| Auth | **Supabase** |
+| Data | **PostgreSQL** via **ORM** in repositories |
+| Request validation (API) | **Zod** + schemas in **controllers** |
+
+---
+
+## Environment variables
+
+Configuration is defined in the repo **`.env`** (do not commit real values; never paste secrets into rules or source).
+
+When implementing features that need keys or URLs, **read them from the environment** using these names—do not hardcode credentials or endpoints:
+
+| Variable | Use |
+|----------|-----|
+| `SUPABASE_URL` | Supabase project URL (auth / client SDK config as applicable) |
+| `SUPABASE_ANON_KEY` | Supabase anonymous key where the stack expects the public key |
+| `API_BASE_URL` | Base URL for the Swift app’s **URLSession** calls to this backend |
+| `DATABASE_URL` | PostgreSQL connection string for the API/ORM |
+| `OPENAI_API_KEY` | LLM / OpenAI API calls from the backend or designated service |
+
+Wire **TypeScript** via `process.env` (or the project’s env loader) and **Docker** so these are injected at runtime. For **Swift**, use whatever mechanism the app already uses (e.g. `xcconfig`, build settings, or a small config type populated at build/runtime) so `API_BASE_URL` and Supabase values are not literals in Swift source.
+
+---
+
+## Feature structuring (required)
+
+- **Follow the frontend and backend layouts below** when adding or changing features. Keep responsibilities in the right layer; do not put business rules in routes, ORM calls in controllers, or HTTP concerns in repositories unless the codebase already establishes a narrow exception.
+
+---
+
+## Frontend architecture (Swift)
+
+Use a **feature folder** per domain. Typical layout:
+
+| Area | Role |
+|------|------|
+| **Screens** | Full-page views (e.g. `MindmapScreen.swift`). Entry point; inject the screen **ViewModel**. |
+| **Components** | Small, reusable UI (e.g. `NodeView.swift`, `CustomButton.swift`). **Dumb**: data in, UI out. |
+| **Controllers** | Logic handlers / coordinators—not UIKit VCs. Examples: layout math (`MindmapLayoutController`), streaming (`AIStreamController` + URLSession events). |
+| **State** | **ViewModel**: `@Observable` “command center” the **Screen** observes. **SwiftUI**: keep simple `@State` in the view; heavier UI-only state (e.g. zoom/pan) in **State/** (e.g. `MapInteractionState`). |
+| **DataSource** | Repositories and API clients for **raw** I/O (e.g. `MindmapRepository.swift`, `OpenAIClient.swift`). URLSession usage lives here or behind thin types these call. |
+
+---
+
+## Backend architecture (TypeScript)
+
+Per feature, respect this **HTTP → data** pipeline:
+
+1. **Routes** — Define paths and HTTP methods. Apply **auth middleware** so only authenticated/authorized requests reach handlers. Forward each request to the correct **backend controller**. Keep routes thin: no business logic, no Zod, no ORM.
+2. **Controller** — **Validate** inputs (and outputs where needed) with **Zod** using shared **schemas**. Map HTTP to calls. If domain logic is involved, call a **service** with already-validated data; do not skip validation.
+3. **Service** — Business rules, orchestration, domain logic. Call **repositories** for persistence; avoid embedding SQL/ORM details when a repository exists for that operation.
+4. **Repository** — Persistence only: use the **ORM** to read/write **PostgreSQL**. No HTTP or request-shape concerns.
+
+**Flow:** `Route (+ auth middleware) → Controller (Zod) → Service (logic) → Repository (ORM) → Database`
+
+---
+
+## Scope and changes
+
+- Prefer the smallest change that solves the task. Avoid unrelated refactors or drive-by edits.
+- Match existing naming, structure, and patterns in the codebase before introducing new conventions.
+
+## Folder organization
+
+- Do not oversaturate **core folders** (app/API roots, feature entry points, shared `src` areas) with loose files, one-off scripts, or layers that do not match the layouts above. Prefer placement under an existing **feature** or a **small, purpose-named** subfolder.
+- Every new file or directory should be **obviously tied to its purpose** at a glance; avoid piling unrelated types into the same folder. When in doubt, extend an existing feature folder rather than widening a top-level bucket.
+
+## Code quality
+
+- Prefer clear names and straightforward control flow over clever one-liners.
+- Handle errors explicitly at boundaries (I/O, APIs, parsing); avoid empty `catch` blocks.
+- Add tests when behavior is non-trivial or when fixing regressions, if the repo already uses tests.
+
+## AI assistance
+
+- Read surrounding files before editing; reuse existing helpers and types instead of duplicating logic.
+- Do not add unsolicited documentation files (README, ADRs) unless the user asks.
