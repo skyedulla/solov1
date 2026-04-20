@@ -21,9 +21,15 @@ let package = Package(
             path: "lib",
             sources: [
                 "core/config/AppConfiguration.swift",
+                "core/constants/sort_by_constants.swift",
                 "features/auth/models/AuthModel.swift",
                 "features/auth/supabase/SupabaseClientProvider.swift",
                 "features/auth/controllers/AuthController.swift",
+                "features/ideas/controllers/IdeaController.swift",
+                "features/ideas/controllers/IdeaSearchController.swift",
+                "features/ideas/data_source/IdeasRemoteDataSource.swift",
+                "features/ideas/models/IdeaFilterModel.swift",
+                "features/ideas/models/IdeaModel.swift",
                 "smoke/SoloAuthSmoke.swift",
             ]
         ),

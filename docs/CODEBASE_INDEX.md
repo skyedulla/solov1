@@ -31,8 +31,8 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 ### `frontend/lib/features/auth/controllers/AuthController.swift`
 
 **Area:** Swift auth coordination.  
-**Purpose:** App-facing API for login/sign-up via **Supabase Auth**.  
-**Contents:** **`login(model:)`** → **`supabase.auth.signIn(email:password:)`** (returns **`Session`**); **`signUp(model:)`** → **`supabase.auth.signUp`** with **`first_name` / `last_name`** metadata (returns **`AuthResponse`**).
+**Purpose:** App-facing API for login/sign-up, password reset, and logout via **Supabase Auth**.  
+**Contents:** **`login(model:)`** → **`signIn`** (**`Session`**); **`signUp(model:)`** → **`signUp`** with **`first_name` / `last_name`** (**`AuthResponse`**); **`resetPassword(email:redirectTo:)`** → **`resetPasswordForEmail`**; **`logout()`** → **`signOut`**.
 
 ---
 
@@ -41,6 +41,46 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 **Area:** Swift shared model.  
 **Purpose:** Sign-up / login field bundle for **`AuthController`**.  
 **Contents:** **`Codable`** struct: **`firstName`**, **`lastName`**, **`email`**, **`password`** (metadata fields passed to Supabase on sign-up).
+
+---
+
+### `frontend/lib/features/ideas/controllers/IdeaController.swift`
+
+**Area:** Swift — ideas coordination.  
+**Purpose:** Orchestrates idea CRUD and related flows; future **`URLSession`** / repository I/O lives behind this type.  
+**Contents:** **`final class IdeaController`**: injectable **`IdeasRemoteDataSource`**; **`fetchIdeas(using:accessToken:)`** builds **`[IdeaModel]`** from the response (HTTP/status handling to be added later).
+
+---
+
+### `frontend/lib/features/ideas/controllers/IdeaSearchController.swift`
+
+**Area:** Swift — ideas search coordination.  
+**Purpose:** Orchestrates search/filter UI/state using **`IdeaFilterModel`**.  
+**Contents:** **`final class IdeaSearchController`**: **`Sendable`** coordinator with a default **`init()`** (behaviour to be wired with search UX).
+
+---
+
+### `frontend/lib/features/ideas/models/IdeaFilterModel.swift`
+
+**Area:** Swift — ideas search/filter model.  
+**Purpose:** Query and sort state for idea lists (mind map **IdeaFilter**).  
+**Contents:** **`Codable`** struct **`IdeaFilterModel`**: **`sortBy`** (API token from each option’s **`value`** in **`SortByConstants.options`**), **`searchQuery`**.
+
+---
+
+### `frontend/lib/features/ideas/models/IdeaModel.swift`
+
+**Area:** Swift — ideas feature model.  
+**Purpose:** Typed bundle for a single idea’s fields.  
+**Contents:** **`Codable`** struct **`IdeaModel`**: **`id`**, **`title`**, **`description`**, **`isPublished`**, **`createdAt`**, **`lastUpdatedAt`**, **`targetUser`**, **`purpose`**.
+
+---
+
+### `frontend/lib/features/ideas/data_source/IdeasRemoteDataSource.swift`
+
+**Area:** Swift — ideas API I/O.  
+**Purpose:** **`URLSession`** **`GET /ideas`** with **`sort`**, optional **`q`**, and **`Authorization: Bearer`**.  
+**Contents:** **`IdeasRemoteDataSource`**: **`fetchIdeas(filter:accessToken:)`** → **`URLSession.data`** for **`GET …/ideas`** (**`sort`**, optional **`q`**, **`Authorization: Bearer`**); returns raw **`(Data, URLResponse)`** only.
 
 ---
 
@@ -56,7 +96,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** API testing (Postman).  
 **Purpose:** Importable collection for manual HTTP checks.  
-**Contents:** `GET /health`, `POST /auth/signup`, `POST /auth/login` with variable **`baseUrl`** (collection default `http://localhost:4000`; set it to match your API **`PORT`**, e.g. `http://localhost:3000` if using the server default).
+**Contents:** `GET /health` with variable **`baseUrl`** (collection default `http://localhost:4000`; set it to match your API **`PORT`**, e.g. `http://localhost:3000` if using the server default).
 
 ---
 
@@ -76,43 +116,11 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 ---
 
-### `backend/src/modules/auth/auth.controller.ts`
+### `backend/src/core/auth.middleware.ts`
 
-**Area:** Auth HTTP layer.  
-**Purpose:** Map requests to `authService` and HTTP responses (no hashing).  
-**Contents:** **`login`** / **`signUp`** handlers: **`loginSchema`** / **`authModelSchema`** `safeParse` on **`req.body`** → 400 on validation failure; 200/401 for login; 201/409 for signup; JSON **`user`** payloads without secrets.
-
----
-
-### `backend/src/modules/auth/auth.repository.ts`
-
-**Area:** Auth persistence.  
-**Purpose:** Prisma-only access to **`users`**; map **`P2002`** to **`DuplicateEmailError`**.  
-**Contents:** **`findUserByEmail`**, **`createUser`**; on failure calls **`logDatabaseError`** then rethrows or maps duplicate email.
-
----
-
-### `backend/src/routes/auth.routes.ts`
-
-**Area:** HTTP routing.  
-**Purpose:** Wire **`/login`** and **`/signup`** under the **`/auth`** mount.  
-**Contents:** Express **`Router`**; **`POST /login`** → **`authController.login`**; **`POST /signup`** → **`authController.signUp`**.
-
----
-
-### `backend/src/modules/auth/auth.schema.ts`
-
-**Area:** Auth validation (Zod).  
-**Purpose:** Shared shapes for login and sign-up bodies (aligned with Swift **`AuthModel`**).  
-**Contents:** **`authModelSchema`** (firstName, lastName, email, password rules); **`loginSchema`** (email + password); exported TypeScript types **`AuthModel`**, **`LoginInput`**, **`SignUpInput`**.
-
----
-
-### `backend/src/modules/auth/auth.service.ts`
-
-**Area:** Auth business logic.  
-**Purpose:** Password hashing (`bcrypt`), credential verification, orchestration of **`authRepository`**.  
-**Contents:** **`login`** / **`signUp`** return **`PublicUser`**-style results or failure reasons; never returns password hashes to callers.
+**Area:** Backend — HTTP auth.  
+**Purpose:** Verify Supabase access tokens for protected routes.  
+**Contents:** **`requireAuth`**: reads **`Authorization: Bearer`**, **`supabase.auth.getUser(token)`**, sets **`req.authUser`**; **`401`** on missing/invalid token; **`500`** only for missing env / config; **`503`** when auth request looks like a transient network failure; otherwise **`500`** generic.
 
 ---
 
@@ -135,8 +143,56 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 ### `backend/src/index.ts`
 
 **Area:** API entrypoint.  
-**Purpose:** Boot Express, load `.env` from repo root, mount JSON body parser and routes.  
-**Contents:** `dotenv` path resolution; **`GET /health`** for liveness; **`app.use("/auth", authRoutes)`**; listens on **`PORT`** (default 3000).
+**Purpose:** Boot Express, load `.env` from repo root, mount JSON body parser.  
+**Contents:** `dotenv` path resolution; comment to run **`prisma migrate deploy`** before relying on DB-backed routes; **`GET /health`** for liveness; **`app.use("/ideas", ideaRoutes)`**; global **`500`** JSON error handler; listens on **`PORT`** (default 3000).
+
+---
+
+### `backend/src/modules/ideas/idea.controller.ts`
+
+**Area:** Backend — ideas HTTP handlers.  
+**Purpose:** Validate query params, call service, set status codes, format JSON for the client.  
+**Contents:** **`listIdeas`**: **`listIdeasQuerySchema.safeParse`**, **`400`** on invalid query; **`req.authUser!.id`** (router uses **`requireAuth`**); **`toIdeaResponseBody`** uses **`ideaResponseBodySchema.parse`**, **`200`** JSON array; **`next(error)`** on failure.
+
+---
+
+### `backend/src/modules/ideas/idea.repository.ts`
+
+**Area:** Backend — ideas persistence.  
+**Purpose:** Prisma-only access for ideas.  
+**Contents:** **`findIdeasForUser`**: **`findMany`** by **`userId`** (Supabase id), **`sort`** → **`orderBy`**, optional **`q`** text filter; **`logDatabaseError`** on failure.
+
+---
+
+### `backend/src/modules/ideas/idea.schema.ts`
+
+**Area:** Backend — ideas validation.  
+**Purpose:** Zod schemas aligned with Prisma **`Idea`**, Swift **`IdeaModel`**, and API wire JSON.  
+**Contents:** **`listIdeasQuerySchema`**; **`ideaCoreSchema`** / **`ideaCreateBodySchema`** (for future POST/PATCH); **`ideaResponseBodySchema`** + **`IdeaResponseBody`** (validate outbound list items; snake_case for the client).
+
+---
+
+### `backend/src/modules/ideas/idea.service.ts`
+
+**Area:** Backend — ideas domain orchestration.  
+**Purpose:** Business-facing entry for listing ideas (extend with cross-domain / external calls later).  
+**Contents:** **`toRepositoryListParams`** maps **`ListIdeasQuery`** → repository args; **`listIdeasForUser`** → **`idea.repository.findIdeasForUser`**.
+
+---
+
+### `backend/src/routes/idea.routes.ts`
+
+**Area:** Backend — ideas routes.  
+**Purpose:** Register ideas paths and apply auth to the whole router.  
+**Contents:** **`Router`** with **`requireAuth`** then **`GET /`** → async **`listIdeas`** wrapper (mounted at **`/ideas`** in **`index.ts`**).
+
+---
+
+### `backend/src/types/express.d.ts`
+
+**Area:** Backend — TypeScript.  
+**Purpose:** Augment **`Express.Request`** with **`authUser`**.  
+**Contents:** Global **`Express`** namespace merge; **`authUser?: User`** (**`@supabase/supabase-js`**).
 
 ---
 
@@ -145,6 +201,14 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 **Area:** Database / Prisma.  
 **Purpose:** Initial SQL migration for the **`users`** table.  
 **Contents:** `CREATE TABLE users` with columns matching `User` in `schema.prisma` (snake_case in DB, mapped in Prisma).
+
+---
+
+### `backend/prisma/migrations/20260420120000_add_ideas/migration.sql`
+
+**Area:** Database / Prisma.  
+**Purpose:** Create **`ideas`** table for user-scoped idea records.  
+**Contents:** **`CREATE TABLE ideas`** with **`user_id`**, content fields, timestamps; index on **`user_id`**.
 
 ---
 
@@ -160,7 +224,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Node API package.  
 **Purpose:** Backend dependencies and scripts (`build`, `start`, Prisma).  
-**Contents:** Declares `express`, `zod`, `@prisma/client`, `bcrypt`, `dotenv`, `prisma`, TypeScript; scripts run `prisma generate` + `tsc` and `node dist/index.js`.
+**Contents:** Declares `express`, `@prisma/client`, `@supabase/supabase-js`, `dotenv`, `zod`, `prisma`, TypeScript; scripts run `prisma generate` + `tsc` and `node dist/index.js`.
 
 ---
 
@@ -180,19 +244,27 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 ---
 
+### `.cursor/rules/backend-layers.mdc`
+
+**Area:** Cursor / AI rules — backend layering.  
+**Purpose:** Pin **`controller`** vs **`service`** vs **`repository`** responsibilities (Zod + HTTP in controller; orchestration in service; ORM only in repository).  
+**Contents:** Required pipeline; **`logDatabaseError`** at repository boundary.
+
+---
+
 ### `.cursor/rules/project.mdc`
 
 **Area:** Project-wide Cursor / AI rules.  
 **Purpose:** Defines stack conventions (Swift client, TypeScript API, Docker, Supabase, env var names, layered architecture for routes → controller → service → repository, Zod validation).  
-**Contents:** Non-code policy; guides how features should be structured and what not to hardcode.
+**Contents:** Non-code policy; guides how features should be structured, what not to hardcode, and that repositories / any Prisma-using code should call **`databaseLogger`** (`logDatabaseError`, etc.) on DB failures.
 
 ---
 
 ### `backend/prisma/schema.prisma`
 
 **Area:** Database / Prisma ORM.  
-**Purpose:** Defines the **`User`** model and `DATABASE_URL` datasource.  
-**Contents:** `generator client`, `datasource db`, `User` fields (`id`, `email`, `passwordHash`, `firstName`, `lastName`, timestamps); table mapped to **`users`**.
+**Purpose:** Defines **`User`** and **`Idea`** models and `DATABASE_URL` datasource.  
+**Contents:** `generator client`, `datasource db`, **`User`** (users table); **`Idea`** ( **`user_id`** = Supabase auth id, content fields, timestamps); **`ideas`** table mapping.
 
 ---
 
@@ -201,6 +273,14 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 **Area:** Editor tooling.  
 **Purpose:** VS Code / Cursor TypeScript workspace settings.  
 **Contents:** Points **`typescript.tsdk`** at **`backend/node_modules/typescript`** so the IDE resolves types (e.g. Prisma) consistently with the backend.
+
+---
+
+### `frontend/lib/core/constants/sort_by_constants.swift`
+
+**Area:** Swift — ideas list sorting.  
+**Purpose:** Pair UI labels with API sort parameter values for **`sortBy`**.  
+**Contents:** **`SortByConstants`** enum; **`options`** is an array of **`[String: String]`** dicts with keys **`label`** (display) and **`value`** (API token, e.g. **`title_asc`**, **`created_desc`**).
 
 ---
 
@@ -231,4 +311,4 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 ## Module placeholders (empty folders)
 
-`backend/src/modules/` may contain other feature folders (**`ai`**, **`ideas`**, **`mindmaps`**, **`nodes`**, **`workshop`**, **`core`**) reserved for future code; add entries here when files land.
+`backend/src/modules/` may contain other feature folders (**`ai`**, **`mindmaps`**, **`nodes`**, **`workshop`**, **`core`**) reserved for future code; **`ideas`** has **`idea.controller.ts`**, **`idea.repository.ts`**, **`idea.schema.ts`**, **`idea.service.ts`**. The former **`auth`** module was removed (client auth uses Supabase only). Add entries here when files land.

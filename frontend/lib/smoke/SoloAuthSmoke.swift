@@ -10,10 +10,11 @@ import Foundation
 enum SoloAuthSmoke {
     static func main() async throws {
         let controller = AuthController()
+        // Supabase Auth rejects many reserved/example domains (e.g. @example.com); use a disposable-style address.
         let model = AuthModel(
             firstName: "Smoke",
             lastName: "Test",
-            email: "smoke-\(UUID().uuidString.prefix(8))@example.com",
+            email: "solo-smoke-\(UUID().uuidString.prefix(8))@mailinator.com",
             password: "password12"
         )
 

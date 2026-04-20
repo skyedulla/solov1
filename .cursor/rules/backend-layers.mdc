@@ -1,0 +1,36 @@
+---
+description: SOLO backend — controller vs service vs repository responsibilities
+alwaysApply: true
+---
+
+# Backend module layers (TypeScript)
+
+For each feature under `backend/src/modules/<feature>/`, keep responsibilities aligned with this pipeline:
+
+**`Route` (+ auth middleware) → `Controller` → `Service` → `Repository` → PostgreSQL (via ORM)**
+
+## Controller (`*.controller.ts`)
+
+- **Parse** HTTP inputs (`req.query`, `req.params`, `req.body`) into plain values.
+- **Validate** requests (and response shapes where appropriate) with **Zod** using shared **schemas** (e.g. `*.schema.ts` in the same module).
+- **Map** validation failures to appropriate **HTTP status codes** (e.g. `400` for bad input) and consistent **error response bodies** for the frontend.
+- **Call** the **service** only with **already-validated** data.
+- **Format** successful **JSON responses** for the frontend (field names, nesting, date/string serialization).
+- Do **not** embed ORM calls, SQL, or cross-cutting domain rules here.
+
+## Service (`*.service.ts`)
+
+- Own **orchestration** and **domain/business rules** for the feature.
+- Perform **sensitive operations** and **cross-domain** coordination (calling multiple repositories or other modules).
+- Integrate **external services** (third-party APIs, email, etc.) when the feature needs them.
+- Call **repositories** for persistence; avoid raw ORM usage when a repository method exists.
+
+## Repository (`*.repository.ts`)
+
+- **Persistence only**: use the **ORM** (Prisma) to read/write **PostgreSQL**.
+- No HTTP concerns, no Zod, no Express types.
+- On database failures, use **`logDatabaseError(error, context)`** from `backend/src/core/databaseLogger.ts` with a short unique **`context`** string.
+
+## Schemas (`*.schema.ts`)
+
+- **Zod** schemas and inferred TypeScript types used by **controllers** for input/output validation.

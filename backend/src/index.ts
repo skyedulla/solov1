@@ -1,11 +1,13 @@
 import path from "node:path";
 
 import { config as loadEnv } from "dotenv";
-import express from "express";
+import express, { type NextFunction, type Request, type Response } from "express";
 
-import { authRoutes } from "./routes/auth.routes";
+import { ideaRoutes } from "./routes/idea.routes";
 
 loadEnv({ path: path.resolve(__dirname, "../../.env") });
+
+// Before using persisted routes (e.g. `GET /ideas`), apply migrations: `cd backend && npx prisma migrate deploy` (or `npm run db:migrate` in development).
 
 const app = express();
 app.use(express.json());
@@ -15,7 +17,16 @@ app.get("/health", (_req, res) => {
   res.status(200).json({ ok: true, service: "solo-api" });
 });
 
-app.use("/auth", authRoutes);
+/** Logged-in API surface — each router applies **`requireAuth`** (or equivalent) for protected resources. */
+app.use("/ideas", ideaRoutes);
+
+app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+  console.error("[express]", err);
+  if (res.headersSent) {
+    return;
+  }
+  res.status(500).json({ error: "Internal server error" });
+});
 
 const port = Number(process.env.PORT) || 3000;
 app.listen(port, () => {

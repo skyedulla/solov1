@@ -66,6 +66,12 @@ Per feature, respect this **HTTP → data** pipeline:
 
 **Flow:** `Route (+ auth middleware) → Controller (Zod) → Service (logic) → Repository (ORM) → Database`
 
+### Database / Prisma error logging
+
+- In **every backend repository** and in **any TypeScript file that uses Prisma** (including one-off scripts under the backend if they touch the ORM), handle database failures with **`logDatabaseError(error, context)`** from **`backend/src/core/databaseLogger.ts`**. Use a short, unique **`context`** string (e.g. `UserRepository.findByEmail`).
+- Use **`isPrismaError`** when you need to branch on Prisma-specific errors; **`getPrismaCodeDescription`** is available for messages if needed.
+- Do not swallow Prisma-related errors silently at persistence boundaries; prefer these helpers over ad-hoc `console.error` for ORM failures.
+
 ---
 
 ## Scope and changes
