@@ -1,12 +1,17 @@
 {
   "info": {
     "name": "SOLO API",
+    "description": "Local API checks. Ideas routes require a Supabase access JWT: sign in with your app or Supabase Dashboard (Authentication) and paste the session access_token into the collection variable `accessToken`. Default `baseUrl` matches `PORT` in `.env` (API defaults to port 3000 if unset).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:4000"
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
     }
   ],
   "item": [
@@ -17,6 +22,76 @@
         "header": [],
         "url": "{{baseUrl}}/health"
       }
+    },
+    {
+      "name": "Ideas",
+      "item": [
+        {
+          "name": "List ideas (fetchIdeas)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ideas?sort=created_desc&q=",
+              "host": ["{{baseUrl}}"],
+              "path": ["ideas"],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "created_desc",
+                  "description": "title_asc | created_desc | created_asc | updated_desc"
+                },
+                {
+                  "key": "q",
+                  "value": "",
+                  "description": "Optional search string"
+                }
+              ]
+            },
+            "description": "Lists all ideas for the authenticated user. Empty DB returns `[]`."
+          }
+        },
+        {
+          "name": "Create idea (createNewIdea)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"My idea title\",\n  \"purpose\": \"Why this exists\",\n  \"description\": \"Optional details\",\n  \"targetUser\": \"Optional audience\"\n}"
+            },
+            "url": "{{baseUrl}}/ideas",
+            "description": "`title` and `purpose` are required. Omit `description` / `targetUser` or send empty strings if unused. Response is `201` with one idea object (snake_case keys)."
+          }
+        }
+      ]
     }
   ]
 }

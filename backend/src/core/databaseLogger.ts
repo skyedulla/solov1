@@ -80,11 +80,33 @@ function inferInitializationCode(message: string): string | undefined {
   return undefined;
 }
 
+type PrismaClientError =
+  | PrismaClientKnownRequestError
+  | PrismaClientInitializationError
+  | PrismaClientValidationError
+  | PrismaClientUnknownRequestError
+  | PrismaClientRustPanicError;
+
+export function isPrismaError(error: unknown): error is PrismaClientError {
+  return (
+    error instanceof PrismaClientKnownRequestError ||
+    error instanceof PrismaClientInitializationError ||
+    error instanceof PrismaClientValidationError ||
+    error instanceof PrismaClientUnknownRequestError ||
+    error instanceof PrismaClientRustPanicError
+  );
+}
+
 /**
- * Logs any Prisma-related error to the terminal with code + description.
- * Call this from repositories (or a global error handler) whenever DB access fails.
+ * Logs Prisma (database client) errors with code + description.
+ * Call from repositories on Prisma failure, or from the global handler when **`isPrismaError`** is true.
+ * For HTTP-layer failures, use **`logApiError`** from **`apiLogger`**; for process/system failures, use **`logSystemError`** from **`systemLogger`**.
  */
 export function logDatabaseError(error: unknown, context: string): void {
+  if (!isPrismaError(error)) {
+    return;
+  }
+
   const lines: string[] = [`[database:${context}]`];
 
   if (error instanceof PrismaClientKnownRequestError) {
@@ -130,24 +152,4 @@ export function logDatabaseError(error: unknown, context: string): void {
     console.error(lines.join("\n"));
     return;
   }
-
-  if (error instanceof Error) {
-    lines.push(`  Error (${error.name})`);
-    lines.push(`  Message: ${error.message}`);
-    console.error(lines.join("\n"));
-    return;
-  }
-
-  lines.push(`  Unknown: ${String(error)}`);
-  console.error(lines.join("\n"));
-}
-
-export function isPrismaError(error: unknown): boolean {
-  return (
-    error instanceof PrismaClientKnownRequestError ||
-    error instanceof PrismaClientInitializationError ||
-    error instanceof PrismaClientValidationError ||
-    error instanceof PrismaClientUnknownRequestError ||
-    error instanceof PrismaClientRustPanicError
-  );
 }

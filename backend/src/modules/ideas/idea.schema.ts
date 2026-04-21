@@ -35,25 +35,20 @@ export const listIdeasQuerySchema = z.object({
 
 export type ListIdeasQuery = z.infer<typeof listIdeasQuerySchema>;
 
-// --- Request bodies (future POST/PATCH) -------------------------------------
+// --- Request bodies (POST create) ------------------------------------------
 
 /**
- * User-editable fields — maps to Prisma `Idea` columns
- * `title`, `description`, `is_published`, `target_user`, `purpose`.
- * Use camelCase for JSON request bodies to this API.
+ * **`POST /ideas`** JSON body — camelCase.
+ * **`title`** and **`purpose`** are required; **`description`** and **`targetUser`** default to empty strings when omitted.
  */
-export const ideaCoreSchema = z.object({
+export const ideaCreateBodySchema = z.object({
   title: z.string().min(1).max(10_000),
-  description: z.string().max(100_000).default(""),
-  isPublished: z.boolean().default(false),
-  targetUser: z.string().min(1).max(2000),
   purpose: z.string().min(1).max(20_000),
+  description: z.string().max(100_000).optional().default(""),
+  targetUser: z.string().max(2000).optional().default(""),
+  isPublished: z.boolean().optional().default(false),
 });
 
-export type IdeaCore = z.infer<typeof ideaCoreSchema>;
-
-/** Request body for creating an idea (same fields as `ideaCoreSchema`). */
-export const ideaCreateBodySchema = ideaCoreSchema;
 export type IdeaCreateBody = z.infer<typeof ideaCreateBodySchema>;
 
 // --- API wire format (Swift `IdeaModel` + snake_case JSON) ------------------

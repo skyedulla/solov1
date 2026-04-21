@@ -1,6 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import { createClient } from "@supabase/supabase-js";
 
+import { logApiError } from "./apiLogger";
+
 function createSupabaseAuthClient() {
   const url = process.env.SUPABASE_URL;
   const anonKey = process.env.SUPABASE_ANON_KEY;
@@ -51,7 +53,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     req.authUser = user;
     next();
   } catch (err) {
-    console.error("[auth.middleware] requireAuth failed:", err);
+    logApiError(err, "auth.middleware.requireAuth");
 
     if (isConfigurationError(err)) {
       res.status(500).json({ error: "Auth configuration error" });

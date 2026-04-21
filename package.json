@@ -4,6 +4,7 @@
   "scripts": {
     "build": "npm run build --prefix backend",
     "start": "npm run start --prefix backend",
-    "start:api": "npm run build --prefix backend && npm run start --prefix backend"
+    "start:api": "npm run build --prefix backend && npm run start --prefix backend",
+    "start:stack": "bash start-api-stack.sh"
   }
 }

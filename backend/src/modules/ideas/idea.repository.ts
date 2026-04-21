@@ -1,7 +1,6 @@
 import type { Idea, Prisma } from "@prisma/client";
 
 import { prisma } from "../../core/prisma";
-import { logDatabaseError } from "../../core/databaseLogger";
 import type { IdeaSortBy } from "./idea.schema";
 
 function orderByForSort(sort: IdeaSortBy): Prisma.IdeaOrderByWithRelationInput {
@@ -21,27 +20,44 @@ export async function findIdeasForUser(
   userId: string,
   params: { sort: IdeaSortBy; searchQuery: string },
 ): Promise<Idea[]> {
-  try {
-    const q = params.searchQuery;
-    const where: Prisma.IdeaWhereInput = {
-      userId,
-      ...(q.length > 0
-        ? {
-            OR: [
-              { title: { contains: q, mode: "insensitive" } },
-              { description: { contains: q, mode: "insensitive" } },
-              { purpose: { contains: q, mode: "insensitive" } },
-            ],
-          }
-        : {}),
-    };
+  const q = params.searchQuery;
+  const where: Prisma.IdeaWhereInput = {
+    userId,
+    ...(q.length > 0
+      ? {
+          OR: [
+            { title: { contains: q, mode: "insensitive" } },
+            { description: { contains: q, mode: "insensitive" } },
+            { purpose: { contains: q, mode: "insensitive" } },
+          ],
+        }
+      : {}),
+  };
 
-    return await prisma.idea.findMany({
-      where,
-      orderBy: orderByForSort(params.sort),
-    });
-  } catch (error) {
-    logDatabaseError(error, "IdeaRepository.findIdeasForUser");
-    throw error;
-  }
+  return prisma.idea.findMany({
+    where,
+    orderBy: orderByForSort(params.sort),
+  });
+}
+
+export async function createIdeaForUser(
+  userId: string,
+  data: {
+    title: string;
+    purpose: string;
+    description: string;
+    targetUser: string;
+    isPublished: boolean;
+  },
+): Promise<Idea> {
+  return prisma.idea.create({
+    data: {
+      userId,
+      title: data.title,
+      purpose: data.purpose,
+      description: data.description,
+      targetUser: data.targetUser,
+      isPublished: data.isPublished,
+    },
+  });
 }

@@ -16,4 +16,25 @@ final class IdeaController: Sendable {
         decoder.dateDecodingStrategy = .iso8601
         return try decoder.decode([IdeaModel].self, from: data)
     }
+
+    /// Creates a new idea (**`title`** and **`purpose`** required; **`description`** and **`targetUser`** optional) and returns the persisted **`IdeaModel`**.
+    func createNewIdea(
+        title: String,
+        purpose: String,
+        description: String? = nil,
+        targetUser: String? = nil,
+        accessToken: String
+    ) async throws -> IdeaModel {
+        let (data, _) = try await remote.createNewIdea(
+            title: title,
+            purpose: purpose,
+            description: description,
+            targetUser: targetUser,
+            accessToken: accessToken
+        )
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        decoder.dateDecodingStrategy = .iso8601
+        return try decoder.decode(IdeaModel.self, from: data)
+    }
 }

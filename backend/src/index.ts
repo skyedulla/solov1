@@ -3,6 +3,8 @@ import path from "node:path";
 import { config as loadEnv } from "dotenv";
 import express, { type NextFunction, type Request, type Response } from "express";
 
+import { logApiError } from "./core/apiLogger";
+import { isPrismaError, logDatabaseError } from "./core/databaseLogger";
 import { ideaRoutes } from "./routes/idea.routes";
 
 loadEnv({ path: path.resolve(__dirname, "../../.env") });
@@ -20,8 +22,13 @@ app.get("/health", (_req, res) => {
 /** Logged-in API surface — each router applies **`requireAuth`** (or equivalent) for protected resources. */
 app.use("/ideas", ideaRoutes);
 
-app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
-  console.error("[express]", err);
+app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
+  const context = `${req.method} ${req.originalUrl}`;
+  if (isPrismaError(err)) {
+    logDatabaseError(err, context);
+  } else {
+    logApiError(err, context);
+  }
   if (res.headersSent) {
     return;
   }

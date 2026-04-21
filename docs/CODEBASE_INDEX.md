@@ -48,7 +48,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Swift — ideas coordination.  
 **Purpose:** Orchestrates idea CRUD and related flows; future **`URLSession`** / repository I/O lives behind this type.  
-**Contents:** **`final class IdeaController`**: injectable **`IdeasRemoteDataSource`**; **`fetchIdeas(using:accessToken:)`** builds **`[IdeaModel]`** from the response (HTTP/status handling to be added later).
+**Contents:** **`final class IdeaController`**: injectable **`IdeasRemoteDataSource`**; **`fetchIdeas(using:accessToken:)`** → **`[IdeaModel]`**; **`createNewIdea(title:purpose:description:targetUser:accessToken:)`** → **`IdeaModel`** (decode single-object **`POST`** response).
 
 ---
 
@@ -80,7 +80,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Swift — ideas API I/O.  
 **Purpose:** **`URLSession`** **`GET /ideas`** with **`sort`**, optional **`q`**, and **`Authorization: Bearer`**.  
-**Contents:** **`IdeasRemoteDataSource`**: **`fetchIdeas(filter:accessToken:)`** → **`URLSession.data`** for **`GET …/ideas`** (**`sort`**, optional **`q`**, **`Authorization: Bearer`**); returns raw **`(Data, URLResponse)`** only.
+**Contents:** **`IdeasRemoteDataSource`**: **`fetchIdeas(filter:accessToken:)`** → **`GET …/ideas`**; **`createNewIdea(title:purpose:description:targetUser:accessToken:)`** → **`POST …/ideas`** with JSON body; both use **`Authorization: Bearer`**; return raw **`(Data, URLResponse)`** only.
 
 ---
 
@@ -96,7 +96,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** API testing (Postman).  
 **Purpose:** Importable collection for manual HTTP checks.  
-**Contents:** `GET /health` with variable **`baseUrl`** (collection default `http://localhost:4000`; set it to match your API **`PORT`**, e.g. `http://localhost:3000` if using the server default).
+**Contents:** Collection vars **`baseUrl`** (default **`http://localhost:3000`**) and **`accessToken`** (Supabase JWT for protected routes); **`GET /health`**; Ideas folder — **`GET /ideas`** (list / `fetchIdeas`, query **`sort`**, **`q`**, **`Authorization: Bearer`**), **`POST /ideas`** (create / **`createNewIdea`**, JSON body **`title`** / **`purpose`** + optional fields).
 
 ---
 
@@ -116,19 +116,27 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 ---
 
+### `backend/src/core/apiLogger.ts`
+
+**Area:** Backend observability — non-database errors.  
+**Purpose:** Single place to log API/HTTP-layer failures that are not Prisma-related.  
+**Contents:** **`logApiError(error, context)`** prints **`[api:…]`** blocks for **`Error`** instances or unknown values; used by **`index.ts`** global handler (when **`isPrismaError`** is false) and **`auth.middleware`**.
+
+---
+
 ### `backend/src/core/auth.middleware.ts`
 
 **Area:** Backend — HTTP auth.  
 **Purpose:** Verify Supabase access tokens for protected routes.  
-**Contents:** **`requireAuth`**: reads **`Authorization: Bearer`**, **`supabase.auth.getUser(token)`**, sets **`req.authUser`**; **`401`** on missing/invalid token; **`500`** only for missing env / config; **`503`** when auth request looks like a transient network failure; otherwise **`500`** generic.
+**Contents:** **`requireAuth`**: reads **`Authorization: Bearer`**, **`supabase.auth.getUser(token)`**, sets **`req.authUser`**; **`401`** on missing/invalid token; **`500`** only for missing env / config; **`503`** when auth request looks like a transient network failure; otherwise **`500`** generic; **`logApiError`** on thrown errors in the **`catch`** block.
 
 ---
 
 ### `backend/src/core/databaseLogger.ts`
 
-**Area:** Backend observability — database errors.  
-**Purpose:** Central logging for Prisma failures (terminal + structured text).  
-**Contents:** Maps Prisma error codes (and inferred codes for init errors) to short descriptions; **`logDatabaseError(error, context)`** used from repositories; handles known, initialization, validation, unknown, and rust-panic errors.
+**Area:** Backend observability — Prisma / database client errors.  
+**Purpose:** Structured logging when the Postgres path fails via Prisma.  
+**Contents:** **`getPrismaCodeDescription`**; **`isPrismaError`** (type guard); **`logDatabaseError(error, context)`** for Prisma only (known request, init, validation, unknown, rust panic); repositories and scripts should call this on ORM failures; global handler uses it when **`next(err)`** receives a Prisma error.
 
 ---
 
@@ -144,7 +152,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** API entrypoint.  
 **Purpose:** Boot Express, load `.env` from repo root, mount JSON body parser.  
-**Contents:** `dotenv` path resolution; comment to run **`prisma migrate deploy`** before relying on DB-backed routes; **`GET /health`** for liveness; **`app.use("/ideas", ideaRoutes)`**; global **`500`** JSON error handler; listens on **`PORT`** (default 3000).
+**Contents:** `dotenv` path resolution; comment to run **`prisma migrate deploy`** before relying on DB-backed routes; **`GET /health`** for liveness; **`app.use("/ideas", ideaRoutes)`**; global **`500`** JSON error handler that routes **`logDatabaseError`** vs **`logApiError`** via **`isPrismaError`**; listens on **`PORT`** (default 3000).
 
 ---
 
@@ -152,7 +160,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Backend — ideas HTTP handlers.  
 **Purpose:** Validate query params, call service, set status codes, format JSON for the client.  
-**Contents:** **`listIdeas`**: **`listIdeasQuerySchema.safeParse`**, **`400`** on invalid query; **`req.authUser!.id`** (router uses **`requireAuth`**); **`toIdeaResponseBody`** uses **`ideaResponseBodySchema.parse`**, **`200`** JSON array; **`next(error)`** on failure.
+**Contents:** **`listIdeas`**: **`listIdeasQuerySchema.safeParse`**, **`400`** on invalid query; **`createNewIdea`**: **`ideaCreateBodySchema.safeParse`**, **`400`** on invalid body; **`toIdeaResponseBody`** + **`ideaResponseBodySchema.parse`**; **`200`** JSON array / **`201`** JSON object; **`req.authUser!.id`** (router uses **`requireAuth`**); **`next(error)`** on failure.
 
 ---
 
@@ -160,7 +168,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Backend — ideas persistence.  
 **Purpose:** Prisma-only access for ideas.  
-**Contents:** **`findIdeasForUser`**: **`findMany`** by **`userId`** (Supabase id), **`sort`** → **`orderBy`**, optional **`q`** text filter; **`logDatabaseError`** on failure.
+**Contents:** **`findIdeasForUser`**: **`findMany`** by **`userId`** (Supabase id), **`sort`** → **`orderBy`**, optional **`q`** text filter; **`createIdeaForUser`**: **`create`** with scoped **`userId`** (errors propagate to the global handler / **`logDatabaseError`** when Prisma-related).
 
 ---
 
@@ -168,7 +176,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Backend — ideas validation.  
 **Purpose:** Zod schemas aligned with Prisma **`Idea`**, Swift **`IdeaModel`**, and API wire JSON.  
-**Contents:** **`listIdeasQuerySchema`**; **`ideaCoreSchema`** / **`ideaCreateBodySchema`** (for future POST/PATCH); **`ideaResponseBodySchema`** + **`IdeaResponseBody`** (validate outbound list items; snake_case for the client).
+**Contents:** **`listIdeasQuerySchema`**; **`ideaCreateBodySchema`** / **`IdeaCreateBody`** (**`POST /ideas`**: required **`title`** / **`purpose`**, optional **`description`** / **`targetUser`** with defaults); **`ideaResponseBodySchema`** + **`IdeaResponseBody`** (outbound snake_case JSON aligned with Swift **`IdeaModel`**).
 
 ---
 
@@ -176,7 +184,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Backend — ideas domain orchestration.  
 **Purpose:** Business-facing entry for listing ideas (extend with cross-domain / external calls later).  
-**Contents:** **`toRepositoryListParams`** maps **`ListIdeasQuery`** → repository args; **`listIdeasForUser`** → **`idea.repository.findIdeasForUser`**.
+**Contents:** **`toRepositoryListParams`** maps **`ListIdeasQuery`** → repository args; **`listIdeasForUser`** → **`idea.repository.findIdeasForUser`**; **`createIdeaForUser`** → **`idea.repository.createIdeaForUser`**.
 
 ---
 
@@ -184,7 +192,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Backend — ideas routes.  
 **Purpose:** Register ideas paths and apply auth to the whole router.  
-**Contents:** **`Router`** with **`requireAuth`** then **`GET /`** → async **`listIdeas`** wrapper (mounted at **`/ideas`** in **`index.ts`**).
+**Contents:** **`Router`** with **`requireAuth`** then **`GET /`** → **`listIdeas`**, **`POST /`** → **`createNewIdea`** (mounted at **`/ideas`** in **`index.ts`**).
 
 ---
 
@@ -232,7 +240,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Workspace convenience.  
 **Purpose:** Shortcuts to backend scripts without **`cd backend`**.  
-**Contents:** **`npm run build`**, **`start`**, **`start:api`** delegate to **`--prefix backend`**.
+**Contents:** **`npm run build`**, **`start`**, **`start:api`**, **`start:stack`** delegate to **`--prefix backend`** or run **`start-api-stack.sh`**.
 
 ---
 
@@ -241,6 +249,22 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 **Area:** Database — Prisma client singleton.  
 **Purpose:** Export a single **`PrismaClient`** for the app process.  
 **Contents:** `export const prisma = new PrismaClient()`; connection uses **`DATABASE_URL`** from `schema.prisma`’s env.
+
+---
+
+### `start-api-stack.sh` (repo root)
+
+**Area:** Local development workflow.  
+**Purpose:** One command to bring up Docker **Postgres** and the **API** (matches **`DATABASE_URL`** on **`localhost:5434`**).  
+**Contents:** Requires Docker; **`docker compose up -d postgres`**; waits on **`pg_isready`**; then **`exec npm run start:api`** (build + **`node dist/index.js`**). Same as **`npm run start:stack`**.
+
+---
+
+### `backend/src/core/systemLogger.ts`
+
+**Area:** Backend observability — system / process errors.  
+**Purpose:** Single place to log failures outside HTTP request handling (startup, shutdown, timers, global handlers) without conflating them with **`[api:…]`** or Prisma.  
+**Contents:** **`logSystemError(error, context)`** prints **`[system:…]`** blocks with optional stack; **`SystemLogger.error`** alias; callers use **`apiLogger`** / **`databaseLogger`** for request-scoped or ORM errors.
 
 ---
 

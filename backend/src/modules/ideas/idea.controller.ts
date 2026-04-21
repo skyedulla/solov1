@@ -1,7 +1,12 @@
 import type { Idea } from "@prisma/client";
 import type { NextFunction, Request, Response } from "express";
 
-import { ideaResponseBodySchema, type IdeaResponseBody, listIdeasQuerySchema } from "./idea.schema";
+import {
+  ideaCreateBodySchema,
+  ideaResponseBodySchema,
+  type IdeaResponseBody,
+  listIdeasQuerySchema,
+} from "./idea.schema";
 import * as ideaService from "./idea.service";
 
 /**
@@ -38,6 +43,26 @@ export async function listIdeas(req: Request, res: Response, next: NextFunction)
     const ideas = await ideaService.listIdeasForUser(userId, parsed.data);
     const body: IdeaResponseBody[] = ideas.map(toIdeaResponseBody);
     res.status(200).json(body);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function createNewIdea(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const parsed = ideaCreateBodySchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({
+      error: "Validation failed",
+      details: parsed.error.flatten(),
+    });
+    return;
+  }
+
+  const userId = req.authUser!.id;
+
+  try {
+    const idea = await ideaService.createIdeaForUser(userId, parsed.data);
+    res.status(201).json(toIdeaResponseBody(idea));
   } catch (error) {
     next(error);
   }

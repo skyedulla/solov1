@@ -1,6 +1,6 @@
 import type { Idea } from "@prisma/client";
 
-import type { IdeaSortBy, ListIdeasQuery } from "./idea.schema";
+import type { IdeaCreateBody, IdeaSortBy, ListIdeasQuery } from "./idea.schema";
 import * as ideaRepository from "./idea.repository";
 
 /** Maps a validated list query into repository parameters (extend when adding filters, paging, policy). */
@@ -17,4 +17,8 @@ function toRepositoryListParams(query: ListIdeasQuery): { sort: IdeaSortBy; sear
  */
 export async function listIdeasForUser(authUserId: string, query: ListIdeasQuery): Promise<Idea[]> {
   return ideaRepository.findIdeasForUser(authUserId, toRepositoryListParams(query));
+}
+
+export async function createIdeaForUser(authUserId: string, body: IdeaCreateBody): Promise<Idea> {
+  return ideaRepository.createIdeaForUser(authUserId, body);
 }
