@@ -3,10 +3,12 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "build": "prisma generate && tsc -p tsconfig.json",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && prisma generate && tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "db:migrate": "prisma migrate dev",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "token": "node scripts/print-supabase-token.cjs"
   },
   "dependencies": {
     "@prisma/client": "^6.3.1",

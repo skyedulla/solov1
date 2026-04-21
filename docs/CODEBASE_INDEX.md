@@ -24,7 +24,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Swift client configuration.  
 **Purpose:** Resolve **`API_BASE_URL`**, **`SUPABASE_URL`**, and **`SUPABASE_ANON_KEY`** without hardcoding in source.  
-**Contents:** Reads each from **`ProcessInfo`** environment or **`Info.plist`** (same keys as `.env`); **`preconditionFailure`** if any required value is missing.
+**Contents:** **`public`** **`enum`**; reads each from **`ProcessInfo`** environment or **`Info.plist`** (same keys as `.env`); **`preconditionFailure`** if any required value is missing (also used by the **`solo-auth-smoke`** executable that **`import`**s **`SoloLib`**).
 
 ---
 
@@ -32,7 +32,15 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Swift auth coordination.  
 **Purpose:** App-facing API for login/sign-up, password reset, and logout via **Supabase Auth**.  
-**Contents:** **`login(model:)`** → **`signIn`** (**`Session`**); **`signUp(model:)`** → **`signUp`** with **`first_name` / `last_name`** (**`AuthResponse`**); **`resetPassword(email:redirectTo:)`** → **`resetPasswordForEmail`**; **`logout()`** → **`signOut`**.
+**Contents:** **`public final class`** with injectable **`SupabaseClient`**; **`AuthValidationError`** (**`LocalizedError`**) when sign-up **`firstName` / `lastName`** are missing after trim; **`login(model:)`** → **`signIn`** (**`Session`**); **`signUp(model:)`** validates non-empty names then **`signUp`** with **`first_name` / `last_name`** (**`AuthResponse`**); **`resetPassword(email:redirectTo:)`** → **`resetPasswordForEmail`**; **`logout()`** → **`signOut`**.
+
+---
+
+### `frontend/Tests/SoloLibTests/AuthControllerFlowTests.swift`
+
+**Area:** Swift — auth feature tests.  
+**Purpose:** Verify **`AuthController`** runs the real **`SupabaseClient`** Auth stack end-to-end with a stub **`URLSession`** (**`MockURLProtocol`**).  
+**Contents:** In-memory **`AuthLocalStorage`**; **`SupabaseClientOptions`** with **`autoRefreshToken: false`** and mocked global session; tests for **`login`**, **`signUp`** (decode **`AuthResponse.user`**), **`resetPassword`**, **`logout`** (after login session), sign-up validation errors; **`testSequentialAuth_invokesLoginResetSignUpLogoutThroughSupabaseSession`** asserts four GoTrue round-trips in order (**`token`**, **`recover`**, **`signup`**, **`logout`**).
 
 ---
 
@@ -40,7 +48,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Swift shared model.  
 **Purpose:** Sign-up / login field bundle for **`AuthController`**.  
-**Contents:** **`Codable`** struct: **`firstName`**, **`lastName`**, **`email`**, **`password`** (metadata fields passed to Supabase on sign-up).
+**Contents:** **`public`** **`Codable`** struct with explicit **`public init`**; **`firstName`**, **`lastName`**, **`email`**, **`password`** (metadata fields passed to Supabase on sign-up).
 
 ---
 
@@ -48,7 +56,15 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Swift — ideas coordination.  
 **Purpose:** Orchestrates idea CRUD and related flows; future **`URLSession`** / repository I/O lives behind this type.  
-**Contents:** **`final class IdeaController`**: injectable **`IdeasRemoteDataSource`**; **`fetchIdeas(using:accessToken:)`** → **`[IdeaModel]`**; **`createNewIdea(title:purpose:description:targetUser:accessToken:)`** → **`IdeaModel`** (decode single-object **`POST`** response).
+**Contents:** **`final class IdeaController`**: injectable **`IdeasRemoteDataSource`**; **`fetchIdeas(using:accessToken:)`** → **`[IdeaModel]`**; **`createNewIdea(title:purpose:description:targetUser:accessToken:)`** → **`IdeaModel`**; **`editIdea(id:title:purpose:description:targetUser:isPublished:accessToken:)`** → **`IdeaModel`** (**`PATCH …/ideas/{id}`**, expects **`200`**; optional **`isPublished`**); **`togglePublished(idea:accessToken:)`** flips **`isPublished`** via **`editIdea`**; **`deleteIdea(id:accessToken:)`** (**`DELETE …/ideas/{id}`**, expects **`204`**).
+
+---
+
+### `frontend/Tests/SoloLibTests/IdeaControllerFlowTests.swift`
+
+**Area:** Swift — ideas feature tests.  
+**Purpose:** Verify **`IdeaController`** entry points run the real stack (**`IdeasRemoteDataSource`** + **`URLSession`**) end-to-end with a stub transport.  
+**Contents:** **`XCTestCase`**; registers **`MockURLProtocol`** on an ephemeral **`URLSession`**; per-method tests for **`fetchIdeas`**, **`createNewIdea`**, **`editIdea`**, **`togglePublished`** (false↔true), **`deleteIdea`** (plus error cases); **`testSequentialCRUD_invokesAllFourControllerMethodsThroughDataSource`** asserts five HTTP round-trips (**`POST`**, **`GET`**, **`PATCH`** edit, **`PATCH`** toggle publish, **`DELETE`**).
 
 ---
 
@@ -80,15 +96,23 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Swift — ideas API I/O.  
 **Purpose:** **`URLSession`** **`GET /ideas`** with **`sort`**, optional **`q`**, and **`Authorization: Bearer`**.  
-**Contents:** **`IdeasRemoteDataSource`**: **`fetchIdeas(filter:accessToken:)`** → **`GET …/ideas`**; **`createNewIdea(title:purpose:description:targetUser:accessToken:)`** → **`POST …/ideas`** with JSON body; both use **`Authorization: Bearer`**; return raw **`(Data, URLResponse)`** only.
+**Contents:** **`IdeasRemoteDataSource`**: **`fetchIdeas(filter:accessToken:)`** → **`GET …/ideas`**; **`createNewIdea(…)`** → **`POST …/ideas`**; **`updateIdea(id:…isPublished:…)`** → **`PATCH …/ideas/{id}`** (optional **`isPublished`** in JSON body); **`deleteIdea(id:accessToken:)`** → **`DELETE …/ideas/{id}`**; all use **`Authorization: Bearer`** where applicable; return raw **`(Data, URLResponse)`** only.
+
+---
+
+### `frontend/Tests/SoloLibTests/MockURLProtocol.swift`
+
+**Area:** Swift — test support.  
+**Purpose:** Let **`URLSession`** integration tests run without a real server by short-circuiting requests in-process.  
+**Contents:** **`URLProtocol`** subclass with a static **`requestHandler`** that returns **`HTTPURLResponse`** + **`Data`**.
 
 ---
 
 ### `frontend/Package.swift`
 
 **Area:** Swift Package / smoke test harness.  
-**Purpose:** Defines executable **`solo-auth-smoke`**, SPM dependencies, and sources under **`lib/`**.  
-**Contents:** SwiftPM manifest; depends on **`supabase-swift`** (**`Supabase`** product); Swift tools 5.10+.
+**Purpose:** Defines library **`SoloLib`** (shared app sources under **`lib/`** except **`smoke/`**), executable **`solo-auth-smoke`**, and **`SoloLibTests`**.  
+**Contents:** SwiftPM manifest; **`SoloLib`** depends on **`supabase-swift`** (**`Supabase`** product); **`SoloAuthSmoke`** target path **`lib/smoke`** + **`import SoloLib`**; **`exclude: ["smoke"]`** on **`SoloLib`**; **`swift test`** runs **`Tests/SoloLibTests`**; Swift tools 5.10+.
 
 ---
 
@@ -96,7 +120,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** API testing (Postman).  
 **Purpose:** Importable collection for manual HTTP checks.  
-**Contents:** Collection vars **`baseUrl`** (default **`http://localhost:3000`**) and **`accessToken`** (Supabase JWT for protected routes); **`GET /health`**; Ideas folder — **`GET /ideas`** (list / `fetchIdeas`, query **`sort`**, **`q`**, **`Authorization: Bearer`**), **`POST /ideas`** (create / **`createNewIdea`**, JSON body **`title`** / **`purpose`** + optional fields).
+**Contents:** Collection vars **`baseUrl`**, **`accessToken`**, **`ideaId`**; **`GET /health`**; Ideas — **`GET /ideas`**, **`POST /ideas`** (test script sets **`ideaId`** from **`201`** response), **`PATCH /ideas/:id`**, duplicate **`PUT /ideas/:id`** (same update body, for proxies that block **`PATCH`**), **`DELETE /ideas/:id`**; JSON bodies camelCase; collection **`info.description`** documents import path and workflow.
 
 ---
 
@@ -104,7 +128,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** CLI smoke test.  
 **Purpose:** End-to-end check of **`AuthController.signUp`** against **Supabase Auth**.  
-**Contents:** **`@main`** builds a random email, calls **`signUp`**, prints **`SUPABASE_URL`** and result (**`AuthResponse`** session vs user).
+**Contents:** **`import SoloLib`**; **`@main`** builds a random email, calls **`signUp`**, prints **`SUPABASE_URL`** and result (**`AuthResponse`** session vs user).
 
 ---
 
@@ -112,7 +136,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Swift — Supabase client wiring.  
 **Purpose:** Single **`SupabaseClient`** configured from **`AppConfiguration`**.  
-**Contents:** **`SupabaseClientProvider.shared`** lazy client using **`SUPABASE_URL`** + **`SUPABASE_ANON_KEY`**; imported by **`AuthController`**.
+**Contents:** **`public enum`** with **`public static let shared`** lazy **`SupabaseClient`** using **`SUPABASE_URL`** + **`SUPABASE_ANON_KEY`**; imported by **`AuthController`**.
 
 ---
 
@@ -129,6 +153,14 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 **Area:** Backend — HTTP auth.  
 **Purpose:** Verify Supabase access tokens for protected routes.  
 **Contents:** **`requireAuth`**: reads **`Authorization: Bearer`**, **`supabase.auth.getUser(token)`**, sets **`req.authUser`**; **`401`** on missing/invalid token; **`500`** only for missing env / config; **`503`** when auth request looks like a transient network failure; otherwise **`500`** generic; **`logApiError`** on thrown errors in the **`catch`** block.
+
+---
+
+### `backend/src/createApp.ts`
+
+**Area:** Backend — Express application factory.  
+**Purpose:** Build the JSON-enabled Express app (health + **`/ideas`** + error handler) without opening a port — reused by **`index.ts`**.  
+**Contents:** **`createApp()`** returns **`express.Application`** with **`/health`**, **`app.use("/ideas", ideaRoutes)`**, and the shared Prisma vs non-Prisma **`500`** handler.
 
 ---
 
@@ -151,8 +183,8 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 ### `backend/src/index.ts`
 
 **Area:** API entrypoint.  
-**Purpose:** Boot Express, load `.env` from repo root, mount JSON body parser.  
-**Contents:** `dotenv` path resolution; comment to run **`prisma migrate deploy`** before relying on DB-backed routes; **`GET /health`** for liveness; **`app.use("/ideas", ideaRoutes)`**; global **`500`** JSON error handler that routes **`logDatabaseError`** vs **`logApiError`** via **`isPrismaError`**; listens on **`PORT`** (default 3000).
+**Purpose:** Load env, create the app via **`createApp()`**, listen for HTTP.  
+**Contents:** `dotenv` path resolution for repo-root **`.env`**; comment to run **`prisma migrate deploy`** before relying on DB-backed routes; **`createApp()`** then **`listen`** on **`PORT`** (default 3000).
 
 ---
 
@@ -160,7 +192,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Backend — ideas HTTP handlers.  
 **Purpose:** Validate query params, call service, set status codes, format JSON for the client.  
-**Contents:** **`listIdeas`**: **`listIdeasQuerySchema.safeParse`**, **`400`** on invalid query; **`createNewIdea`**: **`ideaCreateBodySchema.safeParse`**, **`400`** on invalid body; **`toIdeaResponseBody`** + **`ideaResponseBodySchema.parse`**; **`200`** JSON array / **`201`** JSON object; **`req.authUser!.id`** (router uses **`requireAuth`**); **`next(error)`** on failure.
+**Contents:** **`listIdeas`**, **`createNewIdea`**, **`updateIdea`**, **`deleteIdea`**; param validation via **`ideaIdParamsSchema`**; body validation via **`ideaCreateBodySchema`** / **`ideaUpdateBodySchema`**; **`toIdeaResponseBody`** + **`ideaResponseBodySchema.parse`** for JSON bodies; statuses **`200`** (list / update), **`201`** (create), **`204`** (delete), **`404`** when id missing or not owned; **`req.authUser!.id`**; **`next(error)`** on failure.
 
 ---
 
@@ -168,7 +200,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Backend — ideas persistence.  
 **Purpose:** Prisma-only access for ideas.  
-**Contents:** **`findIdeasForUser`**: **`findMany`** by **`userId`** (Supabase id), **`sort`** → **`orderBy`**, optional **`q`** text filter; **`createIdeaForUser`**: **`create`** with scoped **`userId`** (errors propagate to the global handler / **`logDatabaseError`** when Prisma-related).
+**Contents:** **`findIdeasForUser`**: **`findMany`** by **`userId`**, **`sort`** → **`orderBy`**, optional **`q`**; **`createIdeaForUser`**: **`create`**; **`updateIdeaForUser`**: **`update`** by **`id`** + **`userId`** (optional **`isPublished`** in body when present), **`null`** on **`P2025`**; **`deleteIdeaForUser`**: **`deleteMany`** by **`id`** + **`userId`**, returns whether a row was removed; **`logDatabaseError`** on unexpected Prisma failures for update/delete.
 
 ---
 
@@ -176,7 +208,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Backend — ideas validation.  
 **Purpose:** Zod schemas aligned with Prisma **`Idea`**, Swift **`IdeaModel`**, and API wire JSON.  
-**Contents:** **`listIdeasQuerySchema`**; **`ideaCreateBodySchema`** / **`IdeaCreateBody`** (**`POST /ideas`**: required **`title`** / **`purpose`**, optional **`description`** / **`targetUser`** with defaults); **`ideaResponseBodySchema`** + **`IdeaResponseBody`** (outbound snake_case JSON aligned with Swift **`IdeaModel`**).
+**Contents:** **`listIdeasQuerySchema`**; **`ideaIdParamsSchema`**; **`ideaCreateBodySchema`** / **`IdeaCreateBody`**; **`ideaUpdateBodySchema`** / **`IdeaUpdateBody`** (**`PATCH /ideas/:id`**: required **`title`** / **`purpose`**, optional **`description`** / **`targetUser`** / **`isPublished`** — omit to leave unchanged); **`ideaResponseBodySchema`** + **`IdeaResponseBody`** (snake_case JSON aligned with Swift **`IdeaModel`**).
 
 ---
 
@@ -184,7 +216,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Backend — ideas domain orchestration.  
 **Purpose:** Business-facing entry for listing ideas (extend with cross-domain / external calls later).  
-**Contents:** **`toRepositoryListParams`** maps **`ListIdeasQuery`** → repository args; **`listIdeasForUser`** → **`idea.repository.findIdeasForUser`**; **`createIdeaForUser`** → **`idea.repository.createIdeaForUser`**.
+**Contents:** **`toRepositoryListParams`** maps **`ListIdeasQuery`** → repository args; **`listIdeasForUser`**, **`createIdeaForUser`**, **`updateIdeaForUser`**, **`deleteIdeaForUser`** → matching **`idea.repository`** methods.
 
 ---
 
@@ -192,7 +224,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Backend — ideas routes.  
 **Purpose:** Register ideas paths and apply auth to the whole router.  
-**Contents:** **`Router`** with **`requireAuth`** then **`GET /`** → **`listIdeas`**, **`POST /`** → **`createNewIdea`** (mounted at **`/ideas`** in **`index.ts`**).
+**Contents:** **`Router`** with **`requireAuth`** then **`GET /`** → **`listIdeas`**, **`POST /`** → **`createNewIdea`**, **`PATCH /:id`** and **`PUT /:id`** → **`updateIdea`**, **`DELETE /:id`** → **`deleteIdea`** (mounted at **`/ideas`** in **`index.ts`** → **`/ideas/{id}`** for by-id routes).
 
 ---
 
@@ -232,7 +264,15 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Node API package.  
 **Purpose:** Backend dependencies and scripts (`build`, `start`, Prisma).  
-**Contents:** Declares `express`, `@prisma/client`, `@supabase/supabase-js`, `dotenv`, `zod`, `prisma`, TypeScript; scripts run `prisma generate` + `tsc` and `node dist/index.js`.
+**Contents:** Declares `express`, `@prisma/client`, `@supabase/supabase-js`, `dotenv`, `zod`, `prisma`, TypeScript; scripts **`clean`** (remove **`dist/`**), **`build`** (`clean` + `prisma generate` + **`tsc -p tsconfig.json`**), **`start`** (`node dist/index.js`), Prisma **`db:migrate`** / **`db:push`**, **`token`** (prints Supabase JWT from repo **`.env`**).
+
+---
+
+### `backend/scripts/print-supabase-token.cjs`
+
+**Area:** Backend — local dev helper.  
+**Purpose:** Print a Supabase access token for Postman or **`curl`** without fragile one-line shell escaping.  
+**Contents:** Reads repo-root **`.env`** (**`SUPABASE_URL`**, **`SUPABASE_ANON_KEY`**, **`EMAIL`**, **`PASSWORD`**); **`@supabase/supabase-js`** **`signInWithPassword`**; writes JWT to stdout. Run: **`npm run token --prefix backend`**.
 
 ---
 
@@ -240,7 +280,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Workspace convenience.  
 **Purpose:** Shortcuts to backend scripts without **`cd backend`**.  
-**Contents:** **`npm run build`**, **`start`**, **`start:api`**, **`start:stack`** delegate to **`--prefix backend`** or run **`start-api-stack.sh`**.
+**Contents:** **`npm run build`**, **`start`**, **`start:api`**, **`start:stack`** delegate to **`--prefix backend`** or run **`start-api-stack.sh`**; **`token`** prints a Supabase JWT via **`backend`** **`token`** script.
 
 ---
 
@@ -296,7 +336,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Editor tooling.  
 **Purpose:** VS Code / Cursor TypeScript workspace settings.  
-**Contents:** Points **`typescript.tsdk`** at **`backend/node_modules/typescript`** so the IDE resolves types (e.g. Prisma) consistently with the backend.
+**Contents:** Points **`typescript.tsdk`** at **`backend/node_modules/typescript`** so the IDE resolves types (e.g. Prisma) consistently with the backend; **`files.exclude`** / **`search.exclude`** hide **`backend/dist`** so stale compiled JS does not clutter search or Problems.
 
 ---
 
@@ -311,8 +351,8 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 ### `backend/tsconfig.json`
 
 **Area:** TypeScript tooling.  
-**Purpose:** Compile **`backend/src`** → **`backend/dist`**.  
-**Contents:** `strict`, `rootDir`/`outDir`, CommonJS module settings.
+**Purpose:** Compile **`backend/src`** → **`backend/dist`** (used as **`tsc -p tsconfig.json`**).  
+**Contents:** `strict`, **`rootDir`** **`src`**, **`outDir`** **`dist`**, CommonJS module settings.
 
 ---
 

@@ -1,16 +1,20 @@
 {
   "info": {
     "name": "SOLO API",
-    "description": "Local API checks. Ideas routes require a Supabase access JWT: sign in with your app or Supabase Dashboard (Authentication) and paste the session access_token into the collection variable `accessToken`. Default `baseUrl` matches `PORT` in `.env` (API defaults to port 3000 if unset).",
+    "description": "Import this file in Postman: **Import** → **Upload Files** → choose `backend/postman/SOLO-auth.postman_collection.json`.\n\n**Setup:** Set collection variables **`baseUrl`** (e.g. `http://localhost:4000` — must include `http://` or `https://`) and **`accessToken`** (Supabase JWT: `Bearer` is added by each request). **`ideaId`** is filled when **Create idea** returns `201` (Tests tab), or paste a UUID from **List ideas**. If **Update** fails with “could not connect” / nothing in your API logs, check **`ideaId` is non-empty** in the resolved URL (Postman **Console**), and try **Update idea (PUT)** if a proxy blocks **PATCH**.\n\n**Ideas API:** `GET/POST /ideas`, `PATCH` or `PUT /ideas/:id`, `DELETE /ideas/:id` — all except health require auth.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:3000"
+      "value": "http://localhost:4000"
     },
     {
       "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "ideaId",
       "value": ""
     }
   ],
@@ -64,6 +68,22 @@
         },
         {
           "name": "Create idea (createNewIdea)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  if (data && data.id) {",
+                  "    pm.collectionVariables.set('ideaId', data.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -88,7 +108,80 @@
               "raw": "{\n  \"title\": \"My idea title\",\n  \"purpose\": \"Why this exists\",\n  \"description\": \"Optional details\",\n  \"targetUser\": \"Optional audience\"\n}"
             },
             "url": "{{baseUrl}}/ideas",
-            "description": "`title` and `purpose` are required. Omit `description` / `targetUser` or send empty strings if unused. Response is `201` with one idea object (snake_case keys)."
+            "description": "`title` and `purpose` are required. Omit `description` / `targetUser` or send empty strings if unused. Response is `201` with one idea object (snake_case keys). **Tests** script stores `id` in collection variable `ideaId` for Update/Delete."
+          }
+        },
+        {
+          "name": "Update idea (editIdea) PATCH",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated title\",\n  \"purpose\": \"Updated purpose\",\n  \"description\": \"Optional; omit keys you do not want to change\",\n  \"targetUser\": \"Optional\"\n}"
+            },
+            "url": "{{baseUrl}}/ideas/{{ideaId}}",
+            "description": "`title` and `purpose` are required. `description` and `targetUser` are optional — omit a key to leave that field unchanged. Set **`ideaId`** (or run **Create idea** first so the test script saves it). Response **`200`** with the idea; **`404`** if missing. If Postman shows a connection error, open **View → Show Postman Console** and confirm the URL is `…/ideas/<uuid>` (not `…/ideas/`)."
+          }
+        },
+        {
+          "name": "Update idea (editIdea) PUT",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated title\",\n  \"purpose\": \"Updated purpose\",\n  \"description\": \"Optional; omit keys you do not want to change\",\n  \"targetUser\": \"Optional\"\n}"
+            },
+            "url": "{{baseUrl}}/ideas/{{ideaId}}",
+            "description": "Same as **PATCH** — use this if **PATCH** is blocked by a proxy. Body and responses match **Update idea (editIdea) PATCH**."
+          }
+        },
+        {
+          "name": "Delete idea (deleteIdea)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/ideas/{{ideaId}}",
+            "description": "Set `ideaId` to a UUID from list/create. Response `204` on success; `404` if not found or not owned."
           }
         }
       ]

@@ -51,6 +51,29 @@ export const ideaCreateBodySchema = z.object({
 
 export type IdeaCreateBody = z.infer<typeof ideaCreateBodySchema>;
 
+// --- Path + body (PATCH update) --------------------------------------------
+
+export const ideaIdParamsSchema = z.object({
+  id: z.string().uuid(),
+});
+
+export type IdeaIdParams = z.infer<typeof ideaIdParamsSchema>;
+
+/**
+ * **`PATCH /ideas/:id`** JSON body — camelCase.
+ * **`title`** and **`purpose`** required; **`description`** and **`targetUser`** omitted means leave unchanged.
+ */
+export const ideaUpdateBodySchema = z.object({
+  title: z.string().min(1).max(10_000),
+  purpose: z.string().min(1).max(20_000),
+  description: z.string().max(100_000).optional(),
+  targetUser: z.string().max(2000).optional(),
+  /** Omitted: leave **`isPublished`** unchanged on the server. */
+  isPublished: z.boolean().optional(),
+});
+
+export type IdeaUpdateBody = z.infer<typeof ideaUpdateBodySchema>;
+
 // --- API wire format (Swift `IdeaModel` + snake_case JSON) ------------------
 
 /**

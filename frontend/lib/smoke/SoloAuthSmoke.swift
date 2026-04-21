@@ -1,4 +1,5 @@
 import Foundation
+import SoloLib
 
 /// CLI smoke test: calls `AuthController.signUp` (→ Supabase Auth).
 ///

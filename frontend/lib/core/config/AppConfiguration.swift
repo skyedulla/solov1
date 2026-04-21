@@ -2,8 +2,8 @@ import Foundation
 
 /// Central place for API and Supabase configuration. Mirrors `.env` via the Xcode scheme,
 /// xcconfig → Info.plist, or process environment — not hardcoded in source.
-enum AppConfiguration {
-    static var apiBaseURL: URL {
+public enum AppConfiguration {
+    public static var apiBaseURL: URL {
         let raw =
             ProcessInfo.processInfo.environment["API_BASE_URL"]
             ?? Bundle.main.object(forInfoDictionaryKey: "API_BASE_URL") as? String
@@ -17,7 +17,7 @@ enum AppConfiguration {
     }
 
     /// Supabase project URL (same as `SUPABASE_URL` in `.env`).
-    static var supabaseURL: URL {
+    public static var supabaseURL: URL {
         let raw =
             ProcessInfo.processInfo.environment["SUPABASE_URL"]
             ?? Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String
@@ -30,7 +30,7 @@ enum AppConfiguration {
     }
 
     /// Supabase anonymous key (same as `SUPABASE_ANON_KEY` in `.env`).
-    static var supabaseAnonKey: String {
+    public static var supabaseAnonKey: String {
         let raw =
             ProcessInfo.processInfo.environment["SUPABASE_ANON_KEY"]
             ?? Bundle.main.object(forInfoDictionaryKey: "SUPABASE_ANON_KEY") as? String
