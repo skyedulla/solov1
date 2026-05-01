@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "SOLO API",
-    "description": "Import this file in Postman: **Import** → **Upload Files** → choose `backend/postman/SOLO-auth.postman_collection.json`.\n\n**Setup:** Set collection variables **`baseUrl`** (e.g. `http://localhost:4000` — must include `http://` or `https://`) and **`accessToken`** (Supabase JWT: `Bearer` is added by each request). **`ideaId`** is filled when **Create idea** returns `201` (Tests tab), or paste a UUID from **List ideas**. If **Update** fails with “could not connect” / nothing in your API logs, check **`ideaId` is non-empty** in the resolved URL (Postman **Console**), and try **Update idea (PUT)** if a proxy blocks **PATCH**.\n\n**Ideas API:** `GET/POST /ideas`, `PATCH` or `PUT /ideas/:id`, `DELETE /ideas/:id` — all except health require auth.",
+    "description": "Import this file in Postman: **Import** → **Upload Files** → choose `backend/postman/SOLO-auth.postman_collection.json`.\n\n**Setup:** Set collection variables **`baseUrl`** (e.g. `http://localhost:4000` — include `http://` or `https://`) and **`accessToken`** (Supabase JWT; `Bearer` is added per request). **`ideaId`** / **`objectiveId`** are set when **Create** requests return **`201`** (Tests tab), or paste UUIDs from list/create flows.\n\n**Swift controllers vs this collection**\n- **`IdeaController`** / **`IdeasRemoteDataSource`** → **Ideas** folder (**`GET/POST /ideas`**, **`PATCH`** / **`PUT /ideas/:id`**, **`DELETE /ideas/:id`**).\n- **`ObjectiveController`** / **`ObjectivesRemoteDataSource`** → **Objectives** folder (**`POST/PATCH/DELETE /objectives…`**, **`POST …/complete`**).\n- **`AuthController`** uses **Supabase Auth only** (no calls to **`{{baseUrl}}`**). Test **`login`**, **`signUp`**, **`googleSignIn`**, **`resetPassword`**, **`logout`** against your **`SUPABASE_URL`** GoTrue API or Supabase dashboard — not this collection unless you add those requests yourself.\n- **`IdeaSearchController`** is an empty coordinator (no HTTP yet).\n\nIf **Update idea** fails with connection errors, check **`ideaId`** in the resolved URL (**Postman Console**) or try **PUT** instead of **PATCH**.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -15,6 +15,10 @@
     },
     {
       "key": "ideaId",
+      "value": ""
+    },
+    {
+      "key": "objectiveId",
       "value": ""
     }
   ],
@@ -63,7 +67,7 @@
                 }
               ]
             },
-            "description": "Lists all ideas for the authenticated user. Empty DB returns `[]`."
+            "description": "Maps to **`IdeaController.fetchIdeas`** — lists ideas for the authenticated user (`[]` if empty)."
           }
         },
         {
@@ -108,7 +112,7 @@
               "raw": "{\n  \"title\": \"My idea title\",\n  \"purpose\": \"Why this exists\",\n  \"description\": \"Optional details\",\n  \"targetUser\": \"Optional audience\"\n}"
             },
             "url": "{{baseUrl}}/ideas",
-            "description": "`title` and `purpose` are required. Omit `description` / `targetUser` or send empty strings if unused. Response is `201` with one idea object (snake_case keys). **Tests** script stores `id` in collection variable `ideaId` for Update/Delete."
+            "description": "Maps to **`IdeaController.createNewIdea`**. **`title`** and **`purpose`** required. Response **`201`** — Tests script stores **`id`** in **`ideaId`**."
           }
         },
         {
@@ -137,7 +141,7 @@
               "raw": "{\n  \"title\": \"Updated title\",\n  \"purpose\": \"Updated purpose\",\n  \"description\": \"Optional; omit keys you do not want to change\",\n  \"targetUser\": \"Optional\"\n}"
             },
             "url": "{{baseUrl}}/ideas/{{ideaId}}",
-            "description": "`title` and `purpose` are required. `description` and `targetUser` are optional — omit a key to leave that field unchanged. Set **`ideaId`** (or run **Create idea** first so the test script saves it). Response **`200`** with the idea; **`404`** if missing. If Postman shows a connection error, open **View → Show Postman Console** and confirm the URL is `…/ideas/<uuid>` (not `…/ideas/`)."
+            "description": "Maps to **`IdeaController.editIdea`** — same **`PATCH`** as **`IdeasRemoteDataSource.updateIdea`**."
           }
         },
         {
@@ -166,7 +170,36 @@
               "raw": "{\n  \"title\": \"Updated title\",\n  \"purpose\": \"Updated purpose\",\n  \"description\": \"Optional; omit keys you do not want to change\",\n  \"targetUser\": \"Optional\"\n}"
             },
             "url": "{{baseUrl}}/ideas/{{ideaId}}",
-            "description": "Same as **PATCH** — use this if **PATCH** is blocked by a proxy. Body and responses match **Update idea (editIdea) PATCH**."
+            "description": "Same body/responses as **PATCH** if your proxy blocks **`PATCH`**."
+          }
+        },
+        {
+          "name": "Toggle published (togglePublished) PATCH",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Same as stored title\",\n  \"purpose\": \"Same as stored purpose\",\n  \"description\": \"Optional\",\n  \"targetUser\": \"Optional\",\n  \"isPublished\": true\n}"
+            },
+            "url": "{{baseUrl}}/ideas/{{ideaId}}",
+            "description": "Maps to **`IdeaController.togglePublished`** — calls **`editIdea`** with **`isPublished`** flipped. **`isPublished`** is camelCase (matches Swift **`EditIdeaRequestBody`**). Adjust **`title`/`purpose`** to match the idea or fetch first via **List ideas**."
           }
         },
         {
@@ -181,7 +214,121 @@
               }
             ],
             "url": "{{baseUrl}}/ideas/{{ideaId}}",
-            "description": "Set `ideaId` to a UUID from list/create. Response `204` on success; `404` if not found or not owned."
+            "description": "Maps to **`IdeaController.deleteIdea`** — **`204`** success."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Objectives",
+      "item": [
+        {
+          "name": "Add objective (addObjective)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  if (data && data.id) {",
+                  "    pm.collectionVariables.set('objectiveId', data.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Ship MVP\"\n}"
+            },
+            "url": "{{baseUrl}}/objectives",
+            "description": "Maps to **`ObjectiveController.addObjective`** / **`POST /objectives`**. Response **`201`** with **`id`**, **`text`**, **`is_completed`** — Tests script saves **`objectiveId`**."
+          }
+        },
+        {
+          "name": "Modify objective (modifyObjective)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Updated objective text\"\n}"
+            },
+            "url": "{{baseUrl}}/objectives/{{objectiveId}}",
+            "description": "Maps to **`ObjectiveController.modifyObjective`** — **`PATCH /objectives/:id`**, **`200`**."
+          }
+        },
+        {
+          "name": "Complete objective (completeObjective)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/objectives/{{objectiveId}}/complete",
+            "description": "Maps to **`ObjectiveController.completeObjective`** — **`POST /objectives/:id/complete`** (no body); toggles **`is_completed`**, **`200`**."
+          }
+        },
+        {
+          "name": "Delete objective (deleteObjective)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/objectives/{{objectiveId}}",
+            "description": "Maps to **`ObjectiveController.deleteObjective`** — **`204`**."
           }
         }
       ]

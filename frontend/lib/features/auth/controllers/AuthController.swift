@@ -15,7 +15,7 @@ enum AuthValidationError: Error, LocalizedError {
     }
 }
 
-/// Coordinates auth flows using Supabase Auth (`signIn`, `signUp`, `resetPassword`, `logout`).
+/// Coordinates auth flows using Supabase Auth (`signIn`, `signUp`, `resetPassword`, `logout`, OAuth).
 public final class AuthController: Sendable {
     private let supabase: SupabaseClient
 
@@ -27,6 +27,17 @@ public final class AuthController: Sendable {
         try await supabase.auth.signIn(
             email: model.email,
             password: model.password
+        )
+    }
+
+    /// Signs in with Google via Supabase OAuth (``ASWebAuthenticationSession`` under the hood).
+    /// When **`redirectTo`** is `nil`, uses **`SupabaseClientOptions.AuthOptions.redirectToURL`**
+    /// (**`AppConfiguration.googleWebOAuthRedirectURL`** on the shared client).
+    @discardableResult
+    public func googleSignIn(redirectTo: URL? = nil) async throws -> Session {
+        try await supabase.auth.signInWithOAuth(
+            provider: .google,
+            redirectTo: redirectTo
         )
     }
 

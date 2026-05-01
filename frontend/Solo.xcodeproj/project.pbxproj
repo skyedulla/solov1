@@ -1,0 +1,891 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		010391251ACFA6AE7D261995 /* background_design_constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0994348CE94E9933FD6EA70 /* background_design_constants.swift */; };
+		03ACD06FF42EF7D8CC4A5E03 /* IdeaFilterModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB62665DBE6FA0F32786E41 /* IdeaFilterModel.swift */; };
+		10CCD11F0440E3960F505E1A /* IdeaModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0493D430FD371458A687D10 /* IdeaModel.swift */; };
+		12836DE7FE5D050D74619A48 /* AuthRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73776EA9912809367381ECB3 /* AuthRootView.swift */; };
+		18A940E7CC1E66D34BC2E9F5 /* AuthModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10CFD5B68FADD3FF11D2500 /* AuthModel.swift */; };
+		296145E65E3E38F638876E14 /* AuthLabeledTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922EE1CA0E9EE28C769C5A83 /* AuthLabeledTextField.swift */; };
+		2FBE7E5380701FA6CBF98A34 /* sort_by_constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88118C2F528F0435F68846AE /* sort_by_constants.swift */; };
+		31B06C99229CACE3823BE1DC /* ObjectiveModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B067CDCD5555C3192295A19A /* ObjectiveModel.swift */; };
+		33F42BC12978DD47068FF024 /* MapModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40C511A19029C22B985BC6CA /* MapModel.swift */; };
+		350A05955F034825556131AA /* MockURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD541BF99B01E8D6520F96B3 /* MockURLProtocol.swift */; };
+		35E1F9E4A329F0EAD30EF0DD /* AuthFlowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC158C35D3542F5B8FE8C5B6 /* AuthFlowViewModel.swift */; };
+		375733CFA260DAF1C97AED10 /* libSoloLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C5AB64D0E3D59B10039FB0C4 /* libSoloLib.a */; };
+		3DE8DD7AE1A582007C4FE241 /* AuthModeSwitchRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D8A190C238B3EF4E9EE963 /* AuthModeSwitchRow.swift */; };
+		447423B60D9E6AA63E0A76EF /* AuthControllerFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5DA32090895F0D561579F16 /* AuthControllerFlowTests.swift */; };
+		461348277E46B9608D864093 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F8433D4ADD65E76D3A34EDA /* AppConfiguration.swift */; };
+		4CD4E0BA9833195437555BF9 /* ObjectivesRemoteDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804D648738E55682EBFCC171 /* ObjectivesRemoteDataSource.swift */; };
+		520DFE6119EEF54118891ED0 /* IdeasRemoteDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99634E87102D20BF8F47BC4E /* IdeasRemoteDataSource.swift */; };
+		55206925033504D6AF741B55 /* AuthFormContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42FF1CB07D8B2EB8763B6D5F /* AuthFormContainer.swift */; };
+		5A6050F912076D08D0124BF2 /* ObjectiveControllerFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF7B2A9526AC9EC98D3B7E5 /* ObjectiveControllerFlowTests.swift */; };
+		625C41C8DC0F80626789C6FA /* LoginScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D751B158073C1362A8FB837 /* LoginScreen.swift */; };
+		67937392279EC38D40986944 /* Solo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1187CC598E678F8CA04E56 /* Solo.swift */; };
+		6B85CFBF28F1589D75467438 /* SignUpScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B3469CA18046191BC7171D /* SignUpScreen.swift */; };
+		6FE3B99E5B3BF6DFD81B98B0 /* SupabaseClientProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A9CB7DF5FE954F7DAD653F /* SupabaseClientProvider.swift */; };
+		71854DFD700E75E03DB98ED1 /* ConnectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AB6B8C62DC524A9D168A95F /* ConnectionModel.swift */; };
+		73D5A2616B35EF37E2609C64 /* CanvasModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71EEBCE63B13B27B4364EA2C /* CanvasModel.swift */; };
+		79DD4B8432773A8165413DA7 /* IdeaControllerFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ED9866A4106AE1772DF8760 /* IdeaControllerFlowTests.swift */; };
+		7C0FA07E278F923319F65AF5 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 19A913F36046C87AFC4F1B19 /* Supabase */; };
+		8C2873BD16ED4875F394E5FD /* AuthGoogleMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266950ABDB4D6024F682ACE1 /* AuthGoogleMark.swift */; };
+		93DB9B6AC1D06BDEAB4F5EF5 /* libSoloLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C5AB64D0E3D59B10039FB0C4 /* libSoloLib.a */; };
+		9BDA9C999A4F00E1376BBA3B /* AuthPrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589A4DA2B997E3AD0E310513 /* AuthPrimaryButton.swift */; };
+		9C13E25F549F8020C57249E3 /* IdeaController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FB95740BB86679689903A1 /* IdeaController.swift */; };
+		AD96BB8186020FC215ACAA9E /* IdeaSearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDED07D8F129B4E0F819B4F0 /* IdeaSearchController.swift */; };
+		B122455FD271B98E4BC156BD /* ObjectiveController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4CDCD90422B360094ED7CC1 /* ObjectiveController.swift */; };
+		B76E69E88F0A59AE82CB6871 /* NodeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A36EE19F3218361BF7A663 /* NodeModel.swift */; };
+		B7F0CE410B0FFED739CCDC5A /* AuthController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5E008BA48D746EA63DBC83 /* AuthController.swift */; };
+		C7AE76713153D3EF916ACB89 /* AuthTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33DCE5141B3E1B4B8BF03B9A /* AuthTheme.swift */; };
+		D744743A5C4805B46B6188E7 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 257CF2BB763C0A1D893EDD66 /* Supabase */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6877BCE3A84ECF3E0B1E9019 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 15DF6F5EA7AF9F5809966D6C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1A16C18E354BA7F6BD2B82C9;
+			remoteInfo = SoloLib;
+		};
+		A8CC8448CC83923695A23646 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 15DF6F5EA7AF9F5809966D6C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1A16C18E354BA7F6BD2B82C9;
+			remoteInfo = SoloLib;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		16D8A190C238B3EF4E9EE963 /* AuthModeSwitchRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthModeSwitchRow.swift; sourceTree = "<group>"; };
+		24B3469CA18046191BC7171D /* SignUpScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpScreen.swift; sourceTree = "<group>"; };
+		266950ABDB4D6024F682ACE1 /* AuthGoogleMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthGoogleMark.swift; sourceTree = "<group>"; };
+		311109FA1388BCCF8A8E9659 /* SoloLibTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SoloLibTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		33DCE5141B3E1B4B8BF03B9A /* AuthTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTheme.swift; sourceTree = "<group>"; };
+		40C511A19029C22B985BC6CA /* MapModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapModel.swift; sourceTree = "<group>"; };
+		42FF1CB07D8B2EB8763B6D5F /* AuthFormContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFormContainer.swift; sourceTree = "<group>"; };
+		589A4DA2B997E3AD0E310513 /* AuthPrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthPrimaryButton.swift; sourceTree = "<group>"; };
+		5D751B158073C1362A8FB837 /* LoginScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginScreen.swift; sourceTree = "<group>"; };
+		64FB95740BB86679689903A1 /* IdeaController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdeaController.swift; sourceTree = "<group>"; };
+		6AB6B8C62DC524A9D168A95F /* ConnectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionModel.swift; sourceTree = "<group>"; };
+		71EEBCE63B13B27B4364EA2C /* CanvasModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasModel.swift; sourceTree = "<group>"; };
+		721D8679D3C189090EBA039A /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		73776EA9912809367381ECB3 /* AuthRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthRootView.swift; sourceTree = "<group>"; };
+		7B1187CC598E678F8CA04E56 /* Solo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Solo.swift; sourceTree = "<group>"; };
+		7C5E008BA48D746EA63DBC83 /* AuthController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthController.swift; sourceTree = "<group>"; };
+		7ED9866A4106AE1772DF8760 /* IdeaControllerFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdeaControllerFlowTests.swift; sourceTree = "<group>"; };
+		7F8433D4ADD65E76D3A34EDA /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
+		804D648738E55682EBFCC171 /* ObjectivesRemoteDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectivesRemoteDataSource.swift; sourceTree = "<group>"; };
+		88118C2F528F0435F68846AE /* sort_by_constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sort_by_constants.swift; sourceTree = "<group>"; };
+		8E6D075C8E7E0CD017C49DC8 /* Solo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Solo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		922EE1CA0E9EE28C769C5A83 /* AuthLabeledTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthLabeledTextField.swift; sourceTree = "<group>"; };
+		99634E87102D20BF8F47BC4E /* IdeasRemoteDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdeasRemoteDataSource.swift; sourceTree = "<group>"; };
+		A5A36EE19F3218361BF7A663 /* NodeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeModel.swift; sourceTree = "<group>"; };
+		AAF7B2A9526AC9EC98D3B7E5 /* ObjectiveControllerFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectiveControllerFlowTests.swift; sourceTree = "<group>"; };
+		B067CDCD5555C3192295A19A /* ObjectiveModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectiveModel.swift; sourceTree = "<group>"; };
+		B0994348CE94E9933FD6EA70 /* background_design_constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = background_design_constants.swift; sourceTree = "<group>"; };
+		B10CFD5B68FADD3FF11D2500 /* AuthModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthModel.swift; sourceTree = "<group>"; };
+		BC158C35D3542F5B8FE8C5B6 /* AuthFlowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFlowViewModel.swift; sourceTree = "<group>"; };
+		C4CDCD90422B360094ED7CC1 /* ObjectiveController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectiveController.swift; sourceTree = "<group>"; };
+		C5AB64D0E3D59B10039FB0C4 /* libSoloLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSoloLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		D5DA32090895F0D561579F16 /* AuthControllerFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthControllerFlowTests.swift; sourceTree = "<group>"; };
+		DCB62665DBE6FA0F32786E41 /* IdeaFilterModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdeaFilterModel.swift; sourceTree = "<group>"; };
+		DDED07D8F129B4E0F819B4F0 /* IdeaSearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdeaSearchController.swift; sourceTree = "<group>"; };
+		E0493D430FD371458A687D10 /* IdeaModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdeaModel.swift; sourceTree = "<group>"; };
+		E6A9CB7DF5FE954F7DAD653F /* SupabaseClientProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseClientProvider.swift; sourceTree = "<group>"; };
+		FD541BF99B01E8D6520F96B3 /* MockURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockURLProtocol.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		36DBE0EFAA8D0EFBF55E4DDF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				93DB9B6AC1D06BDEAB4F5EF5 /* libSoloLib.a in Frameworks */,
+				D744743A5C4805B46B6188E7 /* Supabase in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		83DF7E9E7699442DEB054B99 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				375733CFA260DAF1C97AED10 /* libSoloLib.a in Frameworks */,
+				7C0FA07E278F923319F65AF5 /* Supabase in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		04BCCC94B7B29753445ADCF2 /* nodes */ = {
+			isa = PBXGroup;
+			children = (
+				277BD2C016299D9718C2CB80 /* models */,
+			);
+			path = nodes;
+			sourceTree = "<group>";
+		};
+		153091E940A5A2537FDF76F8 /* data_source */ = {
+			isa = PBXGroup;
+			children = (
+				804D648738E55682EBFCC171 /* ObjectivesRemoteDataSource.swift */,
+			);
+			path = data_source;
+			sourceTree = "<group>";
+		};
+		1B1C4B7D57A630538B0A37A5 = {
+			isa = PBXGroup;
+			children = (
+				5AD08305C620E5EBDBD6E584 /* lib */,
+				ABF340F0B8A9927271FAF52B /* macOS */,
+				E6BF0E30ECA5C547F3E6AE7A /* Tests */,
+				94B3974AE7D4D6E320E236F4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		259CA19493BDC8C670DE8755 /* models */ = {
+			isa = PBXGroup;
+			children = (
+				B10CFD5B68FADD3FF11D2500 /* AuthModel.swift */,
+			);
+			path = models;
+			sourceTree = "<group>";
+		};
+		277BD2C016299D9718C2CB80 /* models */ = {
+			isa = PBXGroup;
+			children = (
+				A5A36EE19F3218361BF7A663 /* NodeModel.swift */,
+			);
+			path = models;
+			sourceTree = "<group>";
+		};
+		3A2498E7B065DA9229D87D7A /* screens */ = {
+			isa = PBXGroup;
+			children = (
+				73776EA9912809367381ECB3 /* AuthRootView.swift */,
+				5D751B158073C1362A8FB837 /* LoginScreen.swift */,
+				24B3469CA18046191BC7171D /* SignUpScreen.swift */,
+			);
+			path = screens;
+			sourceTree = "<group>";
+		};
+		42D0106A42C08F367C496B68 /* config */ = {
+			isa = PBXGroup;
+			children = (
+				7F8433D4ADD65E76D3A34EDA /* AppConfiguration.swift */,
+			);
+			path = config;
+			sourceTree = "<group>";
+		};
+		4669E330868362F054301CAE /* ideas */ = {
+			isa = PBXGroup;
+			children = (
+				C27C493FAA84547B3CB584CF /* controllers */,
+				A12B24295CEBFE875BC5EBBE /* data_source */,
+				9F6859AF4AA38C839C8D96B2 /* models */,
+				6D673B4412DAED904B14E82B /* screens */,
+			);
+			path = ideas;
+			sourceTree = "<group>";
+		};
+		5AD08305C620E5EBDBD6E584 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				800D465F67B34E094E0A6B8B /* core */,
+				66392A5A817BB54DFB09E712 /* features */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		6060903120E0C2AF549DE408 /* components */ = {
+			isa = PBXGroup;
+			children = (
+				42FF1CB07D8B2EB8763B6D5F /* AuthFormContainer.swift */,
+				266950ABDB4D6024F682ACE1 /* AuthGoogleMark.swift */,
+				922EE1CA0E9EE28C769C5A83 /* AuthLabeledTextField.swift */,
+				16D8A190C238B3EF4E9EE963 /* AuthModeSwitchRow.swift */,
+				589A4DA2B997E3AD0E310513 /* AuthPrimaryButton.swift */,
+				33DCE5141B3E1B4B8BF03B9A /* AuthTheme.swift */,
+			);
+			path = components;
+			sourceTree = "<group>";
+		};
+		6143FFB6B32E9F0B05E1512F /* state */ = {
+			isa = PBXGroup;
+			children = (
+				BC158C35D3542F5B8FE8C5B6 /* AuthFlowViewModel.swift */,
+			);
+			path = state;
+			sourceTree = "<group>";
+		};
+		66392A5A817BB54DFB09E712 /* features */ = {
+			isa = PBXGroup;
+			children = (
+				D38DC22C317673182E77F44A /* auth */,
+				4669E330868362F054301CAE /* ideas */,
+				9B3A5545902108858ADEE1F1 /* mindmap */,
+				04BCCC94B7B29753445ADCF2 /* nodes */,
+				CC4EEE9D77DF975AD7FE2B1C /* workshop */,
+			);
+			path = features;
+			sourceTree = "<group>";
+		};
+		6D673B4412DAED904B14E82B /* screens */ = {
+			isa = PBXGroup;
+			children = (
+				721D8679D3C189090EBA039A /* .gitkeep */,
+			);
+			path = screens;
+			sourceTree = "<group>";
+		};
+		800D465F67B34E094E0A6B8B /* core */ = {
+			isa = PBXGroup;
+			children = (
+				42D0106A42C08F367C496B68 /* config */,
+				DAF913836E94103BCF7E0EFC /* constants */,
+			);
+			path = core;
+			sourceTree = "<group>";
+		};
+		8E64ECEA7DE3BD098C620366 /* controllers */ = {
+			isa = PBXGroup;
+			children = (
+				7C5E008BA48D746EA63DBC83 /* AuthController.swift */,
+			);
+			path = controllers;
+			sourceTree = "<group>";
+		};
+		94B3974AE7D4D6E320E236F4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C5AB64D0E3D59B10039FB0C4 /* libSoloLib.a */,
+				8E6D075C8E7E0CD017C49DC8 /* Solo.app */,
+				311109FA1388BCCF8A8E9659 /* SoloLibTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9B3A5545902108858ADEE1F1 /* mindmap */ = {
+			isa = PBXGroup;
+			children = (
+				D131780C0AD09A7441690947 /* models */,
+			);
+			path = mindmap;
+			sourceTree = "<group>";
+		};
+		9F6859AF4AA38C839C8D96B2 /* models */ = {
+			isa = PBXGroup;
+			children = (
+				DCB62665DBE6FA0F32786E41 /* IdeaFilterModel.swift */,
+				E0493D430FD371458A687D10 /* IdeaModel.swift */,
+			);
+			path = models;
+			sourceTree = "<group>";
+		};
+		A12B24295CEBFE875BC5EBBE /* data_source */ = {
+			isa = PBXGroup;
+			children = (
+				99634E87102D20BF8F47BC4E /* IdeasRemoteDataSource.swift */,
+			);
+			path = data_source;
+			sourceTree = "<group>";
+		};
+		ABF340F0B8A9927271FAF52B /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+				7B1187CC598E678F8CA04E56 /* Solo.swift */,
+			);
+			path = macOS;
+			sourceTree = "<group>";
+		};
+		C27C493FAA84547B3CB584CF /* controllers */ = {
+			isa = PBXGroup;
+			children = (
+				64FB95740BB86679689903A1 /* IdeaController.swift */,
+				DDED07D8F129B4E0F819B4F0 /* IdeaSearchController.swift */,
+			);
+			path = controllers;
+			sourceTree = "<group>";
+		};
+		CAAB5E0F02AF1E864C093D92 /* supabase */ = {
+			isa = PBXGroup;
+			children = (
+				E6A9CB7DF5FE954F7DAD653F /* SupabaseClientProvider.swift */,
+			);
+			path = supabase;
+			sourceTree = "<group>";
+		};
+		CC4EEE9D77DF975AD7FE2B1C /* workshop */ = {
+			isa = PBXGroup;
+			children = (
+				D437F97E0D3EB3137968FBEF /* controllers */,
+				153091E940A5A2537FDF76F8 /* data_source */,
+				D5D729FBF1ACC879D10DE7B3 /* models */,
+			);
+			path = workshop;
+			sourceTree = "<group>";
+		};
+		D131780C0AD09A7441690947 /* models */ = {
+			isa = PBXGroup;
+			children = (
+				71EEBCE63B13B27B4364EA2C /* CanvasModel.swift */,
+				6AB6B8C62DC524A9D168A95F /* ConnectionModel.swift */,
+				40C511A19029C22B985BC6CA /* MapModel.swift */,
+			);
+			path = models;
+			sourceTree = "<group>";
+		};
+		D38DC22C317673182E77F44A /* auth */ = {
+			isa = PBXGroup;
+			children = (
+				6060903120E0C2AF549DE408 /* components */,
+				8E64ECEA7DE3BD098C620366 /* controllers */,
+				259CA19493BDC8C670DE8755 /* models */,
+				3A2498E7B065DA9229D87D7A /* screens */,
+				6143FFB6B32E9F0B05E1512F /* state */,
+				CAAB5E0F02AF1E864C093D92 /* supabase */,
+			);
+			path = auth;
+			sourceTree = "<group>";
+		};
+		D437F97E0D3EB3137968FBEF /* controllers */ = {
+			isa = PBXGroup;
+			children = (
+				C4CDCD90422B360094ED7CC1 /* ObjectiveController.swift */,
+			);
+			path = controllers;
+			sourceTree = "<group>";
+		};
+		D5D729FBF1ACC879D10DE7B3 /* models */ = {
+			isa = PBXGroup;
+			children = (
+				B067CDCD5555C3192295A19A /* ObjectiveModel.swift */,
+			);
+			path = models;
+			sourceTree = "<group>";
+		};
+		DAF913836E94103BCF7E0EFC /* constants */ = {
+			isa = PBXGroup;
+			children = (
+				B0994348CE94E9933FD6EA70 /* background_design_constants.swift */,
+				88118C2F528F0435F68846AE /* sort_by_constants.swift */,
+			);
+			path = constants;
+			sourceTree = "<group>";
+		};
+		E6BF0E30ECA5C547F3E6AE7A /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				E794EEB1A7E1548095A3CB3C /* SoloLibTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		E794EEB1A7E1548095A3CB3C /* SoloLibTests */ = {
+			isa = PBXGroup;
+			children = (
+				D5DA32090895F0D561579F16 /* AuthControllerFlowTests.swift */,
+				7ED9866A4106AE1772DF8760 /* IdeaControllerFlowTests.swift */,
+				FD541BF99B01E8D6520F96B3 /* MockURLProtocol.swift */,
+				AAF7B2A9526AC9EC98D3B7E5 /* ObjectiveControllerFlowTests.swift */,
+			);
+			path = SoloLibTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0032768903D841281187EB88 /* Solo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5F1A369427AF6BECCD366CB4 /* Build configuration list for PBXNativeTarget "Solo" */;
+			buildPhases = (
+				EA122570D608823B9D621BAD /* Sources */,
+				83DF7E9E7699442DEB054B99 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				ED395FFC63F412B2D1793C4D /* PBXTargetDependency */,
+			);
+			name = Solo;
+			packageProductDependencies = (
+				19A913F36046C87AFC4F1B19 /* Supabase */,
+			);
+			productName = Solo;
+			productReference = 8E6D075C8E7E0CD017C49DC8 /* Solo.app */;
+			productType = "com.apple.product-type.application";
+		};
+		1A16C18E354BA7F6BD2B82C9 /* SoloLib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7E5A43C40C8C335D0FA9937C /* Build configuration list for PBXNativeTarget "SoloLib" */;
+			buildPhases = (
+				30A8F3AEE1C5CC0A39E82275 /* Sources */,
+				D6C889C0FCE601B96C8CBF9A /* Copy Swift Objective-C Interface Header */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				27520DC9753AFD4CF0933BBF /* PBXTargetDependency */,
+			);
+			name = SoloLib;
+			packageProductDependencies = (
+				25B08C7E7FA960E82B731EC8 /* Supabase */,
+			);
+			productName = SoloLib;
+			productReference = C5AB64D0E3D59B10039FB0C4 /* libSoloLib.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		38046ED959787A92FBDD4E9C /* SoloLibTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C47FCAA47B994C7B09A96E8B /* Build configuration list for PBXNativeTarget "SoloLibTests" */;
+			buildPhases = (
+				BFA34A270E43A673EDFA7C0E /* Sources */,
+				36DBE0EFAA8D0EFBF55E4DDF /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FAECF165B1FEB46A4404314B /* PBXTargetDependency */,
+			);
+			name = SoloLibTests;
+			packageProductDependencies = (
+				257CF2BB763C0A1D893EDD66 /* Supabase */,
+			);
+			productName = SoloLibTests;
+			productReference = 311109FA1388BCCF8A8E9659 /* SoloLibTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		15DF6F5EA7AF9F5809966D6C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 50591B2C826CF743701E7E4B /* Build configuration list for PBXProject "Solo" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 1B1C4B7D57A630538B0A37A5;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				4C2AC19000EEC14FF73BD7D6 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 94B3974AE7D4D6E320E236F4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0032768903D841281187EB88 /* Solo */,
+				1A16C18E354BA7F6BD2B82C9 /* SoloLib */,
+				38046ED959787A92FBDD4E9C /* SoloLibTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		D6C889C0FCE601B96C8CBF9A /* Copy Swift Objective-C Interface Header */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(DERIVED_SOURCES_DIR)/$(SWIFT_OBJC_INTERFACE_HEADER_NAME)",
+			);
+			name = "Copy Swift Objective-C Interface Header";
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/include/$(PRODUCT_MODULE_NAME)/$(SWIFT_OBJC_INTERFACE_HEADER_NAME)",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "ditto \"${SCRIPT_INPUT_FILE_0}\" \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		30A8F3AEE1C5CC0A39E82275 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				461348277E46B9608D864093 /* AppConfiguration.swift in Sources */,
+				B7F0CE410B0FFED739CCDC5A /* AuthController.swift in Sources */,
+				35E1F9E4A329F0EAD30EF0DD /* AuthFlowViewModel.swift in Sources */,
+				55206925033504D6AF741B55 /* AuthFormContainer.swift in Sources */,
+				8C2873BD16ED4875F394E5FD /* AuthGoogleMark.swift in Sources */,
+				296145E65E3E38F638876E14 /* AuthLabeledTextField.swift in Sources */,
+				3DE8DD7AE1A582007C4FE241 /* AuthModeSwitchRow.swift in Sources */,
+				18A940E7CC1E66D34BC2E9F5 /* AuthModel.swift in Sources */,
+				9BDA9C999A4F00E1376BBA3B /* AuthPrimaryButton.swift in Sources */,
+				12836DE7FE5D050D74619A48 /* AuthRootView.swift in Sources */,
+				C7AE76713153D3EF916ACB89 /* AuthTheme.swift in Sources */,
+				73D5A2616B35EF37E2609C64 /* CanvasModel.swift in Sources */,
+				71854DFD700E75E03DB98ED1 /* ConnectionModel.swift in Sources */,
+				9C13E25F549F8020C57249E3 /* IdeaController.swift in Sources */,
+				03ACD06FF42EF7D8CC4A5E03 /* IdeaFilterModel.swift in Sources */,
+				10CCD11F0440E3960F505E1A /* IdeaModel.swift in Sources */,
+				AD96BB8186020FC215ACAA9E /* IdeaSearchController.swift in Sources */,
+				520DFE6119EEF54118891ED0 /* IdeasRemoteDataSource.swift in Sources */,
+				625C41C8DC0F80626789C6FA /* LoginScreen.swift in Sources */,
+				33F42BC12978DD47068FF024 /* MapModel.swift in Sources */,
+				B76E69E88F0A59AE82CB6871 /* NodeModel.swift in Sources */,
+				B122455FD271B98E4BC156BD /* ObjectiveController.swift in Sources */,
+				31B06C99229CACE3823BE1DC /* ObjectiveModel.swift in Sources */,
+				4CD4E0BA9833195437555BF9 /* ObjectivesRemoteDataSource.swift in Sources */,
+				6B85CFBF28F1589D75467438 /* SignUpScreen.swift in Sources */,
+				6FE3B99E5B3BF6DFD81B98B0 /* SupabaseClientProvider.swift in Sources */,
+				010391251ACFA6AE7D261995 /* background_design_constants.swift in Sources */,
+				2FBE7E5380701FA6CBF98A34 /* sort_by_constants.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BFA34A270E43A673EDFA7C0E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				447423B60D9E6AA63E0A76EF /* AuthControllerFlowTests.swift in Sources */,
+				79DD4B8432773A8165413DA7 /* IdeaControllerFlowTests.swift in Sources */,
+				350A05955F034825556131AA /* MockURLProtocol.swift in Sources */,
+				5A6050F912076D08D0124BF2 /* ObjectiveControllerFlowTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA122570D608823B9D621BAD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				67937392279EC38D40986944 /* Solo.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		27520DC9753AFD4CF0933BBF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 25B08C7E7FA960E82B731EC8 /* Supabase */;
+		};
+		ED395FFC63F412B2D1793C4D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1A16C18E354BA7F6BD2B82C9 /* SoloLib */;
+			targetProxy = A8CC8448CC83923695A23646 /* PBXContainerItemProxy */;
+		};
+		FAECF165B1FEB46A4404314B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1A16C18E354BA7F6BD2B82C9 /* SoloLib */;
+			targetProxy = 6877BCE3A84ECF3E0B1E9019 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		085D5391970174245173D918 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		14A884395A046AB8B3DA38F3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.solo.SoloLib;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		53665AAB80FF1382026DB5A0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = macOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"-Xlinker -sectcreate -Xlinker __TEXT -Xlinker __info_plist -Xlinker $(SRCROOT)/macOS/Info.plist",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.solo.macos;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		6284DF7EB85E4B731D885475 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.solo.SoloLibTests;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		673A775CEBE90F744AF92CFA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = macOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"-Xlinker -sectcreate -Xlinker __TEXT -Xlinker __info_plist -Xlinker $(SRCROOT)/macOS/Info.plist",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.solo.macos;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		77557D4F391B33133A9B30ED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.solo.SoloLib;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		9BBF2FB74DFCA207BE74F6A9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		B354ECEA3B8D47E8662EC56F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.solo.SoloLibTests;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		50591B2C826CF743701E7E4B /* Build configuration list for PBXProject "Solo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9BBF2FB74DFCA207BE74F6A9 /* Debug */,
+				085D5391970174245173D918 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		5F1A369427AF6BECCD366CB4 /* Build configuration list for PBXNativeTarget "Solo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				673A775CEBE90F744AF92CFA /* Debug */,
+				53665AAB80FF1382026DB5A0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		7E5A43C40C8C335D0FA9937C /* Build configuration list for PBXNativeTarget "SoloLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				77557D4F391B33133A9B30ED /* Debug */,
+				14A884395A046AB8B3DA38F3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C47FCAA47B994C7B09A96E8B /* Build configuration list for PBXNativeTarget "SoloLibTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6284DF7EB85E4B731D885475 /* Debug */,
+				B354ECEA3B8D47E8662EC56F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4C2AC19000EEC14FF73BD7D6 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		19A913F36046C87AFC4F1B19 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4C2AC19000EEC14FF73BD7D6 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+		257CF2BB763C0A1D893EDD66 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4C2AC19000EEC14FF73BD7D6 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+		25B08C7E7FA960E82B731EC8 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4C2AC19000EEC14FF73BD7D6 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 15DF6F5EA7AF9F5809966D6C /* Project object */;
+}

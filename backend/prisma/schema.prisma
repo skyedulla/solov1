@@ -34,3 +34,16 @@ model Idea {
   @@index([userId])
   @@map("ideas")
 }
+
+/// User-owned workshop objectives; `userId` is the Supabase Auth user id from `req.authUser.id`.
+model Objective {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  text        String
+  isCompleted Boolean  @default(false) @map("is_completed")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("objectives")
+}

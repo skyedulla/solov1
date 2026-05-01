@@ -5,7 +5,9 @@
     "build": "npm run build --prefix backend",
     "start": "npm run start --prefix backend",
     "start:api": "npm run build --prefix backend && npm run start --prefix backend",
-    "start:stack": "bash start-api-stack.sh",
-    "token": "npm run token --prefix backend"
+    "start:stack": "bash launch_dev_build.sh --api-only",
+    "launch:dev": "bash launch_dev_build.sh",
+    "token": "npm run token --prefix backend",
+    "test:e2e": "npm run test:e2e --prefix backend"
   }
 }

@@ -1,0 +1,70 @@
+# Regenerate: `xcodegen generate` (see https://github.com/yonaskolb/XcodeGen)
+# Open `Solo.xcodeproj` in Xcode, select the **Solo** scheme, Run (⌘R).
+name: Solo
+options:
+  bundleIdPrefix: app.solo
+  deploymentTarget:
+    macOS: "13.0"
+  createIntermediateGroups: true
+
+packages:
+  supabase:
+    url: https://github.com/supabase/supabase-swift
+    from: 2.0.0
+
+targets:
+  SoloLib:
+    type: library.static
+    platform: macOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.solo.SoloLib
+    sources:
+      - path: lib
+    dependencies:
+      - package: supabase
+        product: Supabase
+
+  Solo:
+    type: application
+    platform: macOS
+    info:
+      path: macOS/Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.solo.macos
+        ASSETCATALOG_COMPILER_APPICON_NAME: ""
+        OTHER_LDFLAGS: "-Xlinker -sectcreate -Xlinker __TEXT -Xlinker __info_plist -Xlinker $(SRCROOT)/macOS/Info.plist"
+    sources:
+      - path: macOS
+        excludes:
+          - Info.plist
+    dependencies:
+      - target: SoloLib
+      - package: supabase
+        product: Supabase
+
+  SoloLibTests:
+    type: bundle.unit-test
+    platform: macOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.solo.SoloLibTests
+        GENERATE_INFOPLIST_FILE: YES
+    sources:
+      - path: Tests/SoloLibTests
+    dependencies:
+      - target: SoloLib
+      - package: supabase
+        product: Supabase
+
+schemes:
+  Solo:
+    build:
+      targets:
+        Solo: all
+    test:
+      targets:
+        - SoloLibTests
+    run:
+      config: Debug
