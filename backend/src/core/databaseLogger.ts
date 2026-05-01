@@ -99,8 +99,8 @@ export function isPrismaError(error: unknown): error is PrismaClientError {
 
 /**
  * Logs Prisma (database client) errors with code + description.
- * Call from repositories on Prisma failure, or from the global handler when **`isPrismaError`** is true.
- * For HTTP-layer failures, use **`logApiError`** from **`apiLogger`**; for process/system failures, use **`logSystemError`** from **`systemLogger`**.
+ * Call from **`prisma.ts`** query extension for queries through the shared client, from **any TypeScript file that uses another Prisma client or driver**, or from **`createApp`** only for non-Prisma paths (Prisma errors are already logged at the query boundary).
+ * For HTTP-layer non-Prisma failures, use **`logApiError`** from **`apiLogger`**; for process/system failures, use **`logSystemError`** from **`systemLogger`**.
  */
 export function logDatabaseError(error: unknown, context: string): void {
   if (!isPrismaError(error)) {

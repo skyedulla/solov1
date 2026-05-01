@@ -2,7 +2,6 @@ import type { Idea, Prisma } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 import { prisma } from "../../core/prisma";
-import { logDatabaseError } from "../../core/databaseLogger";
 import type { IdeaSortBy, IdeaUpdateBody } from "./idea.schema";
 
 function orderByForSort(sort: IdeaSortBy): Prisma.IdeaOrderByWithRelationInput {
@@ -16,6 +15,12 @@ function orderByForSort(sort: IdeaSortBy): Prisma.IdeaOrderByWithRelationInput {
     case "updated_desc":
       return { updatedAt: "desc" };
   }
+}
+
+export async function findIdeaByIdForUser(userId: string, ideaId: string): Promise<Idea | null> {
+  return prisma.idea.findFirst({
+    where: { id: ideaId, userId },
+  });
 }
 
 export async function findIdeasForUser(
@@ -92,19 +97,13 @@ export async function updateIdeaForUser(
     if (error instanceof PrismaClientKnownRequestError && error.code === "P2025") {
       return null;
     }
-    logDatabaseError(error, "IdeaRepository.updateIdeaForUser");
     throw error;
   }
 }
 
 export async function deleteIdeaForUser(userId: string, ideaId: string): Promise<boolean> {
-  try {
-    const result = await prisma.idea.deleteMany({
-      where: { id: ideaId, userId },
-    });
-    return result.count > 0;
-  } catch (error) {
-    logDatabaseError(error, "IdeaRepository.deleteIdeaForUser");
-    throw error;
-  }
+  const result = await prisma.idea.deleteMany({
+    where: { id: ideaId, userId },
+  });
+  return result.count > 0;
 }

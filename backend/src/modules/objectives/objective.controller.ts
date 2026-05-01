@@ -13,6 +13,7 @@ import * as objectiveService from "./objective.service";
 function toObjectiveResponseBody(row: Objective): ObjectiveResponseBody {
   return objectiveResponseBodySchema.parse({
     id: row.id,
+    idea_id: row.ideaId,
     text: row.text,
     is_completed: row.isCompleted,
   });
@@ -32,6 +33,10 @@ export async function addObjective(req: Request, res: Response, next: NextFuncti
 
   try {
     const row = await objectiveService.createObjectiveForUser(userId, parsed.data);
+    if (!row) {
+      res.status(404).json({ error: "Idea not found" });
+      return;
+    }
     res.status(201).json(toObjectiveResponseBody(row));
   } catch (error) {
     next(error);

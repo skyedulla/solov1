@@ -15,8 +15,8 @@ final class ObjectiveController: Sendable {
     }
 
     /// **`POST /objectives`** — returns persisted **`ObjectiveModel`** (**`201`**).
-    func addObjective(text: String, accessToken: String) async throws -> ObjectiveModel {
-        let (data, response) = try await remote.addObjective(text: text, accessToken: accessToken)
+    func addObjective(ideaId: String, text: String, accessToken: String) async throws -> ObjectiveModel {
+        let (data, response) = try await remote.addObjective(ideaId: ideaId, text: text, accessToken: accessToken)
         guard let http = response as? HTTPURLResponse, http.statusCode == 201 else {
             throw URLError(.badServerResponse)
         }

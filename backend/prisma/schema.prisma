@@ -35,15 +35,77 @@ model Idea {
   @@map("ideas")
 }
 
+/// User-owned mind map sessions (`mindmap_id` on nodes and connections); `userId` is the Supabase auth id.
+model Mindmap {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  ideaId    String   @map("idea_id")
+  title     String   @default("")
+  summary   String   @default("")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([userId, ideaId])
+  @@map("mindmaps")
+}
+
 /// User-owned workshop objectives; `userId` is the Supabase Auth user id from `req.authUser.id`.
 model Objective {
   id          String   @id @default(uuid())
   userId      String   @map("user_id")
+  ideaId      String   @map("idea_id")
   text        String
   isCompleted Boolean  @default(false) @map("is_completed")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@index([userId])
+  @@index([userId, ideaId])
   @@map("objectives")
+}
+
+/// User-owned mind map nodes; `userId` is the Supabase Auth user id from `req.authUser.id`.
+model MindmapNode {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  ideaId       String   @map("idea_id")
+  mindmapId    String   @map("mindmap_id")
+  parentNodeId String?  @map("parent_node_id")
+  positionX    Int      @map("position_x")
+  positionY    Int      @map("position_y")
+  text         String   @default("")
+  width        Int
+  height       Int
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([userId, mindmapId])
+  @@map("mindmap_nodes")
+}
+
+enum MindmapConnectionAnchor {
+  top
+  right
+  left
+  bottom
+}
+
+/// User-owned edges between mind map nodes (`userId` = Supabase auth id). Omit target fields until the link is completed.
+model MindmapConnection {
+  id           String                   @id @default(uuid())
+  userId       String                   @map("user_id")
+  ideaId       String                   @map("idea_id")
+  mindmapId    String                   @map("mindmap_id")
+  sourceNodeId String                   @map("source_node_id")
+  targetNodeId String?                  @map("target_node_id")
+  sourceAnchor MindmapConnectionAnchor  @map("source_anchor")
+  targetAnchor MindmapConnectionAnchor? @map("target_anchor")
+  createdAt    DateTime                 @default(now()) @map("created_at")
+  updatedAt    DateTime                 @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([userId, mindmapId])
+  @@map("mindmap_connections")
 }

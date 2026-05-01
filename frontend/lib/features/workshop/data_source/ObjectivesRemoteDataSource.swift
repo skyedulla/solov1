@@ -1,6 +1,7 @@
 import Foundation
 
 private struct AddObjectiveRequestBody: Encodable {
+    let ideaId: String
     let text: String
 }
 
@@ -22,9 +23,9 @@ final class ObjectivesRemoteDataSource: Sendable {
         baseURL.appendingPathComponent("objectives", isDirectory: false)
     }
 
-    /// **`POST {base}/objectives`** with **`{ "text": … }`**, expects **`201`** and JSON body.
-    func addObjective(text: String, accessToken: String) async throws -> (Data, URLResponse) {
-        let body = AddObjectiveRequestBody(text: text)
+    /// **`POST {base}/objectives`** with **`{ "ideaId": …, "text": … }`**, expects **`201`** and JSON body.
+    func addObjective(ideaId: String, text: String, accessToken: String) async throws -> (Data, URLResponse) {
+        let body = AddObjectiveRequestBody(ideaId: ideaId, text: text)
         let data = try JSONEncoder().encode(body)
         var request = URLRequest(url: resourceURL())
         request.httpMethod = "POST"

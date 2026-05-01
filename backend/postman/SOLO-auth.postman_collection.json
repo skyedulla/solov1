@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "SOLO API",
-    "description": "Import this file in Postman: **Import** → **Upload Files** → choose `backend/postman/SOLO-auth.postman_collection.json`.\n\n**Setup:** Set collection variables **`baseUrl`** (e.g. `http://localhost:4000` — include `http://` or `https://`) and **`accessToken`** (Supabase JWT; `Bearer` is added per request). **`ideaId`** / **`objectiveId`** are set when **Create** requests return **`201`** (Tests tab), or paste UUIDs from list/create flows.\n\n**Swift controllers vs this collection**\n- **`IdeaController`** / **`IdeasRemoteDataSource`** → **Ideas** folder (**`GET/POST /ideas`**, **`PATCH`** / **`PUT /ideas/:id`**, **`DELETE /ideas/:id`**).\n- **`ObjectiveController`** / **`ObjectivesRemoteDataSource`** → **Objectives** folder (**`POST/PATCH/DELETE /objectives…`**, **`POST …/complete`**).\n- **`AuthController`** uses **Supabase Auth only** (no calls to **`{{baseUrl}}`**). Test **`login`**, **`signUp`**, **`googleSignIn`**, **`resetPassword`**, **`logout`** against your **`SUPABASE_URL`** GoTrue API or Supabase dashboard — not this collection unless you add those requests yourself.\n- **`IdeaSearchController`** is an empty coordinator (no HTTP yet).\n\nIf **Update idea** fails with connection errors, check **`ideaId`** in the resolved URL (**Postman Console**) or try **PUT** instead of **PATCH**.",
+    "description": "Import this file in Postman: **Import** → **Upload Files** → choose `backend/postman/SOLO-auth.postman_collection.json`.\n\n**Setup — SOLO API:** Set **`baseUrl`**. **Auth (Supabase):** Set **`supabaseUrl`** (project URL, no trailing slash — same as **`SUPABASE_URL`** in **`.env`**) and **`supabaseAnonKey`** (**`SUPABASE_ANON_KEY`**). Set **`authEmail`** + **`authPassword`**. Run **Auth (Supabase) → Sign in** to fill **`accessToken`** (or **Sign up** first if the project returns a session; if email confirmation is enabled, confirm the user then **Sign in**).\n\n**Recommended API flow:** **Create idea** → **`ideaId`** saved → **Create mindmap** → **`mindmapId`** saved → **Nodes** / **Connections** (both **require** that mind map id — query **`mindmap_id`** on **`GET`**, JSON **`mindmapId`** on **`POST`/`PATCH`**). **`nodeId`** / **`connectionId`** / **`objectiveId`** set on **`201`** via Tests scripts; **`GET /mindmaps/:id`** and **`DELETE /mindmaps/:id`** require query **`idea_id`** matching the map.\n\n**Swift / HTTP mapping**\n- **Ideas** → **`IdeaController`** / **`IdeasRemoteDataSource`**.\n- **Mindmaps** → **`POST/GET/DELETE /mindmaps`** (document load **`GET /mindmaps/:id?idea_id=`**).\n- **Nodes** → **`NodeController`** — **`mindmap_id`** (**required**) on **`GET /nodes?mindmap_id={{mindmapId}}`**; **`mindmapId`** (**required**) in create/update JSON.\n- **Connections** → **`ConnectionController`** — **`mindmap_id`** (**required**) on **`GET /connections?mindmap_id={{mindmapId}}`**; **`mindmapId`** (**required**) in create/update JSON.\n- **Objectives** → **`ObjectiveController`** — create (**`POST /objectives`**) requires **`ideaId`** in JSON (camelCase).\n- **`AuthController`** (Swift) uses Supabase only for auth; this collection’s **Auth (Supabase)** folder calls **`{{supabaseUrl}}/auth/v1/...`** (not **`{{baseUrl}}`**).\n\nIf **Update idea** fails, check **`ideaId`** in Postman Console or try **PUT** instead of **PATCH**.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -14,11 +14,47 @@
       "value": ""
     },
     {
+      "key": "authEmail",
+      "value": ""
+    },
+    {
+      "key": "authFirstName",
+      "value": "Dev"
+    },
+    {
+      "key": "authLastName",
+      "value": "User"
+    },
+    {
+      "key": "authPassword",
+      "value": ""
+    },
+    {
       "key": "ideaId",
       "value": ""
     },
     {
       "key": "objectiveId",
+      "value": ""
+    },
+    {
+      "key": "mindmapId",
+      "value": ""
+    },
+    {
+      "key": "nodeId",
+      "value": ""
+    },
+    {
+      "key": "supabaseAnonKey",
+      "value": ""
+    },
+    {
+      "key": "supabaseUrl",
+      "value": ""
+    },
+    {
+      "key": "connectionId",
       "value": ""
     }
   ],
@@ -30,6 +66,128 @@
         "header": [],
         "url": "{{baseUrl}}/health"
       }
+    },
+    {
+      "name": "Auth (Supabase)",
+      "description": "GoTrue (**`/auth/v1`**) — same service the Swift **`AuthController`** uses. Headers **`apikey`** + **`Authorization: Bearer …`** must be your anon key (**`SUPABASE_ANON_KEY`**).\n\n- **Sign in** — **`200`** with **`access_token`** → Tests set collection **`accessToken`** for **`{{baseUrl}}`** requests.\n- **Sign up** — matches app metadata shape **`first_name`** / **`last_name`**. If your project requires email confirmation, you may get a user without **`access_token`**; use **Sign in** after confirming.",
+      "item": [
+        {
+          "name": "Sign in (password)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  const t = data && data.access_token;",
+                  "  if (t) {",
+                  "    pm.collectionVariables.set('accessToken', t);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{supabaseAnonKey}}",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAnonKey}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{authEmail}}\",\n  \"password\": \"{{authPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{supabaseUrl}}/auth/v1/token?grant_type=password",
+              "host": ["{{supabaseUrl}}"],
+              "path": ["auth", "v1", "token"],
+              "query": [
+                {
+                  "key": "grant_type",
+                  "value": "password"
+                }
+              ]
+            },
+            "description": "Maps to Supabase **`signInWithPassword`**. Requires **`supabaseUrl`**, **`supabaseAnonKey`**, **`authEmail`**, **`authPassword`**. Response **`access_token`** is copied to **`accessToken`**."
+          }
+        },
+        {
+          "name": "Sign up (email + password)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  const t = data && data.access_token;",
+                  "  if (t) {",
+                  "    pm.collectionVariables.set('accessToken', t);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{supabaseAnonKey}}",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAnonKey}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{authEmail}}\",\n  \"password\": \"{{authPassword}}\",\n  \"data\": {\n    \"first_name\": \"{{authFirstName}}\",\n    \"last_name\": \"{{authLastName}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{supabaseUrl}}/auth/v1/signup",
+              "host": ["{{supabaseUrl}}"],
+              "path": ["auth", "v1", "signup"]
+            },
+            "description": "Maps to Swift **`signUp`** (**`first_name`** / **`last_name`** in **`data`**). When Supabase returns a session (**`access_token`** at the root), Tests set **`accessToken`**. Otherwise run **Sign in** after confirming email (if enabled)."
+          }
+        }
+      ]
     },
     {
       "name": "Ideas",
@@ -220,6 +378,502 @@
       ]
     },
     {
+      "name": "Mindmaps",
+      "item": [
+        {
+          "name": "Create mindmap (POST /mindmaps)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  if (data && data.id) {",
+                  "    pm.collectionVariables.set('mindmapId', data.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"title\": \"\",\n  \"summary\": \"\"\n}"
+            },
+            "url": "{{baseUrl}}/mindmaps",
+            "description": "Creates a mind map for **`ideaId`**. Optional **`title`** / **`summary`** (default empty strings). Response **`201`** — **`id`**, **`idea_id`**, **`title`**, **`summary`**, timestamps — Tests script stores **`id`** in **`mindmapId`** (use this value for **Nodes** **`mindmap_id`/`mindmapId`** and **Connections** **`mindmap_id`/`mindmapId`**). Run **Create idea** first."
+          }
+        },
+        {
+          "name": "List mindmaps for idea (GET /mindmaps)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/mindmaps?idea_id={{ideaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["mindmaps"],
+              "query": [
+                {
+                  "key": "idea_id",
+                  "value": "{{ideaId}}",
+                  "description": "Required — UUID of the idea whose mind maps to list"
+                }
+              ]
+            },
+            "description": "**`GET /mindmaps?idea_id=`** — lists mind maps for the authenticated user and idea (**`200`** array of **`id`**, **`idea_id`**, **`title`**, **`summary`**, timestamps)."
+          }
+        },
+        {
+          "name": "Load mindmap document (GET /mindmaps/:id)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/mindmaps/{{mindmapId}}?idea_id={{ideaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["mindmaps", "{{mindmapId}}"],
+              "query": [
+                {
+                  "key": "idea_id",
+                  "value": "{{ideaId}}",
+                  "description": "Required — must match the mind map row's idea"
+                }
+              ]
+            },
+            "description": "Full document: **`nodes`**, **`connections`**, **`last_transform`**. **`mindmapId`** in path; **`idea_id`** query required (**`404`** if mismatch or not found)."
+          }
+        },
+        {
+          "name": "Delete mindmap (DELETE /mindmaps/:id)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/mindmaps/{{mindmapId}}?idea_id={{ideaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["mindmaps", "{{mindmapId}}"],
+              "query": [
+                {
+                  "key": "idea_id",
+                  "value": "{{ideaId}}",
+                  "description": "Required — must match the mind map's idea"
+                }
+              ]
+            },
+            "description": "**`204`** on success; **`404`** if not found / **`idea_id`** mismatch."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Nodes",
+      "item": [
+        {
+          "name": "Search nodes (searchNodes)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/nodes?mindmap_id={{mindmapId}}&q=",
+              "host": ["{{baseUrl}}"],
+              "path": ["nodes"],
+              "query": [
+                {
+                  "key": "mindmap_id",
+                  "value": "{{mindmapId}}",
+                  "description": "Required query param — UUID of the mind map (**{{mindmapId}}**)"
+                },
+                {
+                  "key": "q",
+                  "value": "",
+                  "description": "Optional; empty = first 5 nodes by text A–Z. Non-empty = substring match, up to 5, ordered by suffix after first match"
+                }
+              ]
+            },
+            "description": "**`GET /nodes?mindmap_id=`** — **`mindmap_id`** is **required** (use **`{{mindmapId}}`** after **Create mindmap**). Maps to **`NodeController.searchNodes`** — at most **5** nodes."
+          }
+        },
+        {
+          "name": "Sync node create (syncNodeToServer, isNew=true)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  if (data && data.id) {",
+                  "    pm.collectionVariables.set('nodeId', data.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"position\": { \"x\": 0, \"y\": 0 },\n  \"text\": \"New node label\",\n  \"dimensions\": { \"height\": 40, \"width\": 120 }\n}"
+            },
+            "url": "{{baseUrl}}/nodes",
+            "description": "**`mindmapId`** in JSON is **required** (same UUID as **`mindmap_id`** on **GET**). Maps to **`syncNodeToServer`** **`POST`**. Set **`ideaId`** + **`mindmapId`**; **`201`** saves **`nodeId`**."
+          }
+        },
+        {
+          "name": "Sync node update (syncNodeToServer, isNew=false) PATCH",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"parentNodeId\": null,\n  \"position\": { \"x\": 10, \"y\": 20 },\n  \"text\": \"Updated node label\",\n  \"dimensions\": { \"height\": 48, \"width\": 140 }\n}"
+            },
+            "url": "{{baseUrl}}/nodes/{{nodeId}}",
+            "description": "Keep **`mindmapId`** (required) aligned with the node’s map. Full snapshot **`PATCH`** (**`200`**)."
+          }
+        },
+        {
+          "name": "Sync node update PUT",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"parentNodeId\": null,\n  \"position\": { \"x\": 10, \"y\": 20 },\n  \"text\": \"Updated node label\",\n  \"dimensions\": { \"height\": 48, \"width\": 140 }\n}"
+            },
+            "url": "{{baseUrl}}/nodes/{{nodeId}}",
+            "description": "Same as **PATCH**; includes required **`mindmapId`** in body."
+          }
+        },
+        {
+          "name": "Delete node (deleteNode)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/nodes/{{nodeId}}",
+            "description": "Maps to **`NodeController.deleteNode`** — **`204`**. Path id only; mind map was established at create time."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Connections",
+      "item": [
+        {
+          "name": "List connections (GET /connections)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/connections?mindmap_id={{mindmapId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["connections"],
+              "query": [
+                {
+                  "key": "mindmap_id",
+                  "value": "{{mindmapId}}",
+                  "description": "Required — UUID of the mind map (same as **Nodes** **`mindmap_id`**) (**{{mindmapId}}**)"
+                }
+              ]
+            },
+            "description": "**`GET /connections?mindmap_id=`** — **`mindmap_id`** is **required**. **`200`** — all edges for that map for the authenticated user."
+          }
+        },
+        {
+          "name": "Create connection draft (POST /connections, no target)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  if (data && data.id) {",
+                  "    pm.collectionVariables.set('connectionId', data.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"sourceAnchor\": \"right\"\n}"
+            },
+            "url": "{{baseUrl}}/connections",
+            "description": "**`mindmapId`** in JSON is **required**. Omit **`targetNodeId`** / **`targetAnchor`** together for an open-ended link. **`sourceAnchor`**: **`top`** | **`right`** | **`left`** | **`bottom`**. **`201`** — Tests script stores **`connectionId`**."
+          }
+        },
+        {
+          "name": "Create connection with target (POST /connections)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  if (data && data.id) {",
+                  "    pm.collectionVariables.set('connectionId', data.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"sourceAnchor\": \"right\",\n  \"targetNodeId\": \"PASTE_SECOND_NODE_UUID\",\n  \"targetAnchor\": \"left\"\n}"
+            },
+            "url": "{{baseUrl}}/connections",
+            "description": "**`targetNodeId`** and **`targetAnchor`** must both be set or both omitted. Replace **`PASTE_SECOND_NODE_UUID`** with another node on the same **`mindmapId`** (e.g. from **Search nodes** or a second **Create node**)."
+          }
+        },
+        {
+          "name": "Update connection PATCH",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"targetNodeId\": null,\n  \"sourceAnchor\": \"bottom\",\n  \"targetAnchor\": null\n}"
+            },
+            "url": "{{baseUrl}}/connections/{{connectionId}}",
+            "description": "Partial update; **`null`** clears **`targetNodeId`** / **`targetAnchor`**. Include **`mindmapId`** when changing map membership. **`200`**."
+          }
+        },
+        {
+          "name": "Update connection PUT",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"targetNodeId\": null,\n  \"sourceAnchor\": \"bottom\",\n  \"targetAnchor\": null\n}"
+            },
+            "url": "{{baseUrl}}/connections/{{connectionId}}",
+            "description": "Same as **PATCH** if **`PATCH`** is blocked."
+          }
+        },
+        {
+          "name": "Delete connection (DELETE /connections/:id)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/connections/{{connectionId}}",
+            "description": "**`204`** success; **`404`** if id not found."
+          }
+        }
+      ]
+    },
+    {
       "name": "Objectives",
       "item": [
         {
@@ -261,10 +915,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"text\": \"Ship MVP\"\n}"
+              "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"text\": \"Ship MVP\"\n}"
             },
             "url": "{{baseUrl}}/objectives",
-            "description": "Maps to **`ObjectiveController.addObjective`** / **`POST /objectives`**. Response **`201`** with **`id`**, **`text`**, **`is_completed`** — Tests script saves **`objectiveId`**."
+            "description": "Maps to **`ObjectiveController.addObjective`** / **`POST /objectives`**. Body **`ideaId`** (UUID) + **`text`**. Response **`201`** with **`id`**, **`idea_id`**, **`text`**, **`is_completed`** — Tests script saves **`objectiveId`**."
           }
         },
         {

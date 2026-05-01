@@ -1,13 +1,19 @@
 import type { Objective } from "@prisma/client";
 
+import * as ideaRepository from "../ideas/idea.repository";
 import type { ObjectiveCreateBody, ObjectiveUpdateBody } from "./objective.schema";
 import * as objectiveRepository from "./objective.repository";
 
 export async function createObjectiveForUser(
   authUserId: string,
   body: ObjectiveCreateBody,
-): Promise<Objective> {
+): Promise<Objective | null> {
+  const idea = await ideaRepository.findIdeaByIdForUser(authUserId, body.ideaId);
+  if (!idea) {
+    return null;
+  }
   return objectiveRepository.createObjectiveForUser(authUserId, {
+    ideaId: body.ideaId,
     text: body.text,
     isCompleted: false,
   });

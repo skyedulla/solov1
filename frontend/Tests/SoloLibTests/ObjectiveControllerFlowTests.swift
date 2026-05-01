@@ -6,6 +6,7 @@ import XCTest
 final class ObjectiveControllerFlowTests: XCTestCase {
     private let baseURL = URL(string: "https://solo.test")!
     private let accessToken = "test-access-token"
+    private let ideaId = "00000000-0000-4000-8000-0000000000a1"
     private let objectiveId = "00000000-0000-4000-8000-0000000000b2"
 
     override func tearDown() {
@@ -26,11 +27,13 @@ final class ObjectiveControllerFlowTests: XCTestCase {
 
     private static func objectiveResponseJSONObject(
         id: String,
+        ideaId: String,
         text: String,
         isCompleted: Bool
     ) -> [String: Any] {
         [
             "id": id,
+            "idea_id": ideaId,
             "text": text,
             "is_completed": isCompleted,
         ]
@@ -76,6 +79,7 @@ final class ObjectiveControllerFlowTests: XCTestCase {
     func testAddObjective_fullStack_POSTsJSONAndDecodes() async throws {
         let row = Self.objectiveResponseJSONObject(
             id: objectiveId,
+            ideaId: ideaId,
             text: "Learn Swift",
             isCompleted: false
         )
@@ -90,6 +94,7 @@ final class ObjectiveControllerFlowTests: XCTestCase {
             let posted = Self.httpBodyData(from: request)
             XCTAssertFalse(posted.isEmpty)
             let obj = try XCTUnwrap(try JSONSerialization.jsonObject(with: posted) as? [String: Any])
+            XCTAssertEqual(obj["ideaId"] as? String, self.ideaId)
             XCTAssertEqual(obj["text"] as? String, "Learn Swift")
 
             let res = Self.httpResponse(for: request, statusCode: 201)
@@ -97,9 +102,14 @@ final class ObjectiveControllerFlowTests: XCTestCase {
         }
 
         let controller = makeController()
-        let model = try await controller.addObjective(text: "Learn Swift", accessToken: accessToken)
+        let model = try await controller.addObjective(
+            ideaId: ideaId,
+            text: "Learn Swift",
+            accessToken: accessToken
+        )
 
         XCTAssertEqual(model.id, objectiveId)
+        XCTAssertEqual(model.ideaId, ideaId)
         XCTAssertEqual(model.text, "Learn Swift")
         XCTAssertFalse(model.isCompleted)
     }
@@ -107,6 +117,7 @@ final class ObjectiveControllerFlowTests: XCTestCase {
     func testModifyObjective_fullStack_PATCHesJSONAndDecodes() async throws {
         let row = Self.objectiveResponseJSONObject(
             id: objectiveId,
+            ideaId: ideaId,
             text: "Updated text",
             isCompleted: false
         )
@@ -131,12 +142,14 @@ final class ObjectiveControllerFlowTests: XCTestCase {
         )
 
         XCTAssertEqual(model.id, objectiveId)
+        XCTAssertEqual(model.ideaId, ideaId)
         XCTAssertEqual(model.text, "Updated text")
     }
 
     func testCompleteObjective_fullStack_POSTsTogglePathAndDecodes() async throws {
         let row = Self.objectiveResponseJSONObject(
             id: objectiveId,
+            ideaId: ideaId,
             text: "Done item",
             isCompleted: true
         )
@@ -155,6 +168,7 @@ final class ObjectiveControllerFlowTests: XCTestCase {
         let model = try await controller.completeObjective(id: objectiveId, accessToken: accessToken)
 
         XCTAssertTrue(model.isCompleted)
+        XCTAssertEqual(model.ideaId, ideaId)
         XCTAssertEqual(model.text, "Done item")
     }
 

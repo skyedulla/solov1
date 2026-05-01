@@ -8,15 +8,15 @@ enum ConnectionAnchor: String, Codable, Sendable {
     case bottom
 }
 
-/// A directed link between two nodes in a mind map.
+/// A directed link between two nodes in a mind map. **`target`** fields are **`nil`** until the link is completed.
 struct ConnectionModel: Codable, Sendable {
     var id: String
     var ideaId: String
     var mindmapId: String
     var sourceNodeId: String
-    var targetNodeId: String
+    var targetNodeId: String?
     var sourceAnchor: ConnectionAnchor
-    var targetAnchor: ConnectionAnchor
+    var targetAnchor: ConnectionAnchor?
 
     enum CodingKeys: String, CodingKey {
         case id

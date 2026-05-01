@@ -11,6 +11,7 @@ export type ObjectiveIdParams = z.infer<typeof objectiveIdParamsSchema>;
 // --- Request bodies ------------------------------------------------------------
 
 export const objectiveCreateBodySchema = z.object({
+  ideaId: z.string().uuid(),
   text: z.string().min(1).max(100_000),
 });
 
@@ -26,6 +27,7 @@ export type ObjectiveUpdateBody = z.infer<typeof objectiveUpdateBodySchema>;
 
 export const objectiveResponseBodySchema = z.object({
   id: z.string().uuid(),
+  idea_id: z.string().uuid(),
   text: z.string(),
   is_completed: z.boolean(),
 });
