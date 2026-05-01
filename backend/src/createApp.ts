@@ -1,8 +1,11 @@
 import express, { type NextFunction, type Request, type Response } from "express";
 
-import { logApiError } from "./core/apiLogger";
-import { isPrismaError, logDatabaseError } from "./core/databaseLogger";
+import { apiAccessLoggingMiddleware, logApiError } from "./core/apiLogger";
+import { isPrismaError } from "./core/databaseLogger";
+import { connectionRoutes } from "./routes/connection.routes";
 import { ideaRoutes } from "./routes/idea.routes";
+import { mindmapRoutes } from "./routes/mindmap.routes";
+import { nodeRoutes } from "./routes/node.routes";
 import { objectiveRoutes } from "./routes/objective.routes";
 
 /**
@@ -12,19 +15,21 @@ import { objectiveRoutes } from "./routes/objective.routes";
 export function createApp(): express.Application {
   const app = express();
   app.use(express.json());
+  app.use(apiAccessLoggingMiddleware());
 
   app.get("/health", (_req, res) => {
     res.status(200).json({ ok: true, service: "solo-api" });
   });
 
   app.use("/ideas", ideaRoutes);
+  app.use("/mindmaps", mindmapRoutes);
+  app.use("/nodes", nodeRoutes);
+  app.use("/connections", connectionRoutes);
   app.use("/objectives", objectiveRoutes);
 
   app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
     const context = `${req.method} ${req.originalUrl}`;
-    if (isPrismaError(err)) {
-      logDatabaseError(err, context);
-    } else {
+    if (!isPrismaError(err)) {
       logApiError(err, context);
     }
     if (res.headersSent) {
