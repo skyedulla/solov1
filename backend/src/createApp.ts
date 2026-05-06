@@ -2,6 +2,7 @@ import express, { type NextFunction, type Request, type Response } from "express
 
 import { apiAccessLoggingMiddleware, logApiError } from "./core/apiLogger";
 import { isPrismaError } from "./core/databaseLogger";
+import { aiRoutes } from "./routes/ai.routes";
 import { connectionRoutes } from "./routes/connection.routes";
 import { ideaRoutes } from "./routes/idea.routes";
 import { mindmapRoutes } from "./routes/mindmap.routes";
@@ -21,6 +22,7 @@ export function createApp(): express.Application {
     res.status(200).json({ ok: true, service: "solo-api" });
   });
 
+  app.use("/ai", aiRoutes);
   app.use("/ideas", ideaRoutes);
   app.use("/mindmaps", mindmapRoutes);
   app.use("/nodes", nodeRoutes);
