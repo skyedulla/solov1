@@ -14,7 +14,6 @@ import * as nodeService from "./node.service";
 function toNodeResponseBody(row: MindmapNode): NodeResponseBody {
   return nodeResponseBodySchema.parse({
     id: row.id,
-    idea_id: row.ideaId,
     mindmap_id: row.mindmapId,
     parent_node_id: row.parentNodeId,
     position: { x: row.positionX, y: row.positionY },

@@ -11,15 +11,9 @@ function toDbAnchor(value: string): MindmapConnectionAnchor {
 export async function findConnectionsForUserMindmap(
   userId: string,
   mindmapId: string,
-  ideaId?: string,
 ): Promise<MindmapConnection[]> {
-  const where: Prisma.MindmapConnectionWhereInput = { userId, mindmapId };
-  if (ideaId !== undefined) {
-    where.ideaId = ideaId;
-  }
-
   return prisma.mindmapConnection.findMany({
-    where,
+    where: { userId, mindmapId },
     orderBy: [{ createdAt: "asc" }, { id: "asc" }],
   });
 }
@@ -31,7 +25,6 @@ export async function createConnectionForUser(
   return prisma.mindmapConnection.create({
     data: {
       userId,
-      ideaId: body.ideaId,
       mindmapId: body.mindmapId,
       sourceNodeId: body.sourceNodeId,
       sourceAnchor: toDbAnchor(body.sourceAnchor),
@@ -57,9 +50,6 @@ export async function updateConnectionForUser(
 ): Promise<MindmapConnection | null> {
   const data: Prisma.MindmapConnectionUpdateInput = {};
 
-  if (body.ideaId !== undefined) {
-    data.ideaId = body.ideaId;
-  }
   if (body.mindmapId !== undefined) {
     data.mindmapId = body.mindmapId;
   }

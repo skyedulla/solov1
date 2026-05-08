@@ -1,6 +1,6 @@
 import Foundation
 
-/// Coordinates mind map node persistence (search, sync, delete) against the API.
+/// Coordinates mind map node persistence (search, add, edit, delete) against the API.
 final class NodeController: Sendable {
     private let remote: NodesRemoteDataSource
 
@@ -19,14 +19,20 @@ final class NodeController: Sendable {
         return try decoder.decode([NodeModel].self, from: data)
     }
 
-    /// Persists **`node`**: **`POST`** when **`isNew`** (local **`id`** is ignored until the response returns the server row); **`PATCH`** **`node.id`** otherwise. Returns the **`NodeModel`** from the response body.
-    func syncNodeToServer(_ node: NodeModel, isNew: Bool, accessToken: String) async throws -> NodeModel {
-        let (data, response) = try await remote.syncNodeToServer(node, isNew: isNew, accessToken: accessToken)
-        guard let http = response as? HTTPURLResponse else {
+    /// Creates **`node`** on the server (**`POST`**). Local **`id`** is ignored until the response returns the server row. Expects **`201`**. Returns the **`NodeModel`** from the response body.
+    func addNode(_ node: NodeModel, accessToken: String) async throws -> NodeModel {
+        let (data, response) = try await remote.addNode(node, accessToken: accessToken)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 201 else {
             throw URLError(.badServerResponse)
         }
-        let okCode = isNew ? 201 : 200
-        guard http.statusCode == okCode else {
+        let decoder = JSONDecoder()
+        return try decoder.decode(NodeModel.self, from: data)
+    }
+
+    /// Updates **`node`** on the server (**`PATCH …/nodes/{id}`**). Expects **`200`**. Returns the **`NodeModel`** from the response body.
+    func editNode(_ node: NodeModel, accessToken: String) async throws -> NodeModel {
+        let (data, response) = try await remote.editNode(node, accessToken: accessToken)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             throw URLError(.badServerResponse)
         }
         let decoder = JSONDecoder()

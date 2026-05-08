@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "SOLO API",
-    "description": "Import this file in Postman: **Import** → **Upload Files** → choose `backend/postman/SOLO-auth.postman_collection.json`.\n\n**Setup — SOLO API:** Set **`baseUrl`**. **Auth (Supabase):** Set **`supabaseUrl`** (project URL, no trailing slash — same as **`SUPABASE_URL`** in **`.env`**) and **`supabaseAnonKey`** (**`SUPABASE_ANON_KEY`**). Set **`authEmail`** + **`authPassword`**. Run **Auth (Supabase) → Sign in** to fill **`accessToken`** (or **Sign up** first if the project returns a session; if email confirmation is enabled, confirm the user then **Sign in**).\n\n**Recommended API flow:** **Create idea** → **`ideaId`** saved → **Create mindmap** → **`mindmapId`** saved → **Nodes** / **Connections** (both **require** that mind map id — query **`mindmap_id`** on **`GET`**, JSON **`mindmapId`** on **`POST`/`PATCH`**). **`nodeId`** / **`connectionId`** / **`objectiveId`** set on **`201`** via Tests scripts; **`GET /mindmaps/:id`** and **`DELETE /mindmaps/:id`** require query **`idea_id`** matching the map.\n\n**Swift / HTTP mapping**\n- **Ideas** → **`IdeaController`** / **`IdeasRemoteDataSource`**.\n- **Mindmaps** → **`POST/GET/DELETE /mindmaps`** (document load **`GET /mindmaps/:id?idea_id=`**).\n- **Nodes** → **`NodeController`** — **`mindmap_id`** (**required**) on **`GET /nodes?mindmap_id={{mindmapId}}`**; **`mindmapId`** (**required**) in create/update JSON.\n- **Connections** → **`ConnectionController`** — **`mindmap_id`** (**required**) on **`GET /connections?mindmap_id={{mindmapId}}`**; **`mindmapId`** (**required**) in create/update JSON.\n- **Objectives** → **`ObjectiveController`** — create (**`POST /objectives`**) requires **`ideaId`** in JSON (camelCase).\n- **`AuthController`** (Swift) uses Supabase only for auth; this collection’s **Auth (Supabase)** folder calls **`{{supabaseUrl}}/auth/v1/...`** (not **`{{baseUrl}}`**).\n\nIf **Update idea** fails, check **`ideaId`** in Postman Console or try **PUT** instead of **PATCH**.",
+    "description": "Import this file in Postman: **Import** → **Upload Files** → choose `backend/postman/SOLO-auth.postman_collection.json`.\n\n**Setup — SOLO API:** Set **`baseUrl`**. **Auth (Supabase):** Set **`supabaseUrl`** (project URL, no trailing slash — same as **`SUPABASE_URL`** in **`.env`**) and **`supabaseAnonKey`** (**`SUPABASE_ANON_KEY`**). Set **`authEmail`** + **`authPassword`**. Run **Auth (Supabase) → Sign in** to fill **`accessToken`** (or **Sign up** first if the project returns a session; if email confirmation is enabled, confirm the user then **Sign in**).\n\n**Recommended API flow:** **Create idea** → **`ideaId`** saved → **AI → Send prompt** (optional; **`OPENAI_API_KEY`** on server) → **Create mindmap** → **`mindmapId`** saved → **Nodes** / **Connections** (both **require** that mind map id — query **`mindmap_id`** on **`GET`**, JSON **`mindmapId`** on **`POST`/`PATCH`**). **`nodeId`** / **`connectionId`** / **`objectiveId`** set on **`201`** via Tests scripts; **`GET /mindmaps/:id`** and **`DELETE /mindmaps/:id`** require query **`idea_id`** matching the map.\n\n**Swift / HTTP mapping**\n- **Ideas** → **`IdeaController`** / **`IdeasRemoteDataSource`**.\n- **Mindmaps** → **`POST/GET/DELETE /mindmaps`** (document load **`GET /mindmaps/:id?idea_id=`**).\n- **Nodes** → **`NodeController`** — **`mindmap_id`** (**required**) on **`GET /nodes?mindmap_id={{mindmapId}}`**; **`mindmapId`** (**required**) in create/update JSON.\n- **Connections** → **`ConnectionController`** — **`mindmap_id`** (**required**) on **`GET /connections?mindmap_id={{mindmapId}}`**; **`mindmapId`** (**required**) in create/update JSON.\n- **Objectives** → **`ObjectiveController`** — create (**`POST /objectives`**) requires **`ideaId`** in JSON (camelCase).\n- **`AuthController`** (Swift) uses Supabase only for auth; this collection’s **Auth (Supabase)** folder calls **`{{supabaseUrl}}/auth/v1/...`** (not **`{{baseUrl}}`**).\n\nIf **Update idea** fails, check **`ideaId`** in Postman Console or try **PUT** instead of **PATCH**.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -55,6 +55,10 @@
     },
     {
       "key": "connectionId",
+      "value": ""
+    },
+    {
+      "key": "aiConversationId",
       "value": ""
     }
   ],
@@ -299,7 +303,7 @@
               "raw": "{\n  \"title\": \"Updated title\",\n  \"purpose\": \"Updated purpose\",\n  \"description\": \"Optional; omit keys you do not want to change\",\n  \"targetUser\": \"Optional\"\n}"
             },
             "url": "{{baseUrl}}/ideas/{{ideaId}}",
-            "description": "Maps to **`IdeaController.editIdea`** — same **`PATCH`** as **`IdeasRemoteDataSource.updateIdea`**."
+            "description": "Maps to **`IdeaController.editIdea`** — same **`PATCH`** as **`IdeasRemoteDataSource.editIdea`**."
           }
         },
         {
@@ -373,6 +377,85 @@
             ],
             "url": "{{baseUrl}}/ideas/{{ideaId}}",
             "description": "Maps to **`IdeaController.deleteIdea`** — **`204`** success."
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI",
+      "description": "Requires **`accessToken`**, **`ideaId`** (run **Ideas → Create idea** first), and server **`OPENAI_API_KEY`**. **`POST /ai/prompt`** streams **NDJSON** (`application/x-ndjson`): optional **`formatted_prompt`**, **`content`** deltas, then **`done`** (usage) or **`error`**. Collection variable **`aiConversationId`** is set on first run (pre-request) and reused for multi-turn tests; clear it in **Variables** to start a new conversation.",
+      "item": [
+        {
+          "name": "Send prompt (stream NDJSON)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "let c = pm.collectionVariables.get('aiConversationId');",
+                  "if (!c || String(c).trim() === '') {",
+                  "  pm.collectionVariables.set('aiConversationId', pm.variables.replaceIn('{{$guid}}'));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Content-Type is NDJSON', function () {",
+                  "  const ct = pm.response.headers.get('Content-Type') || '';",
+                  "  pm.expect(ct).to.include('application/x-ndjson');",
+                  "});",
+                  "pm.test('Response has at least one NDJSON line', function () {",
+                  "  const lines = pm.response.text().split(/\\r?\\n/).map((l) => l.trim()).filter(Boolean);",
+                  "  pm.expect(lines.length, 'lines').to.be.at.least(1);",
+                  "});",
+                  "pm.test('Stream includes terminal done or error chunk', function () {",
+                  "  const lines = pm.response.text().split(/\\r?\\n/).map((l) => l.trim()).filter(Boolean);",
+                  "  const chunks = lines.map((l) => JSON.parse(l));",
+                  "  const done = chunks.find((c) => c.type === 'done');",
+                  "  const err = chunks.find((c) => c.type === 'error');",
+                  "  pm.expect(Boolean(done || err), 'done or error').to.be.true;",
+                  "  if (done) {",
+                  "    pm.expect(done).to.have.property('model');",
+                  "    pm.expect(done.usage).to.include.keys('prompt_tokens', 'completion_tokens', 'total_tokens');",
+                  "  }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/x-ndjson",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tool_type\": \"ai.research\",\n  \"query\": \"Summarize this product idea in two sentences.\",\n  \"context\": {\n    \"idea_id\": \"{{ideaId}}\",\n    \"conversation_id\": \"{{aiConversationId}}\"\n  },\n  \"llm_model\": \"gpt-4o-mini\",\n  \"temperature\": 0.2,\n  \"max_tokens\": 500,\n  \"idea_id\": \"{{ideaId}}\",\n  \"conversation_id\": \"{{aiConversationId}}\",\n  \"include_formatted_prompt\": false\n}"
+            },
+            "url": "{{baseUrl}}/ai/prompt",
+            "description": "Maps to **`AIViewModel`** / **`AIRemoteDataSource`** — **`postAiPrompt`** streams **`sendPromptStreamForUser`**. **`tool_type`**: **`ai.research`** | **`ai.planning`** | **`ai.mindmap`** | **`ai.highlighted_snippet`**. Set **`include_formatted_prompt`** to **`true`** to receive an initial line with full LLM **`messages`**. **`404`** if the idea cannot be loaded for the user (or conversation cannot be ensured)."
           }
         }
       ]
@@ -484,7 +567,38 @@
                 }
               ]
             },
-            "description": "Full document: **`nodes`**, **`connections`**, **`last_transform`**. **`mindmapId`** in path; **`idea_id`** query required (**`404`** if mismatch or not found)."
+            "description": "Full document: **`title`**, **`nodes`**, **`connections`**, **`last_transform`**. **`mindmapId`** in path; **`idea_id`** query required (**`404`** if mismatch or not found)."
+          }
+        },
+        {
+          "name": "Generate mindmap summary (POST /mindmaps/:id/generate-summary)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/mindmaps/{{mindmapId}}/generate-summary?idea_id={{ideaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["mindmaps", "{{mindmapId}}", "generate-summary"],
+              "query": [
+                {
+                  "key": "idea_id",
+                  "value": "{{ideaId}}",
+                  "description": "Required — must match the mind map row's idea"
+                }
+              ]
+            },
+            "description": "**`OPENAI_API_KEY`** required on server. Loads graph + **`mindmapSummarizationPrompt`** → **`completeChat`**; persists **`mindmaps.summary`**. **`200`** **`{ summary }`**; **`404`** not found; **`503`** LLM / missing key."
           }
         },
         {
@@ -593,10 +707,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"position\": { \"x\": 0, \"y\": 0 },\n  \"text\": \"New node label\",\n  \"dimensions\": { \"height\": 40, \"width\": 120 }\n}"
+              "raw": "{\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"position\": { \"x\": 0, \"y\": 0 },\n  \"text\": \"New node label\",\n  \"dimensions\": { \"height\": 40, \"width\": 120 }\n}"
             },
             "url": "{{baseUrl}}/nodes",
-            "description": "**`mindmapId`** in JSON is **required** (same UUID as **`mindmap_id`** on **GET**). Maps to **`syncNodeToServer`** **`POST`**. Set **`ideaId`** + **`mindmapId`**; **`201`** saves **`nodeId`**."
+            "description": "**`mindmapId`** in JSON is **required** (same UUID as **`mindmap_id`** on **GET**). Maps to **`syncNodeToServer`** **`POST`**. Set **`mindmapId`**; **`201`** saves **`nodeId`**."
           }
         },
         {
@@ -622,7 +736,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"parentNodeId\": null,\n  \"position\": { \"x\": 10, \"y\": 20 },\n  \"text\": \"Updated node label\",\n  \"dimensions\": { \"height\": 48, \"width\": 140 }\n}"
+              "raw": "{\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"parentNodeId\": null,\n  \"position\": { \"x\": 10, \"y\": 20 },\n  \"text\": \"Updated node label\",\n  \"dimensions\": { \"height\": 48, \"width\": 140 }\n}"
             },
             "url": "{{baseUrl}}/nodes/{{nodeId}}",
             "description": "Keep **`mindmapId`** (required) aligned with the node’s map. Full snapshot **`PATCH`** (**`200`**)."
@@ -651,7 +765,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"parentNodeId\": null,\n  \"position\": { \"x\": 10, \"y\": 20 },\n  \"text\": \"Updated node label\",\n  \"dimensions\": { \"height\": 48, \"width\": 140 }\n}"
+              "raw": "{\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"parentNodeId\": null,\n  \"position\": { \"x\": 10, \"y\": 20 },\n  \"text\": \"Updated node label\",\n  \"dimensions\": { \"height\": 48, \"width\": 140 }\n}"
             },
             "url": "{{baseUrl}}/nodes/{{nodeId}}",
             "description": "Same as **PATCH**; includes required **`mindmapId`** in body."
@@ -747,7 +861,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"sourceAnchor\": \"right\"\n}"
+              "raw": "{\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"sourceAnchor\": \"right\"\n}"
             },
             "url": "{{baseUrl}}/connections",
             "description": "**`mindmapId`** in JSON is **required**. Omit **`targetNodeId`** / **`targetAnchor`** together for an open-ended link. **`sourceAnchor`**: **`top`** | **`right`** | **`left`** | **`bottom`**. **`201`** — Tests script stores **`connectionId`**."
@@ -792,7 +906,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"sourceAnchor\": \"right\",\n  \"targetNodeId\": \"PASTE_SECOND_NODE_UUID\",\n  \"targetAnchor\": \"left\"\n}"
+              "raw": "{\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"sourceAnchor\": \"right\",\n  \"targetNodeId\": \"PASTE_SECOND_NODE_UUID\",\n  \"targetAnchor\": \"left\"\n}"
             },
             "url": "{{baseUrl}}/connections",
             "description": "**`targetNodeId`** and **`targetAnchor`** must both be set or both omitted. Replace **`PASTE_SECOND_NODE_UUID`** with another node on the same **`mindmapId`** (e.g. from **Search nodes** or a second **Create node**)."
@@ -821,7 +935,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"targetNodeId\": null,\n  \"sourceAnchor\": \"bottom\",\n  \"targetAnchor\": null\n}"
+              "raw": "{\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"targetNodeId\": null,\n  \"sourceAnchor\": \"bottom\",\n  \"targetAnchor\": null\n}"
             },
             "url": "{{baseUrl}}/connections/{{connectionId}}",
             "description": "Partial update; **`null`** clears **`targetNodeId`** / **`targetAnchor`**. Include **`mindmapId`** when changing map membership. **`200`**."
@@ -850,7 +964,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"targetNodeId\": null,\n  \"sourceAnchor\": \"bottom\",\n  \"targetAnchor\": null\n}"
+              "raw": "{\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"targetNodeId\": null,\n  \"sourceAnchor\": \"bottom\",\n  \"targetAnchor\": null\n}"
             },
             "url": "{{baseUrl}}/connections/{{connectionId}}",
             "description": "Same as **PATCH** if **`PATCH`** is blocked."

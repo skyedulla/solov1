@@ -13,11 +13,7 @@ export type NodeCreateResult =
   | { ok: false; reason: "mindmap_not_found" };
 
 export async function createNodeForUser(authUserId: string, body: NodeCreateBody): Promise<NodeCreateResult> {
-  const mindmap = await mindmapRepository.findMindmapByIdForUserAndIdea(
-    authUserId,
-    body.mindmapId,
-    body.ideaId,
-  );
+  const mindmap = await mindmapRepository.findMindmapByIdForUser(authUserId, body.mindmapId);
   if (!mindmap) {
     return { ok: false, reason: "mindmap_not_found" };
   }
@@ -34,18 +30,8 @@ export async function updateNodeForUser(
   nodeId: string,
   body: NodeUpdateBody,
 ): Promise<NodeUpdateResult> {
-  if (body.ideaId !== undefined || body.mindmapId !== undefined) {
-    const current = await nodeRepository.findNodeByIdForUser(authUserId, nodeId);
-    if (!current) {
-      return { ok: false, reason: "node_not_found" };
-    }
-    const nextIdeaId = body.ideaId ?? current.ideaId;
-    const nextMindmapId = body.mindmapId ?? current.mindmapId;
-    const mindmap = await mindmapRepository.findMindmapByIdForUserAndIdea(
-      authUserId,
-      nextMindmapId,
-      nextIdeaId,
-    );
+  if (body.mindmapId !== undefined) {
+    const mindmap = await mindmapRepository.findMindmapByIdForUser(authUserId, body.mindmapId);
     if (!mindmap) {
       return { ok: false, reason: "mindmap_not_found" };
     }

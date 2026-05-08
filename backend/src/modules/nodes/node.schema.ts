@@ -42,7 +42,6 @@ const dimensionsSchema = z.object({
  * **`POST /nodes`** JSON body — camelCase; nested **`position`** / **`dimensions`** match Swift **`NodeModel`**.
  */
 export const nodeCreateBodySchema = z.object({
-  ideaId: z.string().uuid(),
   mindmapId: z.string().uuid(),
   parentNodeId: z.string().uuid().optional(),
   position: positionSchema,
@@ -62,7 +61,6 @@ export type NodeIdParams = z.infer<typeof nodeIdParamsSchema>;
  * **`PATCH /nodes/:id`** — omit a field to leave it unchanged (**`parentNodeId`**: pass **`null`** to clear).
  */
 export const nodeUpdateBodySchema = z.object({
-  ideaId: z.string().uuid().optional(),
   mindmapId: z.string().uuid().optional(),
   parentNodeId: z.union([z.string().uuid(), z.null()]).optional(),
   position: positionSchema.optional(),
@@ -75,7 +73,6 @@ export type NodeUpdateBody = z.infer<typeof nodeUpdateBodySchema>;
 /** Wire JSON aligned with Swift **`NodeModel`** + snake_case keys. */
 export const nodeResponseBodySchema = z.object({
   id: z.string().uuid(),
-  idea_id: z.string().uuid(),
   mindmap_id: z.string().uuid(),
   parent_node_id: z.string().uuid().nullable(),
   position: positionSchema,

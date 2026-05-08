@@ -31,12 +31,14 @@ final class MindmapControllerFlowTests: XCTestCase {
     private static func mindmapDocumentJSONObject(
         id: String,
         ideaId: String,
+        title: String = "",
         nodes: [[String: Any]] = [],
         connections: [[String: Any]] = []
     ) -> [String: Any] {
         [
             "id": id,
             "idea_id": ideaId,
+            "title": title,
             "nodes": nodes,
             "connections": connections,
             "last_transform": [
@@ -103,7 +105,14 @@ final class MindmapControllerFlowTests: XCTestCase {
     // MARK: - One test per controller method
 
     func testCreateMindmap_fullStack_POSTsJSONAndBuildsEmptyDocument() async throws {
-        let row: [String: Any] = ["id": mindmapId]
+        let row: [String: Any] = [
+            "id": mindmapId,
+            "idea_id": ideaId,
+            "title": "",
+            "summary": "",
+            "created_at": Self.fixtureISO8601,
+            "last_updated_at": Self.fixtureISO8601,
+        ]
         let body = try Self.jsonData(row)
 
         MockURLProtocol.requestHandler = { request in
@@ -128,13 +137,14 @@ final class MindmapControllerFlowTests: XCTestCase {
         XCTAssertEqual(model.ideaId, ideaId)
         XCTAssertTrue(model.nodes.isEmpty)
         XCTAssertTrue(model.connections.isEmpty)
+        XCTAssertEqual(model.title, "")
         XCTAssertEqual(model.lastTransform.scale, 1)
         XCTAssertEqual(model.lastTransform.translateX, 0)
         XCTAssertEqual(model.lastTransform.translateY, 0)
     }
 
     func testLoadMindmap_fullStack_GETsAndDecodesDocument() async throws {
-        let doc = Self.mindmapDocumentJSONObject(id: mindmapId, ideaId: ideaId)
+        let doc = Self.mindmapDocumentJSONObject(id: mindmapId, ideaId: ideaId, title: "Roadmap")
         let body = try Self.jsonData(doc)
 
         MockURLProtocol.requestHandler = { request in
@@ -153,6 +163,7 @@ final class MindmapControllerFlowTests: XCTestCase {
 
         XCTAssertEqual(model.id, mindmapId)
         XCTAssertEqual(model.ideaId, ideaId)
+        XCTAssertEqual(model.title, "Roadmap")
         XCTAssertTrue(model.nodes.isEmpty)
         XCTAssertTrue(model.connections.isEmpty)
     }
@@ -220,6 +231,45 @@ final class MindmapControllerFlowTests: XCTestCase {
 
         let controller = makeController()
         try await controller.deleteMindmap(id: mindmapId, ideaId: ideaId, accessToken: accessToken)
+    }
+
+    func testGenerateMindmapSummary_fullStack_POSTsQueryAndDecodesSummary() async throws {
+        let payload = ["summary": "Detailed outline of nodes A and B linked by topic X."]
+        let body = try Self.jsonData(payload)
+
+        MockURLProtocol.requestHandler = { request in
+            XCTAssertEqual(request.httpMethod, "POST")
+            XCTAssertEqual(request.url?.path, "/mindmaps/\(self.mindmapId)/generate-summary")
+            let items = try XCTUnwrap(URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?.queryItems)
+            XCTAssertEqual(items.first { $0.name == "idea_id" }?.value, self.ideaId)
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer \(self.accessToken)")
+            XCTAssertTrue(Self.httpBodyData(from: request).isEmpty)
+
+            let res = Self.httpResponse(for: request, statusCode: 200)
+            return (res, body)
+        }
+
+        let controller = makeController()
+        let summary = try await controller.generateMindmapSummary(id: mindmapId, ideaId: ideaId, accessToken: accessToken)
+
+        XCTAssertEqual(summary, "Detailed outline of nodes A and B linked by topic X.")
+    }
+
+    func testGenerateMindmapSummary_llmUnavailable_returnsSummaryGenerationUnavailable() async {
+        MockURLProtocol.requestHandler = { request in
+            let res = Self.httpResponse(for: request, statusCode: 503)
+            return (res, Data())
+        }
+
+        let controller = makeController()
+        do {
+            _ = try await controller.generateMindmapSummary(id: mindmapId, ideaId: ideaId, accessToken: accessToken)
+            XCTFail("Expected summaryGenerationUnavailable")
+        } catch MindmapControllerError.summaryGenerationUnavailable {
+            // expected
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
     }
 
     func testDeleteMindmap_notFound_returnsMindmapNotFound() async {

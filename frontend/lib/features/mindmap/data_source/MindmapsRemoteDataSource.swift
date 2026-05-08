@@ -67,6 +67,26 @@ final class MindmapsRemoteDataSource: Sendable {
         return try await session.data(for: request)
     }
 
+    /// **`POST {base}/mindmaps/{id}/generate-summary?idea_id=…`** — runs server summarization (**`OPENAI_API_KEY`**) and returns **`{ "summary": … }`** (**`200`**); **`503`** when the LLM is unavailable.
+    func generateMindmapSummary(id: String, ideaId: String, accessToken: String) async throws -> (Data, URLResponse) {
+        let pathURL = baseURL
+            .appendingPathComponent("mindmaps", isDirectory: false)
+            .appendingPathComponent(id, isDirectory: false)
+            .appendingPathComponent("generate-summary", isDirectory: false)
+        var components = URLComponents(url: pathURL, resolvingAgainstBaseURL: false)!
+        components.queryItems = [URLQueryItem(name: "idea_id", value: ideaId)]
+        guard let url = components.url else {
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        return try await session.data(for: request)
+    }
+
     /// **`DELETE {base}/mindmaps/{id}?idea_id=…`** with **`Authorization: Bearer`** — returns raw **`URLSession`** result (expect **`204`**).
     func deleteMindmap(id: String, ideaId: String, accessToken: String) async throws -> (Data, URLResponse) {
         let pathURL = baseURL

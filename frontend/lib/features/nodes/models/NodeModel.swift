@@ -1,9 +1,8 @@
 import Foundation
 
-/// Mind map node fields.
+/// Mind map node fields (**`idea_id`** lives on **`MindmapModel`**, not each node).
 struct NodeModel: Codable, Sendable {
     var id: String
-    var ideaId: String
     var mindmapId: String
     var parentNodeId: String?
     var position: Position
@@ -22,7 +21,6 @@ struct NodeModel: Codable, Sendable {
 
     enum CodingKeys: String, CodingKey {
         case id
-        case ideaId = "idea_id"
         case mindmapId = "mindmap_id"
         case parentNodeId = "parent_node_id"
         case position

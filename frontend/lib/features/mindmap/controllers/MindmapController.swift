@@ -21,6 +21,7 @@ final class MindmapController: Sendable {
         return MindmapModel(
             id: created.id,
             ideaId: ideaId,
+            title: created.title,
             nodes: [],
             connections: [],
             lastTransform: MindmapModel.MindmapViewTransform(scale: 1, translateX: 0, translateY: 0)
@@ -61,6 +62,28 @@ final class MindmapController: Sendable {
         return try decoder.decode([MindmapSummaryModel].self, from: data)
     }
 
+    /// Regenerates **`summary`** from title + nodes + connections (**`POST …/mindmaps/{id}/generate-summary?idea_id=…`**) and returns the new text (**`200`**). Persists on the server.
+    func generateMindmapSummary(id: String, ideaId: String, accessToken: String) async throws -> String {
+        let (data, response) = try await remote.generateMindmapSummary(id: id, ideaId: ideaId, accessToken: accessToken)
+        guard let http = response as? HTTPURLResponse else {
+            throw MindmapControllerError.unexpectedGenerateSummaryResponse
+        }
+        switch http.statusCode {
+        case 200:
+            break
+        case 404:
+            throw MindmapControllerError.mindmapNotFound
+        case 503:
+            throw MindmapControllerError.summaryGenerationUnavailable
+        default:
+            throw MindmapControllerError.unexpectedGenerateSummaryResponse
+        }
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        let body = try decoder.decode(MindmapGeneratedSummaryBody.self, from: data)
+        return body.summary
+    }
+
     /// Deletes a mind map and its nodes and connections (**`DELETE …/mindmaps/{id}?idea_id=…`**, **`204`**).
     func deleteMindmap(id: String, ideaId: String, accessToken: String) async throws {
         let (_, response) = try await remote.deleteMindmap(id: id, ideaId: ideaId, accessToken: accessToken)
@@ -80,12 +103,19 @@ final class MindmapController: Sendable {
 
 private struct MindmapCreatedResponse: Decodable {
     let id: String
+    let title: String
+}
+
+private struct MindmapGeneratedSummaryBody: Decodable {
+    let summary: String
 }
 
 enum MindmapControllerError: Error {
     case unexpectedCreateResponse
     case unexpectedLoadResponse
     case unexpectedListResponse
+    case unexpectedGenerateSummaryResponse
+    case summaryGenerationUnavailable
     case unexpectedDeleteResponse
     case mindmapNotFound
 }

@@ -6,7 +6,6 @@ import XCTest
 final class NodeControllerFlowTests: XCTestCase {
     private let baseURL = URL(string: "https://solo.test")!
     private let accessToken = "test-access-token"
-    private let ideaId = "00000000-0000-4000-8000-0000000000a1"
     private let mindmapId = "00000000-0000-4000-8000-0000000000c3"
     private let nodeId = "00000000-0000-4000-8000-0000000000d4"
 
@@ -28,7 +27,6 @@ final class NodeControllerFlowTests: XCTestCase {
 
     private static func nodeResponseJSONObject(
         id: String,
-        ideaId: String,
         mindmapId: String,
         parentNodeId: String? = nil,
         text: String,
@@ -39,7 +37,6 @@ final class NodeControllerFlowTests: XCTestCase {
     ) -> [String: Any] {
         var row: [String: Any] = [
             "id": id,
-            "idea_id": ideaId,
             "mindmap_id": mindmapId,
             "position": ["x": x, "y": y],
             "text": text,
@@ -91,7 +88,6 @@ final class NodeControllerFlowTests: XCTestCase {
     private func sampleNode(isNewId: Bool = false) -> NodeModel {
         NodeModel(
             id: isNewId ? "00000000-0000-4000-8000-000000009999" : nodeId,
-            ideaId: ideaId,
             mindmapId: mindmapId,
             parentNodeId: nil,
             position: NodeModel.Position(x: 5, y: 8),
@@ -101,7 +97,7 @@ final class NodeControllerFlowTests: XCTestCase {
     }
 
     func testSearchNodes_fullStack_GETsQueryAndDecodes() async throws {
-        let row = Self.nodeResponseJSONObject(id: nodeId, ideaId: ideaId, mindmapId: mindmapId, text: "Alpha")
+        let row = Self.nodeResponseJSONObject(id: nodeId, mindmapId: mindmapId, text: "Alpha")
         let body = try Self.jsonData([row])
 
         MockURLProtocol.requestHandler = { request in
@@ -139,8 +135,8 @@ final class NodeControllerFlowTests: XCTestCase {
         XCTAssertTrue(list.isEmpty)
     }
 
-    func testSyncNodeToServer_isNew_POSTsJSONAndDecodes() async throws {
-        let row = Self.nodeResponseJSONObject(id: nodeId, ideaId: ideaId, mindmapId: mindmapId, text: "Node text")
+    func testAddNode_POSTsJSONAndDecodes() async throws {
+        let row = Self.nodeResponseJSONObject(id: nodeId, mindmapId: mindmapId, text: "Node text")
         let body = try Self.jsonData(row)
 
         MockURLProtocol.requestHandler = { request in
@@ -151,8 +147,8 @@ final class NodeControllerFlowTests: XCTestCase {
 
             let posted = Self.httpBodyData(from: request)
             let obj = try XCTUnwrap(try JSONSerialization.jsonObject(with: posted) as? [String: Any])
-            XCTAssertEqual(obj["ideaId"] as? String, self.ideaId)
             XCTAssertEqual(obj["mindmapId"] as? String, self.mindmapId)
+            XCTAssertNil(obj["ideaId"] as? String)
             XCTAssertEqual(obj["text"] as? String, "Node text")
 
             let res = Self.httpResponse(for: request, statusCode: 201)
@@ -160,16 +156,15 @@ final class NodeControllerFlowTests: XCTestCase {
         }
 
         let controller = makeController()
-        let saved = try await controller.syncNodeToServer(sampleNode(isNewId: true), isNew: true, accessToken: accessToken)
+        let saved = try await controller.addNode(sampleNode(isNewId: true), accessToken: accessToken)
 
         XCTAssertEqual(saved.id, nodeId)
-        XCTAssertEqual(saved.ideaId, ideaId)
         XCTAssertEqual(saved.mindmapId, mindmapId)
         XCTAssertEqual(saved.text, "Node text")
     }
 
-    func testSyncNodeToServer_existing_PATCHesJSONAndDecodes() async throws {
-        let row = Self.nodeResponseJSONObject(id: nodeId, ideaId: ideaId, mindmapId: mindmapId, text: "Updated")
+    func testEditNode_PATCHesJSONAndDecodes() async throws {
+        let row = Self.nodeResponseJSONObject(id: nodeId, mindmapId: mindmapId, text: "Updated")
         let body = try Self.jsonData(row)
 
         MockURLProtocol.requestHandler = { request in
@@ -188,7 +183,7 @@ final class NodeControllerFlowTests: XCTestCase {
         node.text = "Updated"
 
         let controller = makeController()
-        let saved = try await controller.syncNodeToServer(node, isNew: false, accessToken: accessToken)
+        let saved = try await controller.editNode(node, accessToken: accessToken)
 
         XCTAssertEqual(saved.id, nodeId)
         XCTAssertEqual(saved.text, "Updated")

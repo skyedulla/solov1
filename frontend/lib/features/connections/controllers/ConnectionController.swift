@@ -14,7 +14,6 @@ final class ConnectionController: Sendable {
         sourceAnchor: ConnectionAnchor,
         targetNodeId: String? = nil,
         targetAnchor: ConnectionAnchor? = nil,
-        ideaId: String,
         mindmapId: String,
         accessToken: String
     ) async throws -> ConnectionModel {
@@ -27,11 +26,40 @@ final class ConnectionController: Sendable {
             sourceAnchor: sourceAnchor,
             targetNodeId: targetNodeId,
             targetAnchor: targetAnchor,
-            ideaId: ideaId,
             mindmapId: mindmapId,
             accessToken: accessToken
         )
         guard let http = response as? HTTPURLResponse, http.statusCode == 201 else {
+            throw URLError(.badServerResponse)
+        }
+        let decoder = JSONDecoder()
+        return try decoder.decode(ConnectionModel.self, from: data)
+    }
+
+    /// Applies a partial update (**`PATCH …/connections/{id}`**). Omit parameters to leave those fields unchanged. Use **`setTargetNodeIdToNull`** / **`setTargetAnchorToNull`** to clear target fields per the API. Returns the updated **`ConnectionModel`** (**`200`**).
+    func updateConnection(
+        id: String,
+        mindmapId: String? = nil,
+        sourceNodeId: String? = nil,
+        targetNodeId: String? = nil,
+        setTargetNodeIdToNull: Bool = false,
+        sourceAnchor: ConnectionAnchor? = nil,
+        targetAnchor: ConnectionAnchor? = nil,
+        setTargetAnchorToNull: Bool = false,
+        accessToken: String
+    ) async throws -> ConnectionModel {
+        let (data, response) = try await remote.updateConnection(
+            id: id,
+            mindmapId: mindmapId,
+            sourceNodeId: sourceNodeId,
+            targetNodeId: targetNodeId,
+            setTargetNodeIdToNull: setTargetNodeIdToNull,
+            sourceAnchor: sourceAnchor,
+            targetAnchor: targetAnchor,
+            setTargetAnchorToNull: setTargetAnchorToNull,
+            accessToken: accessToken
+        )
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             throw URLError(.badServerResponse)
         }
         let decoder = JSONDecoder()

@@ -1,7 +1,6 @@
 import Foundation
 
 private struct CreateNodeRequestBody: Encodable {
-    let ideaId: String
     let mindmapId: String
     let parentNodeId: String?
     let position: NodeModel.Position
@@ -9,7 +8,6 @@ private struct CreateNodeRequestBody: Encodable {
     let dimensions: NodeModel.Dimensions
 
     enum CodingKeys: String, CodingKey {
-        case ideaId
         case mindmapId
         case parentNodeId
         case position
@@ -19,7 +17,6 @@ private struct CreateNodeRequestBody: Encodable {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(ideaId, forKey: .ideaId)
         try container.encode(mindmapId, forKey: .mindmapId)
         try container.encodeIfPresent(parentNodeId, forKey: .parentNodeId)
         try container.encode(position, forKey: .position)
@@ -29,7 +26,6 @@ private struct CreateNodeRequestBody: Encodable {
 }
 
 private struct FullNodeSyncPatchBody: Encodable {
-    let ideaId: String
     let mindmapId: String
     let parentNodeId: String?
     let position: NodeModel.Position
@@ -37,7 +33,6 @@ private struct FullNodeSyncPatchBody: Encodable {
     let dimensions: NodeModel.Dimensions
 
     enum CodingKeys: String, CodingKey {
-        case ideaId
         case mindmapId
         case parentNodeId
         case position
@@ -47,7 +42,6 @@ private struct FullNodeSyncPatchBody: Encodable {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(ideaId, forKey: .ideaId)
         try container.encode(mindmapId, forKey: .mindmapId)
         if let parentNodeId {
             try container.encode(parentNodeId, forKey: .parentNodeId)
@@ -90,37 +84,36 @@ final class NodesRemoteDataSource: Sendable {
         return try await session.data(for: request)
     }
 
-    /// Syncs **`node`**: **`POST`** when **`isNew`** (server assigns **`id`**); **`PATCH …/nodes/{id}`** with a full field snapshot when not new.
-    func syncNodeToServer(_ node: NodeModel, isNew: Bool, accessToken: String) async throws -> (Data, URLResponse) {
-        if isNew {
-            let url = baseURL.appendingPathComponent("nodes", isDirectory: false)
-            let body = CreateNodeRequestBody(
-                ideaId: node.ideaId,
-                mindmapId: node.mindmapId,
-                parentNodeId: node.parentNodeId,
-                position: node.position,
-                text: node.text,
-                dimensions: node.dimensions
-            )
-            let encoder = JSONEncoder()
-            let json = try encoder.encode(body)
+    /// Creates **`node`** via **`POST {base}/nodes`** (server assigns **`id`**).
+    func addNode(_ node: NodeModel, accessToken: String) async throws -> (Data, URLResponse) {
+        let url = baseURL.appendingPathComponent("nodes", isDirectory: false)
+        let body = CreateNodeRequestBody(
+            mindmapId: node.mindmapId,
+            parentNodeId: node.parentNodeId,
+            position: node.position,
+            text: node.text,
+            dimensions: node.dimensions
+        )
+        let encoder = JSONEncoder()
+        let json = try encoder.encode(body)
 
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-            request.httpBody = json
-            request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue("application/json", forHTTPHeaderField: "Accept")
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.httpBody = json
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
 
-            return try await session.data(for: request)
-        }
+        return try await session.data(for: request)
+    }
 
+    /// Updates **`node`** via **`PATCH {base}/nodes/{id}`** with a full field snapshot.
+    func editNode(_ node: NodeModel, accessToken: String) async throws -> (Data, URLResponse) {
         let url = baseURL
             .appendingPathComponent("nodes", isDirectory: false)
             .appendingPathComponent(node.id, isDirectory: false)
 
         let patch = FullNodeSyncPatchBody(
-            ideaId: node.ideaId,
             mindmapId: node.mindmapId,
             parentNodeId: node.parentNodeId,
             position: node.position,

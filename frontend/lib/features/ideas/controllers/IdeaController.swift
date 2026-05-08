@@ -48,7 +48,7 @@ final class IdeaController: Sendable {
         isPublished: Bool? = nil,
         accessToken: String
     ) async throws -> IdeaModel {
-        let (data, response) = try await remote.updateIdea(
+        let (data, response) = try await remote.editIdea(
             id: id,
             title: title,
             purpose: purpose,

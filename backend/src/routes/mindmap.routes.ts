@@ -1,7 +1,13 @@
 import { Router } from "express";
 
 import { requireAuth } from "../core/auth.middleware";
-import { createMindmap, deleteMindmap, listMindmaps, loadMindmap } from "../modules/mindmap/mindmap.controller";
+import {
+  createMindmap,
+  deleteMindmap,
+  generateMindmapSummary,
+  listMindmaps,
+  loadMindmap,
+} from "../modules/mindmap/mindmap.controller";
 
 export const mindmapRoutes = Router();
 
@@ -11,6 +17,9 @@ mindmapRoutes.post("/", (req, res, next) => {
 });
 mindmapRoutes.get("/", (req, res, next) => {
   void listMindmaps(req, res, next);
+});
+mindmapRoutes.post("/:id/generate-summary", (req, res, next) => {
+  void generateMindmapSummary(req, res, next);
 });
 mindmapRoutes.get("/:id", (req, res, next) => {
   void loadMindmap(req, res, next);

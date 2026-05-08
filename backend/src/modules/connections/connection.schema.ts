@@ -29,7 +29,6 @@ export type ListConnectionsQuery = z.infer<typeof listConnectionsQuerySchema>;
  */
 export const connectionCreateBodySchema = z
   .object({
-    ideaId: z.string().uuid(),
     mindmapId: z.string().uuid(),
     sourceNodeId: z.string().uuid(),
     sourceAnchor: connectionAnchorSchema,
@@ -60,7 +59,6 @@ export type ConnectionIdParams = z.infer<typeof connectionIdParamsSchema>;
  * **`PATCH /connections/:id`** — omit to leave unchanged; **`targetNodeId`** / **`targetAnchor`**: pass **`null`** to clear.
  */
 export const connectionUpdateBodySchema = z.object({
-  ideaId: z.string().uuid().optional(),
   mindmapId: z.string().uuid().optional(),
   sourceNodeId: z.string().uuid().optional(),
   targetNodeId: z.union([z.string().uuid(), z.null()]).optional(),
@@ -73,7 +71,6 @@ export type ConnectionUpdateBody = z.infer<typeof connectionUpdateBodySchema>;
 /** Wire JSON aligned with Swift **`ConnectionModel`** (snake_case). */
 export const connectionResponseBodySchema = z.object({
   id: z.string().uuid(),
-  idea_id: z.string().uuid(),
   mindmap_id: z.string().uuid(),
   source_node_id: z.string().uuid(),
   target_node_id: z.string().uuid().nullable(),

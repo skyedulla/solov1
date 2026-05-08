@@ -4,6 +4,8 @@ import Foundation
 struct MindmapModel: Codable, Sendable {
     var id: String
     var ideaId: String
+    /// Display title from **`mindmaps.title`** (same key in **`GET`** / **`POST`** JSON).
+    var title: String
     var nodes: [NodeModel]
     var connections: [ConnectionModel]
     var lastTransform: MindmapViewTransform
@@ -24,6 +26,7 @@ struct MindmapModel: Codable, Sendable {
     enum CodingKeys: String, CodingKey {
         case id
         case ideaId = "idea_id"
+        case title
         case nodes
         case connections
         case lastTransform = "last_transform"

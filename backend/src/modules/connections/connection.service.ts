@@ -19,11 +19,7 @@ export async function createConnectionForUser(
   authUserId: string,
   body: ConnectionCreateBody,
 ): Promise<ConnectionCreateResult> {
-  const mindmap = await mindmapRepository.findMindmapByIdForUserAndIdea(
-    authUserId,
-    body.mindmapId,
-    body.ideaId,
-  );
+  const mindmap = await mindmapRepository.findMindmapByIdForUser(authUserId, body.mindmapId);
   if (!mindmap) {
     return { ok: false, reason: "mindmap_not_found" };
   }
@@ -40,18 +36,8 @@ export async function updateConnectionForUser(
   connectionId: string,
   body: ConnectionUpdateBody,
 ): Promise<ConnectionUpdateResult> {
-  if (body.ideaId !== undefined || body.mindmapId !== undefined) {
-    const current = await connectionRepository.findConnectionByIdForUser(authUserId, connectionId);
-    if (!current) {
-      return { ok: false, reason: "connection_not_found" };
-    }
-    const nextIdeaId = body.ideaId ?? current.ideaId;
-    const nextMindmapId = body.mindmapId ?? current.mindmapId;
-    const mindmap = await mindmapRepository.findMindmapByIdForUserAndIdea(
-      authUserId,
-      nextMindmapId,
-      nextIdeaId,
-    );
+  if (body.mindmapId !== undefined) {
+    const mindmap = await mindmapRepository.findMindmapByIdForUser(authUserId, body.mindmapId);
     if (!mindmap) {
       return { ok: false, reason: "mindmap_not_found" };
     }

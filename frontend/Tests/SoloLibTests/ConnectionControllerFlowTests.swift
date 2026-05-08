@@ -6,7 +6,6 @@ import XCTest
 final class ConnectionControllerFlowTests: XCTestCase {
     private let baseURL = URL(string: "https://solo.test")!
     private let accessToken = "test-access-token"
-    private let ideaId = "00000000-0000-4000-8000-0000000000a1"
     private let mindmapId = "00000000-0000-4000-8000-0000000000c3"
     private let connectionId = "00000000-0000-4000-8000-0000000000e5"
     private let sourceNodeId = "00000000-0000-4000-8000-0000000000f1"
@@ -30,7 +29,6 @@ final class ConnectionControllerFlowTests: XCTestCase {
 
     private static func connectionResponseJSONObject(
         id: String,
-        ideaId: String,
         mindmapId: String,
         sourceNodeId: String,
         targetNodeId: String?,
@@ -39,7 +37,6 @@ final class ConnectionControllerFlowTests: XCTestCase {
     ) -> [String: Any] {
         var row: [String: Any] = [
             "id": id,
-            "idea_id": ideaId,
             "mindmap_id": mindmapId,
             "source_node_id": sourceNodeId,
             "source_anchor": sourceAnchor,
@@ -95,7 +92,6 @@ final class ConnectionControllerFlowTests: XCTestCase {
     func testAddConnection_withTarget_POSTsJSONAndDecodes() async throws {
         let row = Self.connectionResponseJSONObject(
             id: connectionId,
-            ideaId: ideaId,
             mindmapId: mindmapId,
             sourceNodeId: sourceNodeId,
             targetNodeId: targetNodeId,
@@ -112,7 +108,9 @@ final class ConnectionControllerFlowTests: XCTestCase {
 
             let posted = Self.httpBodyData(from: request)
             let obj = try XCTUnwrap(try JSONSerialization.jsonObject(with: posted) as? [String: Any])
+            XCTAssertEqual(obj["mindmapId"] as? String, self.mindmapId)
             XCTAssertEqual(obj["sourceNodeId"] as? String, self.sourceNodeId)
+            XCTAssertNil(obj["ideaId"] as? String)
             XCTAssertEqual(obj["targetNodeId"] as? String, self.targetNodeId)
             XCTAssertEqual(obj["sourceAnchor"] as? String, "right")
             XCTAssertEqual(obj["targetAnchor"] as? String, "left")
@@ -127,7 +125,6 @@ final class ConnectionControllerFlowTests: XCTestCase {
             sourceAnchor: .right,
             targetNodeId: targetNodeId,
             targetAnchor: .left,
-            ideaId: ideaId,
             mindmapId: mindmapId,
             accessToken: accessToken
         )
@@ -142,7 +139,6 @@ final class ConnectionControllerFlowTests: XCTestCase {
     func testAddConnection_openEnded_omitsTargetFieldsInBody() async throws {
         let row = Self.connectionResponseJSONObject(
             id: connectionId,
-            ideaId: ideaId,
             mindmapId: mindmapId,
             sourceNodeId: sourceNodeId,
             targetNodeId: nil,
@@ -156,6 +152,7 @@ final class ConnectionControllerFlowTests: XCTestCase {
             let obj = try XCTUnwrap(try JSONSerialization.jsonObject(with: posted) as? [String: Any])
             XCTAssertNil(obj["targetNodeId"] as? String)
             XCTAssertNil(obj["targetAnchor"] as? String)
+            XCTAssertEqual(obj["mindmapId"] as? String, self.mindmapId)
 
             let res = Self.httpResponse(for: request, statusCode: 201)
             return (res, body)
@@ -165,7 +162,6 @@ final class ConnectionControllerFlowTests: XCTestCase {
         let model = try await controller.addConnection(
             sourceNodeId: sourceNodeId,
             sourceAnchor: .bottom,
-            ideaId: ideaId,
             mindmapId: mindmapId,
             accessToken: accessToken
         )
@@ -186,5 +182,48 @@ final class ConnectionControllerFlowTests: XCTestCase {
 
         let controller = makeController()
         try await controller.deleteConnection(id: connectionId, accessToken: accessToken)
+    }
+
+    func testUpdateConnection_PATCHesJSONAndDecodes() async throws {
+        let row = Self.connectionResponseJSONObject(
+            id: connectionId,
+            mindmapId: mindmapId,
+            sourceNodeId: sourceNodeId,
+            targetNodeId: targetNodeId,
+            sourceAnchor: "top",
+            targetAnchor: "bottom"
+        )
+        let body = try Self.jsonData(row)
+
+        MockURLProtocol.requestHandler = { request in
+            XCTAssertEqual(request.httpMethod, "PATCH")
+            XCTAssertEqual(request.url?.path, "/connections/\(self.connectionId)")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer \(self.accessToken)")
+
+            let posted = Self.httpBodyData(from: request)
+            let obj = try XCTUnwrap(try JSONSerialization.jsonObject(with: posted) as? [String: Any])
+            XCTAssertEqual(obj["sourceAnchor"] as? String, "top")
+            XCTAssertEqual(obj["targetNodeId"] as? String, self.targetNodeId)
+            XCTAssertEqual(obj["targetAnchor"] as? String, "bottom")
+            XCTAssertEqual(obj.count, 3)
+
+            let res = Self.httpResponse(for: request, statusCode: 200)
+            return (res, body)
+        }
+
+        let controller = makeController()
+        let model = try await controller.updateConnection(
+            id: connectionId,
+            targetNodeId: targetNodeId,
+            sourceAnchor: .top,
+            targetAnchor: .bottom,
+            accessToken: accessToken
+        )
+
+        XCTAssertEqual(model.id, connectionId)
+        XCTAssertEqual(model.sourceAnchor, .top)
+        XCTAssertEqual(model.targetNodeId, targetNodeId)
+        XCTAssertEqual(model.targetAnchor, .bottom)
     }
 }

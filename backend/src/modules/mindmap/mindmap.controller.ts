@@ -4,7 +4,7 @@ import type { NextFunction, Request, Response } from "express";
 import {
   connectionResponseBodySchema,
   type ConnectionResponseBody,
-} from "../connection/connection.schema";
+} from "../connections/connection.schema";
 import {
   nodeResponseBodySchema,
   type NodeResponseBody,
@@ -13,6 +13,7 @@ import {
   listMindmapsQuerySchema,
   loadMindmapQuerySchema,
   mindmapCreateBodySchema,
+  mindmapGenerateSummaryResponseSchema,
   mindmapIdParamsSchema,
   mindmapLoadDocumentResponseSchema,
   mindmapResponseBodySchema,
@@ -34,7 +35,6 @@ function toMindmapResponseBody(row: Mindmap): MindmapResponseBody {
 function toNodeResponseBody(row: MindmapNode): NodeResponseBody {
   return nodeResponseBodySchema.parse({
     id: row.id,
-    idea_id: row.ideaId,
     mindmap_id: row.mindmapId,
     parent_node_id: row.parentNodeId,
     position: { x: row.positionX, y: row.positionY },
@@ -46,7 +46,6 @@ function toNodeResponseBody(row: MindmapNode): NodeResponseBody {
 function toConnectionResponseBody(row: MindmapConnection): ConnectionResponseBody {
   return connectionResponseBodySchema.parse({
     id: row.id,
-    idea_id: row.ideaId,
     mindmap_id: row.mindmapId,
     source_node_id: row.sourceNodeId,
     target_node_id: row.targetNodeId,
@@ -96,6 +95,49 @@ export async function listMindmaps(req: Request, res: Response, next: NextFuncti
   }
 }
 
+export async function generateMindmapSummary(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const paramsParsed = mindmapIdParamsSchema.safeParse(req.params);
+  if (!paramsParsed.success) {
+    res.status(400).json({
+      error: "Validation failed",
+      details: paramsParsed.error.flatten(),
+    });
+    return;
+  }
+
+  const queryParsed = loadMindmapQuerySchema.safeParse(req.query);
+  if (!queryParsed.success) {
+    res.status(400).json({
+      error: "Validation failed",
+      details: queryParsed.error.flatten(),
+    });
+    return;
+  }
+
+  const userId = req.authUser!.id;
+
+  try {
+    const result = await mindmapService.generateMindmapSummaryForUser(
+      userId,
+      paramsParsed.data.id,
+      queryParsed.data.idea_id,
+    );
+    if (!result.ok) {
+      if (result.kind === "not_found") {
+        res.status(404).json({ error: "Mindmap not found" });
+        return;
+      }
+      res.status(503).json({ error: result.message });
+      return;
+    }
+
+    const body = mindmapGenerateSummaryResponseSchema.parse({ summary: result.summary });
+    res.status(200).json(body);
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function loadMindmap(req: Request, res: Response, next: NextFunction): Promise<void> {
   const paramsParsed = mindmapIdParamsSchema.safeParse(req.params);
   if (!paramsParsed.success) {
@@ -131,6 +173,7 @@ export async function loadMindmap(req: Request, res: Response, next: NextFunctio
     const body = mindmapLoadDocumentResponseSchema.parse({
       id: doc.id,
       idea_id: doc.ideaId,
+      title: doc.title,
       nodes: doc.nodes.map(toNodeResponseBody),
       connections: doc.connections.map(toConnectionResponseBody),
       last_transform: { scale: 1, translate_x: 0, translate_y: 0 },

@@ -14,7 +14,6 @@ import * as connectionService from "./connection.service";
 function toConnectionResponseBody(row: MindmapConnection): ConnectionResponseBody {
   return connectionResponseBodySchema.parse({
     id: row.id,
-    idea_id: row.ideaId,
     mindmap_id: row.mindmapId,
     source_node_id: row.sourceNodeId,
     target_node_id: row.targetNodeId,

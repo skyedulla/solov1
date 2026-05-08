@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { connectionResponseBodySchema } from "../connection/connection.schema";
+import { connectionResponseBodySchema } from "../connections/connection.schema";
 import { nodeResponseBodySchema } from "../nodes/node.schema";
 
 /** Express `req.query` values may be `string | string[] | undefined`. */
@@ -66,9 +66,17 @@ const mindmapLastTransformSchema = z.object({
 export const mindmapLoadDocumentResponseSchema = z.object({
   id: z.string().uuid(),
   idea_id: z.string().uuid(),
+  title: z.string(),
   nodes: z.array(nodeResponseBodySchema),
   connections: z.array(connectionResponseBodySchema),
   last_transform: mindmapLastTransformSchema,
 });
 
 export type MindmapLoadDocumentResponse = z.infer<typeof mindmapLoadDocumentResponseSchema>;
+
+/** **`POST /mindmaps/:id/generate-summary`** — LLM-produced text persisted on **`mindmaps.summary`**. */
+export const mindmapGenerateSummaryResponseSchema = z.object({
+  summary: z.string(),
+});
+
+export type MindmapGenerateSummaryResponse = z.infer<typeof mindmapGenerateSummaryResponseSchema>;

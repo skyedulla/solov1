@@ -10,7 +10,6 @@ export const NODES_SEARCH_LIMIT = 5;
 type MindmapNodeSqlRow = {
   id: string;
   user_id: string;
-  idea_id: string;
   mindmap_id: string;
   parent_node_id: string | null;
   position_x: number;
@@ -26,7 +25,6 @@ function mapSqlRowToMindmapNode(row: MindmapNodeSqlRow): MindmapNode {
   return {
     id: row.id,
     userId: row.user_id,
-    ideaId: row.idea_id,
     mindmapId: row.mindmap_id,
     parentNodeId: row.parent_node_id,
     positionX: row.position_x,
@@ -60,7 +58,7 @@ export async function findNodesForUserMindmap(
   }
 
   const rows = await prisma.$queryRaw<MindmapNodeSqlRow[]>(Prisma.sql`
-      SELECT id, user_id, idea_id, mindmap_id, parent_node_id, position_x, position_y, text, width, height, created_at, updated_at
+      SELECT id, user_id, mindmap_id, parent_node_id, position_x, position_y, text, width, height, created_at, updated_at
       FROM mindmap_nodes
       WHERE user_id = ${userId}
         AND mindmap_id = ${mindmapId}
@@ -73,14 +71,10 @@ export async function findNodesForUserMindmap(
   return rows.map(mapSqlRowToMindmapNode);
 }
 
-/** All nodes for a map and idea (no search limit — used when loading a full mind map). */
-export async function findAllNodesForUserMindmapIdea(
-  userId: string,
-  mindmapId: string,
-  ideaId: string,
-): Promise<MindmapNode[]> {
+/** All nodes for a map (no search limit — used when loading a full mind map). */
+export async function findAllNodesForUserMindmap(userId: string, mindmapId: string): Promise<MindmapNode[]> {
   return prisma.mindmapNode.findMany({
-    where: { userId, mindmapId, ideaId },
+    where: { userId, mindmapId },
     orderBy: [{ text: "asc" }, { id: "asc" }],
   });
 }
@@ -89,7 +83,6 @@ export async function createNodeForUser(userId: string, body: NodeCreateBody): P
   return prisma.mindmapNode.create({
     data: {
       userId,
-      ideaId: body.ideaId,
       mindmapId: body.mindmapId,
       parentNodeId: body.parentNodeId ?? null,
       positionX: body.position.x,
@@ -114,9 +107,6 @@ export async function updateNodeForUser(
 ): Promise<MindmapNode | null> {
   const data: Prisma.MindmapNodeUpdateInput = {};
 
-  if (body.ideaId !== undefined) {
-    data.ideaId = body.ideaId;
-  }
   if (body.mindmapId !== undefined) {
     data.mindmapId = body.mindmapId;
   }

@@ -98,7 +98,7 @@ final class IdeasRemoteDataSource: Sendable {
     }
 
     /// **`PATCH {base}/ideas/{id}`** with JSON body (**`title`**, **`purpose`** required; **`description`**, **`targetUser`** optional) and **`Authorization: Bearer`**.
-    func updateIdea(
+    func editIdea(
         id: String,
         title: String,
         purpose: String,

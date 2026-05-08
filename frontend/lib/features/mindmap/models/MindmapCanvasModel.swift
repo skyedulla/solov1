@@ -1,12 +1,11 @@
 import Foundation
 
-/// Canvas view settings: appearance, grid snap, and viewport.
-struct CanvasModel: Codable, Sendable {
+/// Mind map canvas: appearance, grid snap, and viewport.
+struct MindmapCanvasModel: Codable, Sendable {
     /// When **`snapToGrid`** is enabled, node positions are rounded to this increment (**5** pt).
     static let defaultSnapToGrid: Int = 5
 
     var id: String
-    var mindmapId: String
     /// e.g. hex `"#1C1C1E"`; align with your color picker / `Color` mapping.
     var backgroundColor: String
     var backgroundDesign: BackgroundDesign
@@ -22,7 +21,6 @@ struct CanvasModel: Codable, Sendable {
 
     enum CodingKeys: String, CodingKey {
         case id
-        case mindmapId = "mindmap_id"
         case backgroundColor = "background_color"
         case backgroundDesign = "background_design"
         case snapToGrid = "snap_to_grid"

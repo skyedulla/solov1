@@ -14,6 +14,13 @@ export async function createMindmapForUser(userId: string, body: MindmapCreateBo
   });
 }
 
+/** Mind map row for **`userId`** + **`mindmapId`** (any idea). */
+export async function findMindmapByIdForUser(userId: string, mindmapId: string): Promise<Mindmap | null> {
+  return prisma.mindmap.findFirst({
+    where: { id: mindmapId, userId },
+  });
+}
+
 export async function findMindmapByIdForUserAndIdea(
   userId: string,
   mindmapId: string,
@@ -29,6 +36,22 @@ export async function findMindmapsForUserByIdea(userId: string, ideaId: string):
     where: { userId, ideaId },
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
   });
+}
+
+/**
+ * Updates **`summary`** when **`mindmaps`** row exists for **`userId`** + **`mindmapId`** + **`ideaId`**.
+ */
+export async function updateMindmapSummaryForUser(
+  userId: string,
+  mindmapId: string,
+  ideaId: string,
+  summary: string,
+): Promise<boolean> {
+  const result = await prisma.mindmap.updateMany({
+    where: { id: mindmapId, userId, ideaId },
+    data: { summary },
+  });
+  return result.count > 0;
 }
 
 /**
@@ -48,10 +71,10 @@ export async function deleteMindmapCascadeForUser(
       return false;
     }
     await tx.mindmapConnection.deleteMany({
-      where: { userId, mindmapId, ideaId },
+      where: { userId, mindmapId },
     });
     await tx.mindmapNode.deleteMany({
-      where: { userId, mindmapId, ideaId },
+      where: { userId, mindmapId },
     });
     await tx.mindmap.delete({
       where: { id: mindmapId },

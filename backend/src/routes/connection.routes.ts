@@ -6,7 +6,7 @@ import {
   deleteConnection,
   listConnections,
   updateConnection,
-} from "../modules/connection/connection.controller";
+} from "../modules/connections/connection.controller";
 
 export const connectionRoutes = Router();
 
