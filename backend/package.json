@@ -8,14 +8,21 @@
     "start": "node dist/index.js",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
-    "token": "node scripts/print-supabase-token.cjs",
-    "test:e2e": "jest --config jest.e2e.config.cjs"
+    "create_token": "node scripts/create_token.cjs",
+    "token": "node scripts/create_token.cjs",
+    "test:e2e": "jest --config jest.e2e.config.cjs",
+    "test:ai:stream": "npm run build && node dist/scripts/aiPromptStreamCli.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1045.0",
+    "@aws-sdk/s3-request-presigner": "^3.1045.0",
+    "@langchain/core": "^1.1.44",
+    "@langchain/openai": "^1.4.5",
     "@prisma/client": "^6.3.1",
     "@supabase/supabase-js": "^2.103.3",
     "dotenv": "^16.6.1",
     "express": "^4.21.2",
+    "openai": "^6.35.0",
     "winston": "^3.19.0",
     "zod": "^3.25.76"
   },

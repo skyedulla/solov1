@@ -1,6 +1,6 @@
 import Foundation
 
-/// Sends AI prompt requests via **`URLSession`** only (**`POST /ai/prompt`**) — no response interpretation beyond raw **`Data`**.
+/// Sends AI prompt requests via **`URLSession`** only (**`POST /ai/prompt`**).
 final class AIRemoteDataSource: Sendable {
     private let session: URLSession
     private let baseURL: URL
@@ -11,7 +11,7 @@ final class AIRemoteDataSource: Sendable {
     }
 
     /// **`POST {base}/ai/prompt`** with JSON body (**`AIPromptModel`**, snake_case keys) and **`Authorization: Bearer`**.
-    func sendPrompt(_ prompt: AIPromptModel, accessToken: String) async throws -> (Data, URLResponse) {
+    func sendPromptRaw(_ prompt: AIPromptModel, accessToken: String) async throws -> (Data, URLResponse) {
         let url = baseURL
             .appendingPathComponent("ai", isDirectory: false)
             .appendingPathComponent("prompt", isDirectory: false)
@@ -29,4 +29,20 @@ final class AIRemoteDataSource: Sendable {
 
         return try await session.data(for: request)
     }
+
+    func sendPrompt(_ prompt: AIPromptModel, accessToken: String) async throws -> AICompletionResponseModel {
+        let (data, response) = try await sendPromptRaw(prompt, accessToken: accessToken)
+        let status = (response as? HTTPURLResponse)?.statusCode ?? -1
+        guard (200...299).contains(status) else {
+            throw AIRemoteDataSourceError.unacceptableHTTPStatus(status)
+        }
+
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return try decoder.decode(AICompletionResponseModel.self, from: data)
+    }
+}
+
+enum AIRemoteDataSourceError: Error, Equatable {
+    case unacceptableHTTPStatus(Int)
 }
