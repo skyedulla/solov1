@@ -29,7 +29,7 @@ For each feature under `backend/src/modules/<feature>/`, keep responsibilities a
 
 - **Persistence only**: use the **ORM** (Prisma) to read/write **PostgreSQL**.
 - No HTTP concerns, no Zod, no Express types.
-- On database failures, use **`logDatabaseError(error, context)`** from `backend/src/core/databaseLogger.ts` with a short unique **`context`** string.
+- Unexpected failures on the shared **`prisma`** client are logged in **`core/prisma.ts`** (query extension). Use **`try/catch`** only to map expected Prisma codes (e.g. **`P2025`**) into **`null`** / **`false`**. Other DB clients or scripts must call **`logDatabaseError(error, context)`** from **`backend/src/core/databaseLogger.ts`**.
 
 ## Schemas (`*.schema.ts`)
 

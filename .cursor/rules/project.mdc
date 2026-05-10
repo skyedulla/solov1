@@ -68,7 +68,7 @@ Per feature, respect this **HTTP → data** pipeline:
 
 ### Database / Prisma error logging
 
-- In **every backend repository** and in **any TypeScript file that uses Prisma** (including one-off scripts under the backend if they touch the ORM), handle database failures with **`logDatabaseError(error, context)`** from **`backend/src/core/databaseLogger.ts`**. Use a short, unique **`context`** string (e.g. `UserRepository.findByEmail`).
+- In **repositories**, rely on the shared **`prisma`** client’s query extension (**`core/prisma.ts`**) to log unexpected Prisma failures; use **`try/catch`** only to map expected codes (e.g. **`P2025`** → **`null`**). For **any TypeScript that uses Prisma outside that client** (extra **`PrismaClient`** instances, scripts), call **`logDatabaseError(error, context)`** from **`backend/src/core/databaseLogger.ts`** with a short unique **`context`** string.
 - Use **`isPrismaError`** when you need to branch on Prisma-specific errors; **`getPrismaCodeDescription`** is available for messages if needed.
 - Do not swallow Prisma-related errors silently at persistence boundaries; prefer these helpers over ad-hoc `console.error` for ORM failures.
 
@@ -92,5 +92,7 @@ Per feature, respect this **HTTP → data** pipeline:
 
 ## AI assistance
 
+- **Do not create new files** (source, tests, configs, docs, stubs, helpers, rule files, etc.) **unless the user explicitly asks you to**. Prefer extending or fixing existing files. If splitting would help, propose it first and wait for instruction.
 - Read surrounding files before editing; reuse existing helpers and types instead of duplicating logic.
 - Do not add unsolicited documentation files (README, ADRs) unless the user asks.
+- When the user **deletes or removes** a module or asks you to drop a file, **do not invent replacement files or stubs** to restore behavior unless they explicitly ask. Assume removed functionality stays removed; fix breakage only by adjusting or removing dependents in line with their intent—not by scaffolding parallel helpers.

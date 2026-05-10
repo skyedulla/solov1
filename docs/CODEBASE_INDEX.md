@@ -1,6 +1,6 @@
 # SOLO codebase index
 
-Inventory of meaningful project files, ordered **alphabetically by file name** (last path segment), using **ASCII / byte order** (e.g. uppercase letters before lowercase). When two files share a name, the **full path** breaks the tie. **Update this document** whenever you add, remove, or meaningfully change a tracked file (see `.cursor/rules/codebase-index.mdc`).
+Inventory of meaningful project files, ordered **alphabetically by file name** (last path segment), using **ASCII / byte order** (e.g. uppercase letters before lowercase). When two files share a name, the **full path** breaks the tie. **This snapshot is no longer actively maintained**; it may drift from the repo.
 
 ---
 
@@ -54,7 +54,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 ### `frontend/Tests/SoloLibTests/ConnectionControllerFlowTests.swift`
 
-**Area:** Swift — mind map connection tests.  
+**Area:** Swift — connections feature tests.  
 **Purpose:** Verify **`ConnectionController`** with **`ConnectionsRemoteDataSource`** + stub **`URLSession`**.  
 **Contents:** **`MockURLProtocol`** integration tests for **`addConnection`** (with target, open-ended body omitting **`targetNodeId`** / **`targetAnchor`**) and **`deleteConnection`**.
 
@@ -116,35 +116,35 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 ---
 
-### `frontend/lib/features/mindmap/models/CanvasModel.swift`
+### `frontend/lib/features/connections/controllers/ConnectionController.swift`
+
+**Area:** Swift — connections feature coordination.  
+**Purpose:** Orchestrates connection (**edge**) **`POST`** / **`DELETE`** against the API.  
+**Contents:** **`final class ConnectionController`**: injectable **`ConnectionsRemoteDataSource`**; **`addConnection(sourceNodeId:sourceAnchor:targetNodeId:targetAnchor:mindmapId:accessToken:)`** (optional **`target*`** together — **`POST …/connections`**, **`201`**); **`deleteConnection(id:accessToken:)`** (**`DELETE …/connections/{id}`**, **`204`**); decodes **`ConnectionModel`** with default **`JSONDecoder`** (model uses explicit snake_case **`CodingKeys`**).
+
+---
+
+### `frontend/lib/features/connections/models/ConnectionModel.swift`
+
+**Area:** Swift — connections feature model.  
+**Purpose:** Typed bundle for an edge between two nodes (anchors on each end).  
+**Contents:** **`ConnectionAnchor`** enum (**`String`**: **`top`**, **`right`**, **`left`**, **`bottom`**); **`Codable`** struct **`ConnectionModel`**: **`id`**, **`mindmapId`**, **`sourceNodeId`**, optional **`targetNodeId`** / **`targetAnchor`** (open link until set); **`sourceAnchor`**; JSON keys **`mindmap_id`**, **`source_node_id`**, **`target_node_id`**, **`source_anchor`**, **`target_anchor`** (idea scope via **`MindmapModel.ideaId`**).
+
+---
+
+### `frontend/lib/features/connections/data_source/ConnectionsRemoteDataSource.swift`
+
+**Area:** Swift — connections API I/O.  
+**Purpose:** **`URLSession`** **`POST /connections`** (camelCase JSON body) and **`DELETE …/connections/{id}`** with **`Authorization: Bearer`**.  
+**Contents:** **`ConnectionsRemoteDataSource`**: **`addConnection(…)`** (camelCase body; optional **`targetNodeId`** / **`targetAnchor`** omitted unless both set), **`deleteConnection(id:accessToken:)`**; returns raw **`(Data, URLResponse)`**.
+
+---
+
+### `frontend/lib/features/mindmap/models/MindmapCanvasModel.swift`
 
 **Area:** Swift — mind map feature model.  
 **Purpose:** Persisted canvas appearance and viewport (separate from **`.nodes`** graph data in **`MindmapModel`**).  
-**Contents:** **`Codable`** struct **`CanvasModel`**: **`id`**, **`mindmapId`**, **`backgroundColor`**, **`backgroundDesign`**, **`snapToGrid`** (**`Bool`**, increment **`defaultSnapToGrid`**: **5** when on), **`zoomLevel`**, **`panPosition`** (**`x`**, **`y`**); JSON snake_case for API keys.
-
----
-
-### `frontend/lib/features/mindmap/controllers/ConnectionController.swift`
-
-**Area:** Swift — mind map coordination.  
-**Purpose:** Orchestrates connection (**edge**) **`POST`** / **`DELETE`** against the API.  
-**Contents:** **`final class ConnectionController`**: injectable **`ConnectionsRemoteDataSource`**; **`addConnection(sourceNodeId:sourceAnchor:targetNodeId:targetAnchor:ideaId:mindmapId:accessToken:)`** (optional **`target*`** together — **`POST …/connections`**, **`201`**); **`deleteConnection(id:accessToken:)`** (**`DELETE …/connections/{id}`**, **`204`**); decodes **`ConnectionModel`** with default **`JSONDecoder`** (model uses explicit snake_case **`CodingKeys`**).
-
----
-
-### `frontend/lib/features/mindmap/models/ConnectionModel.swift`
-
-**Area:** Swift — mind map feature model.  
-**Purpose:** Typed bundle for an edge between two nodes (anchors on each end).  
-**Contents:** **`ConnectionAnchor`** enum (**`String`**: **`top`**, **`right`**, **`left`**, **`bottom`**); **`Codable`** struct **`ConnectionModel`**: **`id`**, **`ideaId`**, **`mindmapId`**, **`sourceNodeId`**, optional **`targetNodeId`** / **`targetAnchor`** (open link until set); **`sourceAnchor`**; JSON keys **`idea_id`**, **`mindmap_id`**, **`source_node_id`**, **`target_node_id`**, **`source_anchor`**, **`target_anchor`**.
-
----
-
-### `frontend/lib/features/mindmap/data_source/ConnectionsRemoteDataSource.swift`
-
-**Area:** Swift — mind map API I/O.  
-**Purpose:** **`URLSession`** **`POST /connections`** (camelCase JSON body) and **`DELETE …/connections/{id}`** with **`Authorization: Bearer`**.  
-**Contents:** **`ConnectionsRemoteDataSource`**: **`addConnection(…)`** (camelCase body; optional **`targetNodeId`** / **`targetAnchor`** omitted unless both set), **`deleteConnection(id:accessToken:)`**; returns raw **`(Data, URLResponse)`**.
+**Contents:** **`Codable`** struct **`MindmapCanvasModel`**: **`id`**, **`backgroundColor`**, **`backgroundDesign`**, **`snapToGrid`** (**`Bool`**, increment **`defaultSnapToGrid`**: **5** when on), **`zoomLevel`**, **`panPosition`** (**`x`**, **`y`**); JSON snake_case for API keys.
 
 ---
 
@@ -152,7 +152,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Swift — mind map coordination.  
 **Purpose:** Persist new mind maps via the API and build **`MindmapModel`** with the server-assigned **`id`**.  
-**Contents:** **`final class MindmapController`**: injectable **`MindmapsRemoteDataSource`**; **`createMindmap`**, **`listMindmaps(ideaId:accessToken:)`** (**`GET …/mindmaps?idea_id=…`**, **`[MindmapSummaryModel]`**), **`loadMindmap`**, **`deleteMindmap`**, **`MindmapControllerError`** (includes **`unexpectedListResponse`**); **`loadMindmap`** decodes **`MindmapModel`** with a plain **`JSONDecoder`** (explicit model **`CodingKeys`**); create/list use **`convertFromSnakeCase`** + ISO-8601 where applicable.
+**Contents:** **`final class MindmapController`**: injectable **`MindmapsRemoteDataSource`**; **`createMindmap`**, **`listMindmaps(ideaId:accessToken:)`** (**`GET …/mindmaps?idea_id=…`**, **`[MindmapSummaryModel]`**), **`loadMindmap`**, **`generateMindmapSummary(id:ideaId:accessToken:)`** (**`POST …/mindmaps/{id}/generate-summary`**, **`String`** summary); **`deleteMindmap`**, **`MindmapControllerError`** (**`unexpectedGenerateSummaryResponse`**, **`summaryGenerationUnavailable`**, list/load/delete/not-found cases); **`loadMindmap`** decodes **`MindmapModel`** with a plain **`JSONDecoder`** (explicit model **`CodingKeys`**); create/list/generate-summary use **`convertFromSnakeCase`** + ISO-8601 where applicable.
 
 ---
 
@@ -160,7 +160,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Swift — mind map feature model.  
 **Purpose:** Full graph snapshot and saved viewport.  
-**Contents:** **`Codable`** struct **`MindmapModel`**: **`id`**, **`ideaId`** (JSON **`idea_id`**), **`[NodeModel]`**, **`[ConnectionModel]`**, **`lastTransform`** (**`MindmapViewTransform`**: **`scale`**, **`translateX`**, **`translateY`**; JSON **`last_transform`**, **`translate_x`**, **`translate_y`**).
+**Contents:** **`Codable`** struct **`MindmapModel`**: **`id`**, **`ideaId`** (JSON **`idea_id`**), **`title`**, **`[NodeModel]`**, **`[ConnectionModel]`**, **`lastTransform`** (**`MindmapViewTransform`**: **`scale`**, **`translateX`**, **`translateY`**; JSON **`last_transform`**, **`translate_x`**, **`translate_y`**).
 
 ---
 
@@ -176,7 +176,119 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Swift — mind map API I/O.  
 **Purpose:** **`POST`**, **`GET`**, **`DELETE /mindmaps`** with **`Authorization: Bearer`**.  
-**Contents:** **`MindmapsRemoteDataSource`**: **`createMindmap`**, **`listMindmaps`**, **`loadMindmap`**, **`deleteMindmap`**; returns raw **`(Data, URLResponse)`**.
+**Contents:** **`MindmapsRemoteDataSource`**: **`createMindmap`**, **`listMindmaps`**, **`loadMindmap`**, **`generateMindmapSummary`** (**`POST …/mindmaps/{id}/generate-summary?idea_id=`**), **`deleteMindmap`**; returns raw **`(Data, URLResponse)`**.
+
+---
+
+### `backend/src/core/llm_service/chatCompletion.ts`
+
+**Area:** Backend — core LLM I/O.  
+**Purpose:** Thin non-streaming **`chat.completions`** wrapper with typed **`usage`** (including **`cachedPromptTokens`** for prompt-cache visibility).  
+**Contents:** **`completeChat`** → **`LlmCompletionResult`**; maps **`APIError`** to **`ok: false`**; default model **`gpt-4o-mini`**.
+
+---
+
+### `backend/src/core/llm_service/index.ts`
+
+**Area:** Backend — core LLM I/O.  
+**Purpose:** Barrel exports for **`llm_service`**.  
+**Contents:** Re-exports **`completeChat`**, **`LlmChatMessage`** types, **`getOpenAiClient`**, **`tryGetOpenAiClient`**.
+
+---
+
+### `backend/src/core/llm_service/openaiClient.ts`
+
+**Area:** Backend — core LLM I/O.  
+**Purpose:** Single lazily constructed **`OpenAI`** SDK instance keyed off **`OPENAI_API_KEY`**.  
+**Contents:** **`getOpenAiClient`** (throws if unset); **`tryGetOpenAiClient`** (**`null`** if unset).
+
+---
+
+### `backend/src/modules/ai/ai.controller.ts`
+
+**Area:** Backend — AI HTTP handlers.  
+**Purpose:** Validate **`POST /ai/prompt`** with Zod and return **`LlmCompletionResult`** JSON.  
+**Contents:** **`sendPrompt`** — **`sendPromptBodySchema.safeParse`**, **`sendPromptForUser`**, **`200`** always on handled requests (**`400`** on validation failure).
+
+---
+
+### `backend/src/modules/ai/ai.repository.ts`
+
+**Area:** Backend — AI persistence / policy stub.  
+**Purpose:** Boundary for quotas, audit logs, or future Prisma-backed invocation rows.  
+**Contents:** **`assertAiInvocationAllowed`** — currently returns **`true`** for any authenticated user id.
+
+---
+
+### `backend/src/modules/ai/ai.schema.ts`
+
+**Area:** Backend — AI validation.  
+**Purpose:** Zod for **`POST /ai/prompt`** (camelCase JSON, Swift-aligned).  
+**Contents:** **`aiPromptContextSchema`** / **`AiPromptContext`**; **`sendPromptHistoryMessageSchema`** / **`SendPromptHistoryMessage`** (**`user`** | **`assistant`**, max **100**); **`sendPromptBodySchema`** / **`SendPromptBody`** (**`query`**, optional **`route`**, **`context`**, **`history`**, **`model`**, **`temperature`**, **`maxCompletionTokens`**).
+
+---
+
+### `backend/src/modules/ai/ai.service.ts`
+
+**Area:** Backend — AI orchestration.  
+**Purpose:** Dispatch **`body.route`** (**`general`** default vs **`HIGHLIGHT_FOLLOW_UP_ROUTE_ID`**) and run **`completeChat`**.  
+**Contents:** **`sendPromptForUser`** — **`assertAiInvocationAllowed`**; builds **`[system, …history, currentUser]`** from route constructors + optional **`body.history`**; **`completeChat`** with optional model / sampling params.
+
+---
+
+### `backend/src/modules/ai/prompt_constructor/generalQueryPrompt.ts`
+
+**Area:** Backend — AI prompt helpers / default chat layout.  
+**Purpose:** System + user messages for the **`general`** **`POST /ai/prompt`** route.  
+**Contents:** **`buildGeneralQueryMessages`** — SOLO-wide base system line + optional **`AiPromptContext`** fragments around **`query`**.
+
+---
+
+### `backend/src/modules/ai/prompt_constructor/highlightedFollowUpPrompt.ts`
+
+**Area:** Backend — AI prompt helpers / highlight follow-up message builder.  
+**Purpose:** Labeled excerpt preamble (**`formatHighlightedTextContext`**) and **`buildHighlightedFollowUpQueryMessages`** for **`completeChat`**; stable **`HIGHLIGHT_FOLLOW_UP_ROUTE_ID`** for dispatch.  
+**Contents:** **`AiPromptContext`** (via **`../ai.schema`** type import); **`FormatHighlightedTextContextParams`**, **`HighlightedExcerptSourceRole`**; **`formatHighlightedTextContext`**; **`HIGHLIGHT_FOLLOW_UP_ROUTE_ID`**; **`buildHighlightedFollowUpQueryMessages`** (SOLO stance + highlight-follow-up guardrails).
+
+---
+
+### `backend/src/modules/ai/prompt_constructor/objectiveContextPrompt.ts`
+
+**Area:** Backend — AI prompt helpers.  
+**Purpose:** Formats the AI-panel **chat objective** (what the user wants to achieve) for **`AiPromptContext`** injection.  
+**Contents:** **`FormatObjectiveContextParams`** (**`objectiveText`**, optional **`maxChars`**); **`formatObjectiveContext`** wraps trimmed text in **`[BEGIN / END CHAT OBJECTIVE]`** (intro line references SOLO’s AI panel) or returns **`""`** when unset.
+
+---
+
+### `backend/src/modules/ai/prompt_constructor/roleContextPrompt.ts`
+
+**Area:** Backend — AI prompt helpers.  
+**Purpose:** Builds prompt-ready copy from role / persona context (stub until flows define inputs).  
+**Contents:** **`formatRoleContext`** — placeholder returning **`""`**; signature and body to be implemented next.
+
+---
+
+### `frontend/lib/features/ai/viewmodel/AIController.swift`
+
+**Area:** Swift — AI coordination.  
+**Purpose:** Parses **`POST /ai/prompt`** responses after **`AIRemoteDataSource`** transport.  
+**Contents:** **`actor AIController`**: **`conversationHistory`** (**`SendPromptHistoryMessage`** tape); **`sendPrompt(query:route:context:model:temperature:maxCompletionTokens:accessToken:)`** sends accumulated **`history`** then appends user **`query`** + assistant reply on **`.success`** (trimmed); **`sendPrompt(body:accessToken:)`** stateless; **`resetConversation()`**, **`setMaxStoredHistoryMessages`**.
+
+---
+
+### `frontend/lib/features/ai/data_source/AIRemoteDataSource.swift`
+
+**Area:** Swift — AI API I/O.  
+**Purpose:** Raw **`URLSession`** **`POST …/ai/prompt`** with Bearer auth.  
+**Contents:** **`final class AIRemoteDataSource`**; **`sendPrompt(body:accessToken:)`** → **`(Data, URLResponse)`**.
+
+---
+
+### `frontend/lib/features/ai/models/SendPromptModels.swift`
+
+**Area:** Swift — AI wire / domain types.  
+**Purpose:** Encodable request + decodable **`LlmCompletionResult`** envelope for **`/ai/prompt`**.  
+**Contents:** **`AiPromptRouteID`**, **`AiPromptContextPayload`**, **`SendPromptHistoryRole`**, **`SendPromptHistoryMessage`**, **`SendPromptRequestBody`** (optional **`history`**), **`LlmCompletionUsageModel`**, **`SendPromptResult`** (**`success`** / **`failure`**).
 
 ---
 
@@ -248,7 +360,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Swift — ideas API I/O.  
 **Purpose:** **`URLSession`** **`GET /ideas`** with **`sort`**, optional **`q`**, and **`Authorization: Bearer`**.  
-**Contents:** **`IdeasRemoteDataSource`**: **`fetchIdeas(filter:accessToken:)`** → **`GET …/ideas`**; **`createNewIdea(…)`** → **`POST …/ideas`**; **`updateIdea(id:…isPublished:…)`** → **`PATCH …/ideas/{id}`** (optional **`isPublished`** in JSON body); **`deleteIdea(id:accessToken:)`** → **`DELETE …/ideas/{id}`**; all use **`Authorization: Bearer`** where applicable; return raw **`(Data, URLResponse)`** only.
+**Contents:** **`IdeasRemoteDataSource`**: **`fetchIdeas(filter:accessToken:)`** → **`GET …/ideas`**; **`createNewIdea(…)`** → **`POST …/ideas`**; **`editIdea(id:…isPublished:…)`** → **`PATCH …/ideas/{id}`** (optional **`isPublished`** in JSON body); **`deleteIdea(id:accessToken:)`** → **`DELETE …/ideas/{id}`**; all use **`Authorization: Bearer`** where applicable; return raw **`(Data, URLResponse)`** only.
 
 ---
 
@@ -304,7 +416,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Swift — nodes feature model.  
 **Purpose:** Typed bundle for a single mind map node’s fields.  
-**Contents:** **`Codable`** struct **`NodeModel`**: **`ideaId`**, **`mindmapId`**, **`id`**, optional **`parentNodeId`**, **`position`** (**`x`**, **`y`** as **`Int`**), **`text`**, **`dimensions`** (**`height`**, **`width`** as **`Int`**); JSON keys **`idea_id`**, **`mindmap_id`**, **`parent_node_id`**.
+**Contents:** **`Codable`** struct **`NodeModel`**: **`mindmapId`**, **`id`**, optional **`parentNodeId`**, **`position`** (**`x`**, **`y`** as **`Int`**), **`text`**, **`dimensions`** (**`height`**, **`width`** as **`Int`**); JSON keys **`mindmap_id`**, **`parent_node_id`** (idea scope via **`MindmapModel.ideaId`**).
 
 ---
 
@@ -396,70 +508,6 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 ---
 
-### `backend/e2e/auth.e2e.test.ts`
-
-**Area:** Backend — Jest E2E.  
-**Purpose:** Exercise real **Supabase Auth** flows that mirror the Swift **`AuthController`** (**`signInWithPassword`**, **`signUp`**, **`resetPasswordForEmail`**, **`signOut`**).  
-**Contents:** Uses **`@supabase/supabase-js`** and repo-root **`.env`** (**`SUPABASE_*`**, **`EMAIL`**, **`PASSWORD`**); disposable sign-up email.
-
----
-
-### `backend/e2e/globalSetup.cjs`
-
-**Area:** Backend — Jest E2E lifecycle.  
-**Purpose:** Start **`launch_dev_build.sh --api-only`** (Docker Postgres + migrate + API) before tests, or wait on **`/health`** when **`SOLO_E2E_SKIP_STACK=1`**.  
-**Contents:** Loads **`.env`**; validates required keys; spawns detached **`bash launch_dev_build.sh --api-only`** from repo root; writes **`e2e/.api-stack.pid`**; polls **`API_BASE_URL`** **`/health`**.
-
----
-
-### `backend/e2e/globalTeardown.cjs`
-
-**Area:** Backend — Jest E2E lifecycle.  
-**Purpose:** Stop the API process tree started by **`globalSetup`** via **`tree-kill`** (**`SIGTERM`**).  
-**Contents:** Reads **`e2e/.api-stack.pid`**; no-op when **`SOLO_E2E_SKIP_STACK=1`**.
-
----
-
-### `backend/e2e/ideas.e2e.test.ts`
-
-**Area:** Backend — Jest E2E.  
-**Purpose:** Real HTTP against **`/ideas`** matching **`IdeaController`** (list, create, patch edit, patch publish toggle, delete).  
-**Contents:** **`getTestAccessToken`** + **`apiFetch`**; serial tests sharing a created idea id; expects **`200/201/204`** and JSON shapes aligned with **`idea.schema`**.
-
----
-
-### `backend/jest.e2e.config.cjs`
-
-**Area:** Backend — Jest E2E.  
-**Purpose:** Separate Jest config for integration tests without changing **`src`** **`tsconfig`** **`rootDir`**.  
-**Contents:** **`ts-jest`** transform with inline **`tsconfig`**; **`globalSetup`** / **`globalTeardown`**; **`setupFilesAfterEnv`** **`jest.env.ts`**; **`maxWorkers: 1`**, long timeout, **`forceExit`**.
-
----
-
-### `backend/e2e/jest.env.ts`
-
-**Area:** Backend — Jest E2E.  
-**Purpose:** Load repo-root **`.env`** before each test file (Jest **`cwd`** is **`backend/`**).  
-**Contents:** **`dotenv.config`** on **`../.env`**.
-
----
-
-### `backend/e2e/objectives.e2e.test.ts`
-
-**Area:** Backend — Jest E2E.  
-**Purpose:** Real HTTP against **`/objectives`** matching **`ObjectiveController`** (POST create, PATCH, POST complete, DELETE).  
-**Contents:** Bearer token from **`getTestAccessToken`**; asserts status codes and **`is_completed`** toggle.
-
----
-
-### `backend/e2e/testHelpers.ts`
-
-**Area:** Backend — Jest E2E.  
-**Purpose:** Shared **`fetch`** wrapper and Supabase sign-in for authenticated API calls.  
-**Contents:** **`apiBaseURL`**, **`requireEnv`**, **`getTestAccessToken`** (**`signInWithPassword`**), **`apiFetch`** with **`Authorization: Bearer`**.
-
----
-
 ### `backend/src/core/auth.middleware.ts`
 
 **Area:** Backend — HTTP auth.  
@@ -471,8 +519,8 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 ### `backend/src/createApp.ts`
 
 **Area:** Backend — Express application factory.  
-**Purpose:** Build the JSON-enabled Express app (health + **`/ideas`** + **`/mindmaps`** + **`/nodes`** + **`/connections`** + **`/objectives`** + error handler) without opening a port — reused by **`index.ts`**.  
-**Contents:** **`createApp()`** returns **`express.Application`** with **`express.json()`**, **`apiAccessLoggingMiddleware`**, **`/health`**, route **`use`** for ideas/mindmaps/nodes/connections/objectives, and **`500`** handler: **`logApiError`** for non-Prisma errors (**Prisma** failures are already logged in **`core/prisma.ts`** query extension, so they are not duplicated here).
+**Purpose:** Build the JSON-enabled Express app (health + **`/ai`** + **`/ideas`** + **`/mindmaps`** + **`/nodes`** + **`/connections`** + **`/objectives`** + error handler) without opening a port — reused by **`index.ts`**.  
+**Contents:** **`createApp()`** returns **`express.Application`** with **`express.json()`**, **`apiAccessLoggingMiddleware`**, **`/health`**, route **`use`** for ai/ideas/mindmaps/nodes/connections/objectives, and **`500`** handler: **`logApiError`** for non-Prisma errors (**Prisma** failures are already logged in **`core/prisma.ts`** query extension, so they are not duplicated here).
 
 ---
 
@@ -500,7 +548,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 ---
 
-### `backend/src/modules/connection/connection.controller.ts`
+### `backend/src/modules/connections/connection.controller.ts`
 
 **Area:** Backend — mind map connections HTTP handlers.  
 **Purpose:** Validate query, params, and bodies; return **`ConnectionResponseBody`** (snake_case) or **`204`**.  
@@ -508,27 +556,27 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 ---
 
-### `backend/src/modules/connection/connection.repository.ts`
+### `backend/src/modules/connections/connection.repository.ts`
 
 **Area:** Backend — mind map connections persistence.  
 **Purpose:** Prisma-only access for **`MindmapConnection`**.  
-**Contents:** **`findConnectionsForUserMindmap`** (optional **`ideaId`**); **`createConnectionForUser`**, **`findConnectionByIdForUser`**, **`updateConnectionForUser`** (**`P2025`** → **`null`**), **`deleteConnectionForUser`**; empty PATCH → **`findFirst`**.
+**Contents:** **`findConnectionsForUserMindmap`**; **`createConnectionForUser`**, **`findConnectionByIdForUser`**, **`updateConnectionForUser`** (**`P2025`** → **`null`**), **`deleteConnectionForUser`**; empty PATCH → **`findFirst`**.
 
 ---
 
-### `backend/src/modules/connection/connection.schema.ts`
+### `backend/src/modules/connections/connection.schema.ts`
 
 **Area:** Backend — connections validation.  
 **Purpose:** Zod for **`/connections`** list query, create/update bodies, response aligned with Swift **`ConnectionModel`**.  
-**Contents:** **`listConnectionsQuerySchema`** (**`mindmap_id`** UUID); **`connectionCreateBodySchema`** / **`connectionUpdateBodySchema`** (camelCase JSON; optional **`targetNodeId`** / **`targetAnchor`** together on create; **`null`** clears targets on update); **`connectionAnchorSchema`**; **`connectionResponseBodySchema`** (**`target_*`** nullable).
+**Contents:** **`listConnectionsQuerySchema`** (**`mindmap_id`** UUID); **`connectionCreateBodySchema`** / **`connectionUpdateBodySchema`** (camelCase JSON; optional **`targetNodeId`** / **`targetAnchor`** together on create; **`null`** clears targets on update); **`connectionAnchorSchema`**; **`connectionResponseBodySchema`** (**`mindmap_id`**, **`target_*`** nullable).
 
 ---
 
-### `backend/src/modules/connection/connection.service.ts`
+### `backend/src/modules/connections/connection.service.ts`
 
 **Area:** Backend — mind map connections orchestration.  
 **Purpose:** Map validated HTTP data to repository calls.  
-**Contents:** **`listConnectionsForUser`**; **`createConnectionForUser`** (**`ConnectionCreateResult`** — **`mindmap_not_found`** before insert); **`updateConnectionForUser`** (**`ConnectionUpdateResult`** — validates target **`mindmap`** when **`ideaId`** / **`mindmapId`** change); **`deleteConnectionForUser`**.
+**Contents:** **`listConnectionsForUser`**; **`createConnectionForUser`** (**`ConnectionCreateResult`** — **`mindmap_not_found`** before insert); **`updateConnectionForUser`** (**`ConnectionUpdateResult`** — validates target **`mindmap`** when **`mindmapId`** changes); **`deleteConnectionForUser`**.
 
 ---
 
@@ -567,32 +615,40 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 ### `backend/src/modules/mindmap/mindmap.controller.ts`
 
 **Area:** Backend — mind map resource HTTP handlers.  
-**Purpose:** Validate **`POST`**, **`GET /`** (list), **`GET /:id`**, **`DELETE /:id`**; mind map list and load payloads.  
-**Contents:** **`createMindmap`**; **`listMindmaps`** (**`listMindmapsQuerySchema`**, **`200`**, **`MindmapResponseBody[]`**); **`loadMindmap`**; **`deleteMindmap`**; node/connection mappers; **`404`** when applicable.
+**Purpose:** Validate **`POST`**, **`GET /`** (list), **`POST /:id/generate-summary`**, **`GET /:id`**, **`DELETE /:id`**; mind map list, summarization, and load payloads.  
+**Contents:** **`createMindmap`**; **`listMindmaps`** (**`listMindmapsQuerySchema`**, **`200`**, **`MindmapResponseBody[]`**); **`generateMindmapSummary`** (**`idea_id`** query, **`200`** **`{ summary }`**, **`503`** LLM/config failure); **`loadMindmap`**; **`deleteMindmap`**; node/connection mappers; **`404`** when applicable.
 
 ---
 
 ### `backend/src/modules/mindmap/mindmap.repository.ts`
 
 **Area:** Backend — mind map (`Mindmap`) persistence.  
-**Purpose:** Prisma **`create`** and **`findFirst`** for **`mindmaps`**.  
-**Contents:** **`createMindmapForUser`**, **`findMindmapByIdForUserAndIdea`**, **`findMindmapsForUserByIdea`** ( **`updatedAt`** desc), **`deleteMindmapCascadeForUser`** (**`$transaction`**).
+**Purpose:** Prisma **`create`**, **`findFirst`**, **`updateMany`** (**`summary`**), cascade delete for **`mindmaps`**.  
+**Contents:** **`createMindmapForUser`**, **`findMindmapByIdForUser`**, **`findMindmapByIdForUserAndIdea`**, **`findMindmapsForUserByIdea`** ( **`updatedAt`** desc), **`updateMindmapSummaryForUser`**, **`deleteMindmapCascadeForUser`** (**`$transaction`** — clears edges/nodes by **`userId`** + **`mindmapId`**).
 
 ---
 
 ### `backend/src/modules/mindmap/mindmap.schema.ts`
 
 **Area:** Backend — mind map validation.  
-**Purpose:** Zod for **`POST /mindmaps`**, **`GET` / **`DELETE /mindmaps/:id`**, and nested node/connection wire shapes on load.  
-**Contents:** **`mindmapCreateBodySchema`** (optional **`title`**, **`summary`**); **`mindmapResponseBodySchema`** (**`title`**, **`summary`** + ids/timestamps); **`mindmapIdParamsSchema`**, **`loadMindmapQuerySchema`**, **`listMindmapsQuerySchema`** (alias of **`idea_id`** query); **`mindmapLoadDocumentResponseSchema`** (**`idea_id`** plus graph + **`last_transform`**).
+**Purpose:** Zod for **`POST /mindmaps`**, **`POST /mindmaps/:id/generate-summary`**, **`GET` / **`DELETE /mindmaps/:id`**, and nested node/connection wire shapes on load.  
+**Contents:** **`mindmapCreateBodySchema`** (optional **`title`**, **`summary`**); **`mindmapResponseBodySchema`** (**`title`**, **`summary`** + ids/timestamps); **`mindmapGenerateSummaryResponseSchema`** (**`summary`**); **`mindmapIdParamsSchema`**, **`loadMindmapQuerySchema`**, **`listMindmapsQuerySchema`** (alias of **`idea_id`** query); **`mindmapLoadDocumentResponseSchema`** (**`idea_id`**, **`title`**, graph + **`last_transform`**).
 
 ---
 
 ### `backend/src/modules/mindmap/mindmap.service.ts`
 
 **Area:** Backend — mind map orchestration.  
-**Purpose:** Create mind maps, assemble full documents for **`GET`**, and cascade delete for **`DELETE`**.  
-**Contents:** **`createMindmapForUser`**, **`listMindmapsForUser`**; **`loadMindmapDocumentForUser`** (document includes **`ideaId`**); **`deleteMindmapForUser`**.
+**Purpose:** Create mind maps, assemble full documents for **`GET`**, LLM summarization (**`completeChat`** + **`mindmapSummarizationPrompt`**), persist **`summary`**, cascade delete for **`DELETE`**.  
+**Contents:** **`createMindmapForUser`**, **`listMindmapsForUser`**; **`loadMindmapDocumentForUser`** (document includes **`ideaId`** + **`title`**); **`generateMindmapSummaryForUser`**; **`deleteMindmapForUser`**.
+
+---
+
+### `backend/src/modules/mindmap/prompt_constructor/mindmapSummarizationPrompt.ts`
+
+**Area:** Backend — mind map LLM prompts.  
+**Purpose:** Pure **`LlmChatMessage[]`** builder for AI-assisted **`Mindmap`** summary refresh.  
+**Contents:** **`MindmapSummarizationNode`**, **`MindmapSummarizationConnection`**, **`MindmapSummarizationPromptInput`** (**`title`**, **`nodes`**, **`connections`**, optional stale **`currentSummary`**); **`mindmapSummarizationInputFromPersisted`** (Prisma **`MindmapNode`** / **`MindmapConnection`** → input); **`buildMindmapSummarizationMessages`** (concise SOLO **system** stance for graph-only summarization + structured graph sections and edge-aware user instructions).
 
 ---
 
@@ -608,7 +664,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Backend — mind map nodes persistence.  
 **Purpose:** Prisma-only access for **`MindmapNode`**.  
-**Contents:** **`NODES_SEARCH_LIMIT`** (**5**); **`findNodesForUserMindmap`**: at most 5 rows — empty **`q`** → **`findMany`** **`text`** / **`id`** asc; non-empty **`q`** → raw SQL **`strpos`** match + **`ORDER BY`** lowercased substring after first match + **`id`**; **`findAllNodesForUserMindmapIdea`**; **`createNodeForUser`**, **`findNodeByIdForUser`**, **`updateNodeForUser`** (**`P2025`** → **`null`**), **`deleteNodeForUser`**; empty PATCH → **`findFirst`**.
+**Contents:** **`NODES_SEARCH_LIMIT`** (**5**); **`findNodesForUserMindmap`**: at most 5 rows — empty **`q`** → **`findMany`** **`text`** / **`id`** asc; non-empty **`q`** → raw SQL **`strpos`** match + **`ORDER BY`** lowercased substring after first match + **`id`**; **`findAllNodesForUserMindmap`**; **`createNodeForUser`**, **`findNodeByIdForUser`**, **`updateNodeForUser`** (**`P2025`** → **`null`**), **`deleteNodeForUser`**; empty PATCH → **`findFirst`**.
 
 ---
 
@@ -616,7 +672,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Backend — mind maps routes.  
 **Purpose:** Register **`/mindmaps`** with auth.  
-**Contents:** **`requireAuth`**; **`POST /`**, **`GET /`** (**`listMindmaps`**, **`idea_id`** query), **`GET /:id`** (**`loadMindmap`**), **`DELETE /:id`** (**`deleteMindmap`**).
+**Contents:** **`requireAuth`**; **`POST /`**, **`GET /`** (**`listMindmaps`**, **`idea_id`** query), **`POST /:id/generate-summary`** (**`generateMindmapSummary`**, **`idea_id`** query — register before **`GET /:id`**), **`GET /:id`** (**`loadMindmap`**), **`DELETE /:id`** (**`deleteMindmap`**).
 
 ---
 
@@ -632,7 +688,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Backend — nodes validation.  
 **Purpose:** Zod for **`/nodes`** list query, create/update bodies, and response shape aligned with Swift **`NodeModel`**.  
-**Contents:** **`searchNodesQuerySchema`** (**`mindmap_id`** UUID, optional **`q`** trimmed, max 500 chars — empty **`q`** → first 5 by **`text`**; non-empty → up to 5 matches); **`nodeCreateBodySchema`** / **`nodeUpdateBodySchema`** (camelCase JSON); **`nodeResponseBodySchema`** (**`idea_id`**, **`mindmap_id`**, **`parent_node_id`**, nested **`position`** / **`dimensions`**).
+**Contents:** **`searchNodesQuerySchema`** (**`mindmap_id`** UUID, optional **`q`** trimmed, max 500 chars — empty **`q`** → first 5 by **`text`**; non-empty → up to 5 matches); **`nodeCreateBodySchema`** / **`nodeUpdateBodySchema`** (camelCase JSON); **`nodeResponseBodySchema`** (**`mindmap_id`**, **`parent_node_id`**, nested **`position`** / **`dimensions`**).
 
 ---
 
@@ -640,7 +696,15 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Backend — nodes orchestration.  
 **Purpose:** Map validated HTTP data to repository calls.  
-**Contents:** **`searchNodesForUser`**; **`createNodeForUser`** (**`NodeCreateResult`** — verifies **`mindmap`**); **`updateNodeForUser`** (**`NodeUpdateResult`** — verifies **`mindmap`** when **`ideaId`** / **`mindmapId`** change); **`deleteNodeForUser`**.
+**Contents:** **`searchNodesForUser`**; **`createNodeForUser`** (**`NodeCreateResult`** — verifies owning **`mindmap`** via **`findMindmapByIdForUser`**); **`updateNodeForUser`** (**`NodeUpdateResult`** — verifies **`mindmap`** when **`mindmapId`** changes); **`deleteNodeForUser`**.
+
+---
+
+### `backend/src/routes/ai.routes.ts`
+
+**Area:** Backend — AI routes.  
+**Purpose:** Register **`/ai`** paths with auth (mounted so **`POST /ai/prompt`**).  
+**Contents:** **`requireAuth`**; **`POST /prompt`** → **`sendPrompt`**.
 
 ---
 
@@ -780,6 +844,14 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 ---
 
+### `backend/prisma/migrations/20260503120000_drop_mindmap_node_connection_idea_id/migration.sql`
+
+**Area:** Database / Prisma.  
+**Purpose:** Remove denormalized **`idea_id`** from **`mindmap_nodes`** and **`mindmap_connections`** (idea scope remains on **`mindmaps.idea_id`**).  
+**Contents:** **`ALTER TABLE`** **`DROP COLUMN idea_id`** on both tables.
+
+---
+
 ### `backend/prisma/migrations/migration_lock.toml`
 
 **Area:** Database / Prisma.  
@@ -792,15 +864,15 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Node API package.  
 **Purpose:** Backend dependencies and scripts (`build`, `start`, Prisma).  
-**Contents:** Declares `express`, `@prisma/client`, `@supabase/supabase-js`, `dotenv`, `zod`, `prisma`, TypeScript; devDependencies **`jest`**, **`ts-jest`**, **`@types/jest`**, **`tree-kill`**; scripts **`clean`** (remove **`dist/`**), **`build`** (`clean` + `prisma generate` + **`tsc -p tsconfig.json`**), **`start`** (`node dist/index.js`), Prisma **`db:migrate`** / **`db:push`**, **`token`** (prints Supabase JWT from repo **`.env`**), **`test:e2e`** (Jest **`jest.e2e.config.cjs`** — Docker stack + real API + Supabase Auth).
+**Contents:** Declares `express`, `@prisma/client`, `@supabase/supabase-js`, `dotenv`, `openai`, `zod`, `prisma`, TypeScript; devDependencies **`jest`**, **`ts-jest`**, **`@types/jest`**, **`tree-kill`**; scripts **`clean`** (remove **`dist/`**), **`build`** (`clean` + `prisma generate` + **`tsc -p tsconfig.json`**), **`start`** (`node dist/index.js`), Prisma **`db:migrate`** / **`db:push`**, **`create_token`** / **`token`** (prints Supabase JWT from repo **`.env`**), **`test:e2e`** (**`jest --config jest.e2e.config.cjs`** — config/suite files are not in this repo until restored).
 
 ---
 
-### `backend/scripts/print-supabase-token.cjs`
+### `backend/scripts/create_token.cjs`
 
 **Area:** Backend — local dev helper.  
 **Purpose:** Print a Supabase access token for Postman or **`curl`** without fragile one-line shell escaping.  
-**Contents:** Reads repo-root **`.env`** (**`SUPABASE_URL`**, **`SUPABASE_ANON_KEY`**, **`EMAIL`**, **`PASSWORD`**); **`@supabase/supabase-js`** **`signInWithPassword`**; writes JWT to stdout. Run: **`npm run token --prefix backend`**.
+**Contents:** Reads repo-root **`.env`** (**`SUPABASE_URL`**, **`SUPABASE_ANON_KEY`**, **`EMAIL`**, **`PASSWORD`**); **`@supabase/supabase-js`** **`signInWithPassword`**; writes JWT to stdout. Run: **`npm run create_token --prefix backend`** (or **`npm run token --prefix backend`**, same script).
 
 ---
 
@@ -808,7 +880,7 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 **Area:** Workspace convenience.  
 **Purpose:** Shortcuts to backend scripts without **`cd backend`**.  
-**Contents:** **`npm run build`**, **`start`**, **`start:api`**, **`start:stack`** (Docker + migrate + API via **`launch_dev_build.sh --api-only`**) and **`npm run launch:dev`** (full **`launch_dev_build.sh`**: also **`xcodebuild`** + **`Solo.app`**; quit app tears down); **`token`** prints a Supabase JWT via **`backend`** **`token`** script; **`test:e2e`** runs **`backend`** Jest E2E suite.
+**Contents:** **`npm run build`**, **`start`**, **`start:api`**, **`start:stack`** (Docker + migrate + API via **`launch_dev_build.sh --api-only`**) and **`npm run launch:dev`** (full **`launch_dev_build.sh`**: also **`xcodebuild`** + **`Solo.app`**; quit app tears down); **`create_token`** / **`token`** prints a Supabase JWT via **`backend`**; **`test:e2e`** forwards to **`backend`** (see **`backend/package.json`**).
 
 ---
 
@@ -817,14 +889,6 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 **Area:** Database — Prisma client singleton.  
 **Purpose:** Single **`PrismaClient`** for the app; central **`logDatabaseError`** on failed queries (via **`$extends`** **`query.$allOperations`**).  
 **Contents:** Wraps **`new PrismaClient()`** with **`$extends`**: logs **`Prisma.{Model}.{operation}`** or **`Prisma.raw.{operation}`**, skips **`P2025`**, rethrows; export cast **`as PrismaClient`**; **`DATABASE_URL`** from **`schema.prisma`**.
-
----
-
-### `backend/src/core/systemLogger.ts`
-
-**Area:** Backend observability — system / process errors.  
-**Purpose:** Single place to log failures outside HTTP request handling (startup, shutdown, timers, global handlers) without conflating them with **`[api:…]`** or Prisma.  
-**Contents:** **`logSystemError(error, context)`** prints **`[system:…]`** blocks with optional stack; **`SystemLogger.error`** alias; callers use **`apiLogger`** / **`databaseLogger`** for request-scoped or ORM errors.
 
 ---
 
@@ -844,11 +908,27 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 ---
 
+### `docs/app_feature_description.md`
+
+**Area:** Documentation — product draft.  
+**Purpose:** Draft narrative of SOLO as an idea-development app so prompts and features stay aligned with intent.  
+**Contents:** Idea stores and formats; mind maps; AI research and controls; documents/sheets and referencing stored idea data; attachments and RAG-style ingestion (e.g. codebases); note that capabilities evolve.
+
+---
+
+### `docs/prompt_constructors.md`
+
+**Area:** Documentation — LLM prompts.  
+**Purpose:** Lets developers review prompt wording; high-level SOLO stance is grounded in `.cursor/rules/project.mdc` and `docs/app_feature_description.md`, not ad hoc chat.  
+**Contents:** One section per prompt constructor with System prompt, Guardrails, Other controls; implementation paths listed at top.
+
+---
+
 ### `backend/prisma/schema.prisma`
 
 **Area:** Database / Prisma ORM.  
 **Purpose:** Defines PostgreSQL models and **`DATABASE_URL`** datasource.  
-**Contents:** `generator client`, `datasource db`, **`User`**, **`Idea`**, **`Mindmap`** (**`title`**, **`summary`**, **`idea_id`**), **`Objective`** (**`user_id`**, **`idea_id`**, **`text`**, **`is_completed`** — Supabase **`sub`** on **`user_id`**), **`MindmapNode`**, enum **`MindmapConnectionAnchor`** + **`MindmapConnection`** (nullable **`target_*`**); snake_case **`@@map`** table names.
+**Contents:** `generator client`, `datasource db`, **`User`**, **`Idea`**, **`Mindmap`** (**`title`**, **`summary`**, **`idea_id`**), **`Objective`** (**`user_id`**, **`idea_id`**, **`text`**, **`is_completed`** — Supabase **`sub`** on **`user_id`**), **`MindmapNode`** (**`mindmap_id`** only — idea via **`Mindmap`**), enum **`MindmapConnectionAnchor`** + **`MindmapConnection`** (**`mindmap_id`** only, nullable **`target_*`**); snake_case **`@@map`** table names.
 
 ---
 
@@ -860,10 +940,10 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 ---
 
-### `frontend/lib/core/constants/background_design_constants.swift`
+### `frontend/lib/core/constants/settings/mindmap_canvas_background_design_options.swift`
 
-**Area:** Swift — mind map canvas background.  
-**Purpose:** Stable enum values for **`CanvasModel.backgroundDesign`**.  
+**Area:** Swift — mind map canvas settings (constants).  
+**Purpose:** Stable enum values for **`MindmapCanvasModel.backgroundDesign`**.  
 **Contents:** **`BackgroundDesign`** (**`String`**, **`Codable`**): **`none`**, **`dots`**; **`BackgroundDesignConstants.options`** re-exports all cases for pickers.
 
 ---
@@ -904,4 +984,4 @@ Inventory of meaningful project files, ordered **alphabetically by file name** (
 
 ## Module placeholders (empty folders)
 
-`backend/src/modules/` may contain other feature folders (**`ai`**, **`workshop`**, **`core`**) reserved for future code; **`connection`** has **`connection.controller.ts`**, **`connection.repository.ts`**, **`connection.schema.ts`**, **`connection.service.ts`**; **`ideas`** has **`idea.controller.ts`**, **`idea.repository.ts`**, **`idea.schema.ts`**, **`idea.service.ts`**; **`mindmap`** has **`mindmap.controller.ts`**, **`mindmap.repository.ts`**, **`mindmap.schema.ts`**, **`mindmap.service.ts`**; **`nodes`** has **`node.controller.ts`**, **`node.repository.ts`**, **`node.schema.ts`**, **`node.service.ts`**; **`objectives`** has **`objective.controller.ts`**, **`objective.repository.ts`**, **`objective.schema.ts`**, **`objective.service.ts`**. The former **`auth`** module was removed (client auth uses Supabase only). Add entries here when files land.
+`backend/src/modules/` includes **`ai/`** (**`ai.controller.ts`**, **`ai.repository.ts`**, **`ai.schema.ts`**, **`ai.service.ts`**) plus **`ai/prompt_constructor/`** (**`generalQueryPrompt.ts`**, **`highlightedFollowUpPrompt.ts`**, **`objectiveContextPrompt.ts`**, **`roleContextPrompt.ts`** stub); other feature folders (**`workshop`**, **`core`**) may be reserved for future code; **`connections`** has **`connection.controller.ts`**, **`connection.repository.ts`**, **`connection.schema.ts`**, **`connection.service.ts`**; **`ideas`** has **`idea.controller.ts`**, **`idea.repository.ts`**, **`idea.schema.ts`**, **`idea.service.ts`**; **`mindmap`** has **`mindmap.controller.ts`**, **`mindmap.repository.ts`**, **`mindmap.schema.ts`**, **`mindmap.service.ts`**; **`nodes`** has **`node.controller.ts`**, **`node.repository.ts`**, **`node.schema.ts`**, **`node.service.ts`**; **`objectives`** has **`objective.controller.ts`**, **`objective.repository.ts`**, **`objective.schema.ts`**, **`objective.service.ts`**. The former **`auth`** module was removed (client auth uses Supabase only). Add entries here when files land.

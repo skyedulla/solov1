@@ -26,6 +26,8 @@
 		3DE8DD7AE1A582007C4FE241 /* AuthModeSwitchRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D8A190C238B3EF4E9EE963 /* AuthModeSwitchRow.swift */; };
 		3EF9621A11AEF0B75B35002A /* MindmapControllerFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA150D57EA430DCFDA0E304F /* MindmapControllerFlowTests.swift */; };
 		447423B60D9E6AA63E0A76EF /* AuthControllerFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5DA32090895F0D561579F16 /* AuthControllerFlowTests.swift */; };
+		A82D5B3EA9E65874938109AB /* FileModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91E4C2DA8F5476382910ABC /* FileModel.swift */; };
+		82F7E6D5C4B3A29170605443 /* StorageRemoteDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F8E7D6C5B4A39281706554 /* StorageRemoteDataSource.swift */; };
 		461348277E46B9608D864093 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F8433D4ADD65E76D3A34EDA /* AppConfiguration.swift */; };
 		4C1664AAA54E369F2397EEAE /* NodesRemoteDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648BF7E4BBB7A70EAF336CF8 /* NodesRemoteDataSource.swift */; };
 		4CD4E0BA9833195437555BF9 /* ObjectivesRemoteDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804D648738E55682EBFCC171 /* ObjectivesRemoteDataSource.swift */; };
@@ -39,6 +41,8 @@
 		79DD4B8432773A8165413DA7 /* IdeaControllerFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ED9866A4106AE1772DF8760 /* IdeaControllerFlowTests.swift */; };
 		7C0FA07E278F923319F65AF5 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 19A913F36046C87AFC4F1B19 /* Supabase */; };
 		8A387526C8255B0ABDE4339A /* MindmapController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB1FDF010C58C5BB9DD4DFD /* MindmapController.swift */; };
+		B9E4D3C220F65C8D0B3E9F2A514C7D0B /* MindmapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F3C2D110E54B7C9A2D8E1F403B6C9A /* MindmapViewModel.swift */; };
+		E2F3A4B5C6D7E890ABCDEF01 /* MindmapManagementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E2F3A4B5C6D7E890ABCDEF /* MindmapManagementViewModel.swift */; };
 		8AFD67F8F5445B77BD034495 /* AIPromptModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0143DBC6C492140C93478BB5 /* AIPromptModel.swift */; };
 		8C2873BD16ED4875F394E5FD /* AuthGoogleMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266950ABDB4D6024F682ACE1 /* AuthGoogleMark.swift */; };
 		9278B48AD6EB60C03D2704FF /* NodeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71EDCBAF223917BDB331D20C /* NodeController.swift */; };
@@ -62,6 +66,7 @@
 		D744743A5C4805B46B6188E7 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 257CF2BB763C0A1D893EDD66 /* Supabase */; };
 		DA2D2F56B8EAC6E7C1247F98 /* ConnectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41283DEC1295AD97CDD178A /* ConnectionController.swift */; };
 		DFCCFF36BC6DE9CABE30CD79 /* llm_response_settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E837169166638FB423B946E /* llm_response_settings.swift */; };
+		B7C8D9012E453A6F8091BBC1 /* UIPlaygroundScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7C8D9012E453A6F8091BBC0 /* UIPlaygroundScreen.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,6 +100,8 @@
 		33DCE5141B3E1B4B8BF03B9A /* AuthTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTheme.swift; sourceTree = "<group>"; };
 		3799D85D92BBB08761761070 /* ai_tool_types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ai_tool_types.swift; sourceTree = "<group>"; };
 		3EB1FDF010C58C5BB9DD4DFD /* MindmapController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindmapController.swift; sourceTree = "<group>"; };
+		A8F3C2D110E54B7C9A2D8E1F403B6C9A /* MindmapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindmapViewModel.swift; sourceTree = "<group>"; };
+		D1E2F3A4B5C6D7E890ABCDEF /* MindmapManagementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindmapManagementViewModel.swift; sourceTree = "<group>"; };
 		42FF1CB07D8B2EB8763B6D5F /* AuthFormContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFormContainer.swift; sourceTree = "<group>"; };
 		44844BDF7C89CBF97797E261 /* ConnectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionModel.swift; sourceTree = "<group>"; };
 		4E837169166638FB423B946E /* llm_response_settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = llm_response_settings.swift; sourceTree = "<group>"; };
@@ -124,6 +131,8 @@
 		A69F7D127F74E77940E8E325 /* ConnectionControllerFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionControllerFlowTests.swift; sourceTree = "<group>"; };
 		AAF7B2A9526AC9EC98D3B7E5 /* ObjectiveControllerFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectiveControllerFlowTests.swift; sourceTree = "<group>"; };
 		B067CDCD5555C3192295A19A /* ObjectiveModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectiveModel.swift; sourceTree = "<group>"; };
+		B91E4C2DA8F5476382910ABC /* FileModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileModel.swift; sourceTree = "<group>"; };
+		91F8E7D6C5B4A39281706554 /* StorageRemoteDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageRemoteDataSource.swift; sourceTree = "<group>"; };
 		B10CFD5B68FADD3FF11D2500 /* AuthModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthModel.swift; sourceTree = "<group>"; };
 		BC158C35D3542F5B8FE8C5B6 /* AuthFlowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFlowViewModel.swift; sourceTree = "<group>"; };
 		C4CDCD90422B360094ED7CC1 /* ObjectiveController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectiveController.swift; sourceTree = "<group>"; };
@@ -137,6 +146,7 @@
 		E6A9CB7DF5FE954F7DAD653F /* SupabaseClientProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseClientProvider.swift; sourceTree = "<group>"; };
 		EA150D57EA430DCFDA0E304F /* MindmapControllerFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindmapControllerFlowTests.swift; sourceTree = "<group>"; };
 		FD541BF99B01E8D6520F96B3 /* MockURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockURLProtocol.swift; sourceTree = "<group>"; };
+		B7C8D9012E453A6F8091BBC0 /* UIPlaygroundScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIPlaygroundScreen.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -316,8 +326,17 @@
 			children = (
 				800D465F67B34E094E0A6B8B /* core */,
 				66392A5A817BB54DFB09E712 /* features */,
+				B7C8D9012E453A6F8091BBC2 /* ui_playground */,
 			);
 			path = lib;
+			sourceTree = "<group>";
+		};
+		B7C8D9012E453A6F8091BBC2 /* ui_playground */ = {
+			isa = PBXGroup;
+			children = (
+				B7C8D9012E453A6F8091BBC0 /* UIPlaygroundScreen.swift */,
+			);
+			path = ui_playground;
 			sourceTree = "<group>";
 		};
 		6060903120E0C2AF549DE408 /* components */ = {
@@ -350,6 +369,7 @@
 				4669E330868362F054301CAE /* ideas */,
 				9B3A5545902108858ADEE1F1 /* mindmap */,
 				04BCCC94B7B29753445ADCF2 /* nodes */,
+				E64B3929A7C43642716587AA /* storage */,
 				CC4EEE9D77DF975AD7FE2B1C /* workshop */,
 			);
 			path = features;
@@ -396,6 +416,7 @@
 				B6E07EE1A2F93276479C6CF7 /* controllers */,
 				46E9AB2B9E2CF7B306395C09 /* data_source */,
 				D131780C0AD09A7441690947 /* models */,
+				C1A2B3C4D5E67890ABCDEF12 /* viewmodels */,
 			);
 			path = mindmap;
 			sourceTree = "<group>";
@@ -431,6 +452,15 @@
 				3EB1FDF010C58C5BB9DD4DFD /* MindmapController.swift */,
 			);
 			path = controllers;
+			sourceTree = "<group>";
+		};
+		C1A2B3C4D5E67890ABCDEF12 /* viewmodels */ = {
+			isa = PBXGroup;
+			children = (
+				D1E2F3A4B5C6D7E890ABCDEF /* MindmapManagementViewModel.swift */,
+				A8F3C2D110E54B7C9A2D8E1F403B6C9A /* MindmapViewModel.swift */,
+			);
+			path = viewmodels;
 			sourceTree = "<group>";
 		};
 		C27C493FAA84547B3CB584CF /* controllers */ = {
@@ -476,6 +506,31 @@
 				91F3B40D273236B5E270C850 /* MindmapCanvasModel.swift */,
 				1D7CC0A3206E088628D439CC /* MindmapModel.swift */,
 				50E1C0ABCA2E2ED5EFFB6F08 /* MindmapSummaryModel.swift */,
+			);
+			path = models;
+			sourceTree = "<group>";
+		};
+		E64B3929A7C43642716587AA /* storage */ = {
+			isa = PBXGroup;
+			children = (
+				71E6D5C4B3A291806054332 /* data_source */,
+				D73C4A29B8D54753827098AA /* models */,
+			);
+			path = storage;
+			sourceTree = "<group>";
+		};
+		71E6D5C4B3A291806054332 /* data_source */ = {
+			isa = PBXGroup;
+			children = (
+				91F8E7D6C5B4A39281706554 /* StorageRemoteDataSource.swift */,
+			);
+			path = data_source;
+			sourceTree = "<group>";
+		};
+		D73C4A29B8D54753827098AA /* models */ = {
+			isa = PBXGroup;
+			children = (
+				B91E4C2DA8F5476382910ABC /* FileModel.swift */,
 			);
 			path = models;
 			sourceTree = "<group>";
@@ -699,6 +754,7 @@
 				DA2D2F56B8EAC6E7C1247F98 /* ConnectionController.swift in Sources */,
 				116E517A240B33464DBCC48B /* ConnectionModel.swift in Sources */,
 				193286BD96BE8633CBC1FA85 /* ConnectionsRemoteDataSource.swift in Sources */,
+				A82D5B3EA9E65874938109AB /* FileModel.swift in Sources */,
 				9C13E25F549F8020C57249E3 /* IdeaController.swift in Sources */,
 				03ACD06FF42EF7D8CC4A5E03 /* IdeaFilterModel.swift in Sources */,
 				10CCD11F0440E3960F505E1A /* IdeaModel.swift in Sources */,
@@ -707,6 +763,8 @@
 				625C41C8DC0F80626789C6FA /* LoginScreen.swift in Sources */,
 				B3B39CA7C553B22A7DFCA75B /* MindmapCanvasModel.swift in Sources */,
 				8A387526C8255B0ABDE4339A /* MindmapController.swift in Sources */,
+				B9E4D3C220F65C8D0B3E9F2A514C7D0B /* MindmapViewModel.swift in Sources */,
+				E2F3A4B5C6D7E890ABCDEF01 /* MindmapManagementViewModel.swift in Sources */,
 				93A78454C370E971C3F143A9 /* MindmapModel.swift in Sources */,
 				088F6348F58495DFE69D5F74 /* MindmapSummaryModel.swift in Sources */,
 				93F3A56033A04095F5BDD449 /* MindmapsRemoteDataSource.swift in Sources */,
@@ -717,7 +775,9 @@
 				31B06C99229CACE3823BE1DC /* ObjectiveModel.swift in Sources */,
 				4CD4E0BA9833195437555BF9 /* ObjectivesRemoteDataSource.swift in Sources */,
 				6B85CFBF28F1589D75467438 /* SignUpScreen.swift in Sources */,
+				82F7E6D5C4B3A29170605443 /* StorageRemoteDataSource.swift in Sources */,
 				6FE3B99E5B3BF6DFD81B98B0 /* SupabaseClientProvider.swift in Sources */,
+				B7C8D9012E453A6F8091BBC1 /* UIPlaygroundScreen.swift in Sources */,
 				1DE38D517B2B3D7CB6D4FE5C /* ai_tool_types.swift in Sources */,
 				DFCCFF36BC6DE9CABE30CD79 /* llm_response_settings.swift in Sources */,
 				26203605859685118ED1D7E4 /* mindmap_canvas_background_design_options.swift in Sources */,

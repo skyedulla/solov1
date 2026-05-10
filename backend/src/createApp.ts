@@ -8,6 +8,7 @@ import { ideaRoutes } from "./routes/idea.routes";
 import { mindmapRoutes } from "./routes/mindmap.routes";
 import { nodeRoutes } from "./routes/node.routes";
 import { objectiveRoutes } from "./routes/objective.routes";
+import { storageRoutes } from "./routes/storage.routes";
 
 /**
  * Builds the Express app (routes + JSON parser + error handler) without listening.
@@ -28,6 +29,7 @@ export function createApp(): express.Application {
   app.use("/nodes", nodeRoutes);
   app.use("/connections", connectionRoutes);
   app.use("/objectives", objectiveRoutes);
+  app.use("/storage", storageRoutes);
 
   app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
     const context = `${req.method} ${req.originalUrl}`;

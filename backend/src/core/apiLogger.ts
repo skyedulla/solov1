@@ -3,7 +3,6 @@ import type { NextFunction, Request, RequestHandler, Response } from "express";
 /**
  * Logs each completed HTTP request (method, path, status, duration).
  * Use **`logApiError`** for failures; use **`logDatabaseError`** for Prisma / DB client failures.
- * Use **`logSystemError`** from **`systemLogger`** for process/system-level failures outside request handling.
  */
 export function logApiAccess(method: string, path: string, statusCode: number, durationMs: number): void {
   console.log(`[api] ${method} ${path} ${statusCode} ${durationMs}ms`);
@@ -24,7 +23,6 @@ export function apiAccessLoggingMiddleware(): RequestHandler {
 /**
  * Logs non-database errors for the HTTP API (Express routes, middleware, etc.).
  * Use **`logDatabaseError`** from **`databaseLogger`** for Prisma / DB client failures.
- * Use **`logSystemError`** from **`systemLogger`** for process/system-level failures outside request handling.
  */
 export function logApiError(error: unknown, context: string): void {
   const lines: string[] = [`[api:${context}]`];

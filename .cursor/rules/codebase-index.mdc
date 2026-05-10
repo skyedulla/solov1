@@ -1,30 +1,6 @@
 ---
-description: Keep docs/CODEBASE_INDEX.md in sync when the repo layout or file purposes change
-alwaysApply: true
+description: ARCHIVED — CODEBASE_INDEX is no longer maintained as a workflow
+alwaysApply: false
 ---
 
-# Codebase index maintenance
-
-The canonical **alphabetical inventory** of meaningful project files is **`docs/CODEBASE_INDEX.md`**.
-
-## When to update it
-
-Update that document in the **same change** (or immediately after) when you:
-
-- **Add** a new tracked source, config, or doc file that is part of the SOLO app or tooling (TypeScript, Swift, Prisma, Docker, Postman, Cursor rules, root `package.json` / `tsconfig`, `.vscode`, etc.).
-- **Delete** or **rename** a file that has an entry in the index.
-- **Change** a file’s responsibilities enough that its **Area**, **Purpose**, or **Contents** summary would be misleading.
-
-Do **not** require updates for: edits that only fix typos or internals without changing what the file *is for*; generated folders (`backend/dist`, `frontend/.build`, `node_modules`); or lockfiles unless the team explicitly indexes them.
-
-## How to update
-
-1. **Order:** Sort entries **alphabetically by file name** (basename only, not folder path). Use **ASCII / byte order** (e.g. uppercase before lowercase; `migration.sql` before `migration_lock.toml`). If two entries share a name (e.g. `package.json`), break ties by **full path** (`backend/package.json` before root `package.json`). Match `sort` / simple string compare unless the team agrees on locale rules.
-2. **Each entry** should include:
-   - **Area** — feature or layer (e.g. auth, database, Swift client, infra).
-   - **Purpose** — one or two sentences on why the file exists.
-   - **Contents** — what the code or config actually does (handlers, models, env keys, etc.).
-3. Adjust the **“Excluded from this index”** or **module placeholders** sections if exclusions or empty feature folders change.
-4. If a new top-level area appears (e.g. a new `backend/src/modules/<feature>`), add a short subsection or bullet so readers can navigate quickly.
-
-Agents should treat a stale index as a bug: if you touch the tree, leave **`docs/CODEBASE_INDEX.md`** accurate for the next reader.
+`docs/CODEBASE_INDEX.md` remains in the repository as a snapshot for readers. **Do not** treat updating it as a required part of edits or structural changes agents make.
