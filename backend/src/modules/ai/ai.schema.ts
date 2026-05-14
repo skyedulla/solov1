@@ -24,22 +24,6 @@ export const aiPromptBodySchema = z.object({
 
 export type AiPromptBody = z.infer<typeof aiPromptBodySchema>;
 
-/** **`POST /ai/prompt`** success body (Swift decodes snake_case usage fields). */
-export const aiPromptCompletionResponseSchema = z.object({
-  content: z.string(),
-  model: z.string(),
-  /** Resolved conversation id (echoed when client sent one, or the server-generated id). */
-  conversation_id: z.string().uuid().optional(),
-  usage: z.object({
-    prompt_tokens: z.number(),
-    completion_tokens: z.number(),
-    total_tokens: z.number(),
-    cached_prompt_tokens: z.number().nullable(),
-  }),
-});
-
-export type AiPromptCompletionResponseBody = z.infer<typeof aiPromptCompletionResponseSchema>;
-
 export const aiPromptStreamChunkSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("conversation"),

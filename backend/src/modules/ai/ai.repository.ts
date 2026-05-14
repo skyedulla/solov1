@@ -2,22 +2,6 @@ import type { AIConversation, AIMessage } from "@prisma/client";
 
 import { prisma } from "../../core/prisma";
 
-export async function findConversationForUser(
-  userId: string,
-  ideaId: string,
-  conversationId: string,
-): Promise<AIConversation | null> {
-  return prisma.aIConversation.findFirst({
-    where: {
-      id: conversationId,
-      ideaId,
-      idea: {
-        userId,
-      },
-    },
-  });
-}
-
 export async function createConversationForUser(params: {
   userId: string;
   ideaId: string;
@@ -39,17 +23,32 @@ export async function createConversationForUser(params: {
   });
 }
 
-export async function findMessagesForConversation(
-  conversationId: string,
-): Promise<Pick<AIMessage, "prompt" | "output">[]> {
-  return prisma.aIMessage.findMany({
-    where: { conversationId },
-    orderBy: { createdAt: "asc" },
+/**
+ * Loads prior turns ordered by **`createdAt`**. **`null`** = no **`AIConversation`** row for **`(conversationId,
+ * ideaId, userId)`** (unknown id or unauthorized). **`[]`** = valid thread with no messages yet.
+ */
+export async function findMessagesForUserConversation(params: {
+  userId: string;
+  ideaId: string;
+  conversationId: string;
+}): Promise<Pick<AIMessage, "prompt" | "output">[] | null> {
+  const conv = await prisma.aIConversation.findFirst({
+    where: {
+      id: params.conversationId,
+      ideaId: params.ideaId,
+      idea: { userId: params.userId },
+    },
     select: {
-      prompt: true,
-      output: true,
+      messages: {
+        orderBy: { createdAt: "asc" },
+        select: {
+          prompt: true,
+          output: true,
+        },
+      },
     },
   });
+  return conv ? conv.messages : null;
 }
 
 export async function createMessageForConversation(params: {

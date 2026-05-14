@@ -67,8 +67,15 @@ function contentFromMessage(message: BaseMessage): string {
   return message.content.map((part) => (typeof part === "string" ? part : "text" in part ? part.text : "")).join("");
 }
 
-async function loadConversationMessages(conversationId: string): Promise<BaseMessage[]> {
-  const turns = await aiRepository.findMessagesForConversation(conversationId);
+async function loadConversationMessages(input: BaseChainInput): Promise<BaseMessage[] | null> {
+  const turns = await aiRepository.findMessagesForUserConversation({
+    userId: input.userId,
+    ideaId: input.ideaId,
+    conversationId: input.conversationId,
+  });
+  if (turns === null) {
+    return null;
+  }
   return turns.flatMap((turn) => [new HumanMessage(turn.prompt), new AIMessage(turn.output)]);
 }
 
@@ -153,8 +160,13 @@ export async function prepareBaseChainLlmMessages(input: BaseChainInput): Promis
     ["human", "{question}"],
   ]);
 
+  const history = await loadConversationMessages(input);
+  if (history === null) {
+    return null;
+  }
+
   const formattedMessages = await prompt.formatMessages({
-    history: await loadConversationMessages(input.conversationId),
+    history,
     question: buildCurrentUserMessage(input.query, input.context),
   });
 

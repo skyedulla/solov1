@@ -1,10 +1,6 @@
-import type { AiPromptBody, AiPromptCompletionResponseBody, AiPromptStreamChunk } from "./ai.schema";
+import type { AiPromptBody, AiPromptStreamChunk } from "./ai.schema";
 import * as aiRepository from "./ai.repository";
-import {
-  invokeBaseChain,
-  prepareBaseChainLlmMessages,
-  streamBaseChainCompletion,
-} from "./chains/baseChain";
+import { prepareBaseChainLlmMessages, streamBaseChainCompletion } from "./chains/baseChain";
 import { getToolConfig } from "./tools/toolRegistry";
 
 function titleFromPrompt(query: string): string {
@@ -15,17 +11,12 @@ function titleFromPrompt(query: string): string {
   return `${trimmed.slice(0, 61)}...`;
 }
 
-async function resolveConversationForPrompt(
+async function fetchConversationForPrompt(
   userId: string,
   body: AiPromptBody,
 ): Promise<{ conversationId: string } | null> {
   if (body.conversation_id) {
-    const conversation = await aiRepository.findConversationForUser(
-      userId,
-      body.idea_id,
-      body.conversation_id,
-    );
-    return conversation ? { conversationId: conversation.id } : null;
+    return { conversationId: body.conversation_id };
   }
 
   const conversation = await aiRepository.createConversationForUser({
@@ -36,57 +27,11 @@ async function resolveConversationForPrompt(
   return conversation ? { conversationId: conversation.id } : null;
 }
 
-export async function sendPromptForUser(
-  userId: string,
-  body: AiPromptBody,
-): Promise<AiPromptCompletionResponseBody | null> {
-  const resolved = await resolveConversationForPrompt(userId, body);
-  if (!resolved) {
-    return null;
-  }
-  const { conversationId } = resolved;
-
-  const toolConfig = await getToolConfig(body.tool_type);
-  const result = await invokeBaseChain({
-    toolConfig,
-    userId,
-    ideaId: body.idea_id,
-    conversationId,
-    query: body.query,
-    context: body.context,
-    model: body.llm_model,
-    temperature: body.temperature,
-    maxTokens: body.max_tokens,
-  });
-  if (!result) {
-    return null;
-  }
-
-  await aiRepository.createMessageForConversation({
-    conversationId,
-    prompt: body.query,
-    output: result.content,
-    tokenCount: result.usage.totalTokens,
-  });
-
-  return {
-    content: result.content,
-    model: result.model,
-    conversation_id: conversationId,
-    usage: {
-      prompt_tokens: result.usage.promptTokens,
-      completion_tokens: result.usage.completionTokens,
-      total_tokens: result.usage.totalTokens,
-      cached_prompt_tokens: result.usage.cachedPromptTokens,
-    },
-  };
-}
-
 export async function sendPromptStreamForUser(
   userId: string,
   body: AiPromptBody,
 ): Promise<AsyncGenerator<AiPromptStreamChunk> | null> {
-  const resolved = await resolveConversationForPrompt(userId, body);
+  const resolved = await fetchConversationForPrompt(userId, body);
   if (!resolved) {
     return null;
   }
