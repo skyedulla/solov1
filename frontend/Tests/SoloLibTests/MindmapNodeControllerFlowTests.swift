@@ -88,7 +88,7 @@ final class MindmapNodeControllerFlowTests: XCTestCase {
     private func sampleMindmapNode(isNewId: Bool = false) -> NodeModel {
         NodeModel(
             id: isNewId ? "00000000-0000-4000-8000-000000009999" : mindmapNodeId,
-            nodeType: .mindmapNode(mindmapId: mindmapId, text: "Mind map node body"),
+            nodeType: .mindmapNode(MindmapNodeModel(mindmapId: mindmapId, text: "Mind map node body")),
             parentNodeId: nil,
             position: NodeModel.Position(x: 5, y: 8),
             dimensions: NodeModel.Dimensions(height: 32, width: 100)
@@ -119,11 +119,11 @@ final class MindmapNodeControllerFlowTests: XCTestCase {
 
         XCTAssertEqual(list.count, 1)
         XCTAssertEqual(list[0].id, mindmapNodeId)
-        guard case let .mindmapNode(_, text) = list[0].nodeType else {
+        guard case let .mindmapNode(payload) = list[0].nodeType else {
             XCTFail("expected mindmap-node")
             return
         }
-        XCTAssertEqual(text, "Alpha")
+        XCTAssertEqual(payload.text, "Alpha")
     }
 
     func testSearchMindmapNodes_emptyQuery_omitsQParameter() async throws {
@@ -174,12 +174,12 @@ final class MindmapNodeControllerFlowTests: XCTestCase {
         let saved = try await controller.addMindmapNode(sampleMindmapNode(isNewId: true), accessToken: accessToken)
 
         XCTAssertEqual(saved.id, mindmapNodeId)
-        guard case let .mindmapNode(savedMindmapId, savedText) = saved.nodeType else {
+        guard case let .mindmapNode(saved) = saved.nodeType else {
             XCTFail("expected mindmap-node")
             return
         }
-        XCTAssertEqual(savedMindmapId, mindmapId)
-        XCTAssertEqual(savedText, "Mind map node body")
+        XCTAssertEqual(saved.mindmapId, mindmapId)
+        XCTAssertEqual(saved.text, "Mind map node body")
     }
 
     func testEditMindmapNode_PATCHesJSONAndDecodes() async throws {
@@ -199,21 +199,21 @@ final class MindmapNodeControllerFlowTests: XCTestCase {
         }
 
         var mindmapNode = sampleMindmapNode(isNewId: false)
-        guard case let .mindmapNode(mid, _) = mindmapNode.nodeType else {
+        guard case let .mindmapNode(existing) = mindmapNode.nodeType else {
             XCTFail("expected mindmap-node")
             return
         }
-        mindmapNode.nodeType = .mindmapNode(mindmapId: mid, text: "Updated")
+        mindmapNode.nodeType = .mindmapNode(MindmapNodeModel(mindmapId: existing.mindmapId, text: "Updated"))
 
         let controller = makeController()
         let saved = try await controller.editMindmapNode(mindmapNode, accessToken: accessToken)
 
         XCTAssertEqual(saved.id, mindmapNodeId)
-        guard case let .mindmapNode(_, updatedText) = saved.nodeType else {
+        guard case let .mindmapNode(updated) = saved.nodeType else {
             XCTFail("expected mindmap-node")
             return
         }
-        XCTAssertEqual(updatedText, "Updated")
+        XCTAssertEqual(updated.text, "Updated")
     }
 
     func testDeleteMindmapNode_fullStack_DELETEsAndAccepts204() async throws {

@@ -134,6 +134,11 @@ final class MindmapConnectionControllerFlowTests: XCTestCase {
         XCTAssertEqual(model.targetNodeId, targetNodeId)
         XCTAssertEqual(model.sourceAnchor, .right)
         XCTAssertEqual(model.targetAnchor, .left)
+        guard case let .mindmapConnection(scope) = model.connectionType else {
+            XCTFail("expected mindmap connection")
+            return
+        }
+        XCTAssertEqual(scope.mindmapId, mindmapId)
     }
 
     func testAddMindmapConnection_openEnded_omitsTargetFieldsInBody() async throws {
@@ -169,6 +174,11 @@ final class MindmapConnectionControllerFlowTests: XCTestCase {
         XCTAssertNil(model.targetNodeId)
         XCTAssertNil(model.targetAnchor)
         XCTAssertEqual(model.sourceAnchor, .bottom)
+        guard case let .mindmapConnection(scope) = model.connectionType else {
+            XCTFail("expected mindmap connection")
+            return
+        }
+        XCTAssertEqual(scope.mindmapId, mindmapId)
     }
 
     func testDeleteMindmapConnection_fullStack_DELETEsAndAccepts204() async throws {
@@ -228,5 +238,10 @@ final class MindmapConnectionControllerFlowTests: XCTestCase {
         XCTAssertEqual(model.sourceAnchor, .top)
         XCTAssertEqual(model.targetNodeId, targetNodeId)
         XCTAssertEqual(model.targetAnchor, .bottom)
+        guard case let .mindmapConnection(scope) = model.connectionType else {
+            XCTFail("expected mindmap connection")
+            return
+        }
+        XCTAssertEqual(scope.mindmapId, mindmapId)
     }
 }

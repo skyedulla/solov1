@@ -73,6 +73,10 @@
 		B2E4F68091C304152637D1A6 /* DecisionMapController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E4F68091C304152637D1A5 /* DecisionMapController.swift */; };
 		B2E4F68091C304152637D1A2 /* DecisionMapModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E4F68091C304152637D1A1 /* DecisionMapModel.swift */; };
 		B2E4F68091C304152637D1A4 /* DecisionMapsRemoteDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E4F68091C304152637D1A3 /* DecisionMapsRemoteDataSource.swift */; };
+		D2F8E410B301C403D948EA01 /* MindmapNodeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F8E410B301C403D948EA02 /* MindmapNodeModel.swift */; };
+		D2F8E410B301C403D948EA03 /* MindmapConnectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F8E410B301C403D948EA04 /* MindmapConnectionModel.swift */; };
+		D2F8E410B301C403D948EA05 /* DecisionNodeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F8E410B301C403D948EA06 /* DecisionNodeModel.swift */; };
+		D2F8E410B301C403D948EA07 /* DecisionConnectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F8E410B301C403D948EA08 /* DecisionConnectionModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -159,6 +163,10 @@
 		EA150D57EA430DCFDA0E304F /* MindmapControllerFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindmapControllerFlowTests.swift; sourceTree = "<group>"; };
 		FD541BF99B01E8D6520F96B3 /* MockURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockURLProtocol.swift; sourceTree = "<group>"; };
 		B7C8D9012E453A6F8091BBC0 /* UIPlaygroundScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIPlaygroundScreen.swift; sourceTree = "<group>"; };
+		D2F8E410B301C403D948EA02 /* MindmapNodeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindmapNodeModel.swift; sourceTree = "<group>"; };
+		D2F8E410B301C403D948EA04 /* MindmapConnectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindmapConnectionModel.swift; sourceTree = "<group>"; };
+		D2F8E410B301C403D948EA06 /* DecisionNodeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionNodeModel.swift; sourceTree = "<group>"; };
+		D2F8E410B301C403D948EA08 /* DecisionConnectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionConnectionModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -289,6 +297,7 @@
 			children = (
 				F0E1D2C3B4A5968778695A02 /* controllers */,
 				F0E1D2C3B4A5968778695A03 /* data_source */,
+				D2F8E410B301C403D948EAA1 /* models */,
 			);
 			path = mindmap-nodes;
 			sourceTree = "<group>";
@@ -314,8 +323,57 @@
 			children = (
 				F0E1D2C3B4A5968778695B02 /* controllers */,
 				F0E1D2C3B4A5968778695B03 /* data_source */,
+				D2F8E410B301C403D948EAA2 /* models */,
 			);
 			path = mindmap-connections;
+			sourceTree = "<group>";
+		};
+		D2F8E410B301C403D948EAA1 /* models */ = {
+			isa = PBXGroup;
+			children = (
+				D2F8E410B301C403D948EA02 /* MindmapNodeModel.swift */,
+			);
+			path = models;
+			sourceTree = "<group>";
+		};
+		D2F8E410B301C403D948EAA2 /* models */ = {
+			isa = PBXGroup;
+			children = (
+				D2F8E410B301C403D948EA04 /* MindmapConnectionModel.swift */,
+			);
+			path = models;
+			sourceTree = "<group>";
+		};
+		D2F8E410B301C403D948EAA3 /* models */ = {
+			isa = PBXGroup;
+			children = (
+				D2F8E410B301C403D948EA06 /* DecisionNodeModel.swift */,
+			);
+			path = models;
+			sourceTree = "<group>";
+		};
+		D2F8E410B301C403D948EAA4 /* decision-node */ = {
+			isa = PBXGroup;
+			children = (
+				D2F8E410B301C403D948EAA3 /* models */,
+			);
+			path = decision-node;
+			sourceTree = "<group>";
+		};
+		D2F8E410B301C403D948EAA5 /* models */ = {
+			isa = PBXGroup;
+			children = (
+				D2F8E410B301C403D948EA08 /* DecisionConnectionModel.swift */,
+			);
+			path = models;
+			sourceTree = "<group>";
+		};
+		D2F8E410B301C403D948EAA6 /* decision-connection */ = {
+			isa = PBXGroup;
+			children = (
+				D2F8E410B301C403D948EAA5 /* models */,
+			);
+			path = decision-connection;
 			sourceTree = "<group>";
 		};
 		F0E1D2C3B4A5968778695B02 /* controllers */ = {
@@ -428,6 +486,8 @@
 				B2E4F68091C304152637D1B1 /* controllers */,
 				B2E4F68091C304152637D1B3 /* data_source */,
 				B2E4F68091C304152637D1B2 /* models */,
+				D2F8E410B301C403D948EAA4 /* decision-node */,
+				D2F8E410B301C403D948EAA6 /* decision-connection */,
 			);
 			path = decision_map;
 			sourceTree = "<group>";
@@ -812,7 +872,10 @@
 				C7AE76713153D3EF916ACB89 /* AuthTheme.swift in Sources */,
 				DA2D2F56B8EAC6E7C1247F98 /* MindmapConnectionController.swift in Sources */,
 				116E517A240B33464DBCC48B /* ConnectionModel.swift in Sources */,
+				D2F8E410B301C403D948EA07 /* DecisionConnectionModel.swift in Sources */,
+				D2F8E410B301C403D948EA05 /* DecisionNodeModel.swift in Sources */,
 				193286BD96BE8633CBC1FA85 /* MindmapConnectionRemoteDataSource.swift in Sources */,
+				D2F8E410B301C403D948EA03 /* MindmapConnectionModel.swift in Sources */,
 				B2E4F68091C304152637D1A6 /* DecisionMapController.swift in Sources */,
 				B2E4F68091C304152637D1A2 /* DecisionMapModel.swift in Sources */,
 				B2E4F68091C304152637D1A4 /* DecisionMapsRemoteDataSource.swift in Sources */,
@@ -831,6 +894,7 @@
 				088F6348F58495DFE69D5F74 /* MindmapSummaryModel.swift in Sources */,
 				93F3A56033A04095F5BDD449 /* MindmapsRemoteDataSource.swift in Sources */,
 				9278B48AD6EB60C03D2704FF /* MindmapNodeController.swift in Sources */,
+				D2F8E410B301C403D948EA01 /* MindmapNodeModel.swift in Sources */,
 				B76E69E88F0A59AE82CB6871 /* NodeModel.swift in Sources */,
 				4C1664AAA54E369F2397EEAE /* MindmapNodeRemoteDataSource.swift in Sources */,
 				B122455FD271B98E4BC156BD /* ObjectiveController.swift in Sources */,

@@ -91,15 +91,15 @@ final class MindmapNodeRemoteDataSource: Sendable {
 
     /// Creates **`mindmapNode`** via **`POST {base}/mindmap-node`** (server assigns **`id`**).
     func addMindmapNode(_ mindmapNode: NodeModel, accessToken: String) async throws -> (Data, URLResponse) {
-        guard case let .mindmapNode(mindmapId, text) = mindmapNode.nodeType else {
+        guard case let .mindmapNode(payload) = mindmapNode.nodeType else {
             throw MindmapNodeRemoteDataSourceError.onlyMindmapNodesSupported
         }
         let url = baseURL.appendingPathComponent("mindmap-node", isDirectory: false)
         let body = CreateMindmapNodeRequestBody(
-            mindmapId: mindmapId,
+            mindmapId: payload.mindmapId,
             parentNodeId: mindmapNode.parentNodeId,
             position: mindmapNode.position,
-            text: text,
+            text: payload.text,
             dimensions: mindmapNode.dimensions
         )
         let encoder = JSONEncoder()
@@ -117,7 +117,7 @@ final class MindmapNodeRemoteDataSource: Sendable {
 
     /// Updates **`mindmapNode`** via **`PATCH {base}/mindmap-node/{id}`** with a full field snapshot.
     func editMindmapNode(_ mindmapNode: NodeModel, accessToken: String) async throws -> (Data, URLResponse) {
-        guard case let .mindmapNode(mindmapId, text) = mindmapNode.nodeType else {
+        guard case let .mindmapNode(payload) = mindmapNode.nodeType else {
             throw MindmapNodeRemoteDataSourceError.onlyMindmapNodesSupported
         }
         let url = baseURL
@@ -125,10 +125,10 @@ final class MindmapNodeRemoteDataSource: Sendable {
             .appendingPathComponent(mindmapNode.id, isDirectory: false)
 
         let patch = FullMindmapNodeSyncPatchBody(
-            mindmapId: mindmapId,
+            mindmapId: payload.mindmapId,
             parentNodeId: mindmapNode.parentNodeId,
             position: mindmapNode.position,
-            text: text,
+            text: payload.text,
             dimensions: mindmapNode.dimensions
         )
         let encoder = JSONEncoder()
