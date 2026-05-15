@@ -2,12 +2,12 @@ import XCTest
 
 @testable import SoloLib
 
-/// Exercises **`ConnectionController`** → **`ConnectionsRemoteDataSource`** → **`URLSession`** with **`MockURLProtocol`**.
-final class ConnectionControllerFlowTests: XCTestCase {
+/// Exercises **`MindmapConnectionController`** → **`MindmapConnectionRemoteDataSource`** → **`URLSession`** with **`MockURLProtocol`**.
+final class MindmapConnectionControllerFlowTests: XCTestCase {
     private let baseURL = URL(string: "https://solo.test")!
     private let accessToken = "test-access-token"
     private let mindmapId = "00000000-0000-4000-8000-0000000000c3"
-    private let connectionId = "00000000-0000-4000-8000-0000000000e5"
+    private let mindmapConnectionId = "00000000-0000-4000-8000-0000000000e5"
     private let sourceNodeId = "00000000-0000-4000-8000-0000000000f1"
     private let targetNodeId = "00000000-0000-4000-8000-0000000000f2"
 
@@ -22,9 +22,9 @@ final class ConnectionControllerFlowTests: XCTestCase {
         return URLSession(configuration: configuration)
     }
 
-    private func makeController() -> ConnectionController {
-        let remote = ConnectionsRemoteDataSource(session: makeSession(), baseURL: baseURL)
-        return ConnectionController(remote: remote)
+    private func makeController() -> MindmapConnectionController {
+        let remote = MindmapConnectionRemoteDataSource(session: makeSession(), baseURL: baseURL)
+        return MindmapConnectionController(remote: remote)
     }
 
     private static func connectionResponseJSONObject(
@@ -89,9 +89,9 @@ final class ConnectionControllerFlowTests: XCTestCase {
         return data
     }
 
-    func testAddConnection_withTarget_POSTsJSONAndDecodes() async throws {
+    func testAddMindmapConnection_withTarget_POSTsJSONAndDecodes() async throws {
         let row = Self.connectionResponseJSONObject(
-            id: connectionId,
+            id: mindmapConnectionId,
             mindmapId: mindmapId,
             sourceNodeId: sourceNodeId,
             targetNodeId: targetNodeId,
@@ -102,7 +102,7 @@ final class ConnectionControllerFlowTests: XCTestCase {
 
         MockURLProtocol.requestHandler = { request in
             XCTAssertEqual(request.httpMethod, "POST")
-            XCTAssertEqual(request.url?.path, "/connections")
+            XCTAssertEqual(request.url?.path, "/mindmap-connection")
             XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
             XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer \(self.accessToken)")
 
@@ -120,7 +120,7 @@ final class ConnectionControllerFlowTests: XCTestCase {
         }
 
         let controller = makeController()
-        let model = try await controller.addConnection(
+        let model = try await controller.addMindmapConnection(
             sourceNodeId: sourceNodeId,
             sourceAnchor: .right,
             targetNodeId: targetNodeId,
@@ -129,16 +129,16 @@ final class ConnectionControllerFlowTests: XCTestCase {
             accessToken: accessToken
         )
 
-        XCTAssertEqual(model.id, connectionId)
+        XCTAssertEqual(model.id, mindmapConnectionId)
         XCTAssertEqual(model.sourceNodeId, sourceNodeId)
         XCTAssertEqual(model.targetNodeId, targetNodeId)
         XCTAssertEqual(model.sourceAnchor, .right)
         XCTAssertEqual(model.targetAnchor, .left)
     }
 
-    func testAddConnection_openEnded_omitsTargetFieldsInBody() async throws {
+    func testAddMindmapConnection_openEnded_omitsTargetFieldsInBody() async throws {
         let row = Self.connectionResponseJSONObject(
-            id: connectionId,
+            id: mindmapConnectionId,
             mindmapId: mindmapId,
             sourceNodeId: sourceNodeId,
             targetNodeId: nil,
@@ -159,7 +159,7 @@ final class ConnectionControllerFlowTests: XCTestCase {
         }
 
         let controller = makeController()
-        let model = try await controller.addConnection(
+        let model = try await controller.addMindmapConnection(
             sourceNodeId: sourceNodeId,
             sourceAnchor: .bottom,
             mindmapId: mindmapId,
@@ -171,22 +171,25 @@ final class ConnectionControllerFlowTests: XCTestCase {
         XCTAssertEqual(model.sourceAnchor, .bottom)
     }
 
-    func testDeleteConnection_fullStack_DELETEsAndAccepts204() async throws {
+    func testDeleteMindmapConnection_fullStack_DELETEsAndAccepts204() async throws {
         MockURLProtocol.requestHandler = { request in
             XCTAssertEqual(request.httpMethod, "DELETE")
-            XCTAssertEqual(request.url?.path, "/connections/\(self.connectionId)")
+            XCTAssertEqual(request.url?.path, "/mindmap-connection/\(self.mindmapConnectionId)")
             XCTAssertTrue(Self.httpBodyData(from: request).isEmpty)
             let res = Self.httpResponse(for: request, statusCode: 204)
             return (res, Data())
         }
 
         let controller = makeController()
-        try await controller.deleteConnection(id: connectionId, accessToken: accessToken)
+        try await controller.deleteMindmapConnection(
+            mindmapConnectionId: mindmapConnectionId,
+            accessToken: accessToken
+        )
     }
 
-    func testUpdateConnection_PATCHesJSONAndDecodes() async throws {
+    func testUpdateMindmapConnection_PATCHesJSONAndDecodes() async throws {
         let row = Self.connectionResponseJSONObject(
-            id: connectionId,
+            id: mindmapConnectionId,
             mindmapId: mindmapId,
             sourceNodeId: sourceNodeId,
             targetNodeId: targetNodeId,
@@ -197,7 +200,7 @@ final class ConnectionControllerFlowTests: XCTestCase {
 
         MockURLProtocol.requestHandler = { request in
             XCTAssertEqual(request.httpMethod, "PATCH")
-            XCTAssertEqual(request.url?.path, "/connections/\(self.connectionId)")
+            XCTAssertEqual(request.url?.path, "/mindmap-connection/\(self.mindmapConnectionId)")
             XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
             XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer \(self.accessToken)")
 
@@ -213,15 +216,15 @@ final class ConnectionControllerFlowTests: XCTestCase {
         }
 
         let controller = makeController()
-        let model = try await controller.updateConnection(
-            id: connectionId,
+        let model = try await controller.updateMindmapConnection(
+            mindmapConnectionId: mindmapConnectionId,
             targetNodeId: targetNodeId,
             sourceAnchor: .top,
             targetAnchor: .bottom,
             accessToken: accessToken
         )
 
-        XCTAssertEqual(model.id, connectionId)
+        XCTAssertEqual(model.id, mindmapConnectionId)
         XCTAssertEqual(model.sourceAnchor, .top)
         XCTAssertEqual(model.targetNodeId, targetNodeId)
         XCTAssertEqual(model.targetAnchor, .bottom)

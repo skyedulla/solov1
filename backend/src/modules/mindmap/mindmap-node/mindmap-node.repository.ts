@@ -1,11 +1,11 @@
 import { Prisma, type MindmapNode } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
-import { prisma } from "../../core/prisma";
-import type { NodeCreateBody, NodeUpdateBody } from "./node.schema";
+import { prisma } from "../../../core/prisma";
+import type { MindmapNodeCreateBody, MindmapNodeUpdateBody } from "./mindmap-node.schema";
 
-/** Maximum rows returned by **`findNodesForUserMindmap`** (search / unsorted list). */
-export const NODES_SEARCH_LIMIT = 5;
+/** Maximum rows returned by **`findMindmapNodesForUserMindmap`** (search / unsorted list). */
+export const MINDMAP_NODES_SEARCH_LIMIT = 5;
 
 type MindmapNodeSqlRow = {
   id: string;
@@ -38,11 +38,11 @@ function mapSqlRowToMindmapNode(row: MindmapNodeSqlRow): MindmapNode {
 }
 
 /**
- * Lists up to **`NODES_SEARCH_LIMIT`** nodes for the map.
- * - Empty **`searchQuery`**: all nodes, ordered by **`text`** ascending.
+ * Lists up to **`MINDMAP_NODES_SEARCH_LIMIT`** **mindmap-nodes** for the map.
+ * - Empty **`searchQuery`**: all **mindmap-nodes**, ordered by **`text`** ascending.
  * - Non-empty: case-insensitive substring match on **`text`** (`strpos`), ordered alphabetically by the suffix starting **after** the first match (the “next characters” after **`q`**).
  */
-export async function findNodesForUserMindmap(
+export async function findMindmapNodesForUserMindmap(
   userId: string,
   mindmapId: string,
   searchQuery: string,
@@ -53,7 +53,7 @@ export async function findNodesForUserMindmap(
     return prisma.mindmapNode.findMany({
       where: { userId, mindmapId },
       orderBy: [{ text: "asc" }, { id: "asc" }],
-      take: NODES_SEARCH_LIMIT,
+      take: MINDMAP_NODES_SEARCH_LIMIT,
     });
   }
 
@@ -65,21 +65,27 @@ export async function findNodesForUserMindmap(
         AND strpos(lower(text), lower(${q}::text)) > 0
       ORDER BY lower(substring(text FROM strpos(lower(text), lower(${q}::text)) + char_length(${q}::text))) ASC,
         id ASC
-      LIMIT ${NODES_SEARCH_LIMIT}
+      LIMIT ${MINDMAP_NODES_SEARCH_LIMIT}
     `);
 
   return rows.map(mapSqlRowToMindmapNode);
 }
 
-/** All nodes for a map (no search limit — used when loading a full mind map). */
-export async function findAllNodesForUserMindmap(userId: string, mindmapId: string): Promise<MindmapNode[]> {
+/** All **mindmap-nodes** for a map (no search limit — used when loading the **`GET /mindmaps/:id`** document with **mindmap-nodes** + **mindmap-connections**). */
+export async function findAllMindmapNodesForUserMindmap(
+  userId: string,
+  mindmapId: string,
+): Promise<MindmapNode[]> {
   return prisma.mindmapNode.findMany({
     where: { userId, mindmapId },
     orderBy: [{ text: "asc" }, { id: "asc" }],
   });
 }
 
-export async function createNodeForUser(userId: string, body: NodeCreateBody): Promise<MindmapNode> {
+export async function createMindmapNodeForUser(
+  userId: string,
+  body: MindmapNodeCreateBody,
+): Promise<MindmapNode> {
   return prisma.mindmapNode.create({
     data: {
       userId,
@@ -94,16 +100,19 @@ export async function createNodeForUser(userId: string, body: NodeCreateBody): P
   });
 }
 
-export async function findNodeByIdForUser(userId: string, nodeId: string): Promise<MindmapNode | null> {
+export async function findMindmapNodeByIdForUser(
+  userId: string,
+  mindmapNodeId: string,
+): Promise<MindmapNode | null> {
   return prisma.mindmapNode.findFirst({
-    where: { id: nodeId, userId },
+    where: { id: mindmapNodeId, userId },
   });
 }
 
-export async function updateNodeForUser(
+export async function updateMindmapNodeForUser(
   userId: string,
-  nodeId: string,
-  body: NodeUpdateBody,
+  mindmapNodeId: string,
+  body: MindmapNodeUpdateBody,
 ): Promise<MindmapNode | null> {
   const data: Prisma.MindmapNodeUpdateInput = {};
 
@@ -127,13 +136,13 @@ export async function updateNodeForUser(
 
   if (Object.keys(data).length === 0) {
     return prisma.mindmapNode.findFirst({
-      where: { id: nodeId, userId },
+      where: { id: mindmapNodeId, userId },
     });
   }
 
   try {
     return await prisma.mindmapNode.update({
-      where: { id: nodeId, userId },
+      where: { id: mindmapNodeId, userId },
       data,
     });
   } catch (error) {
@@ -144,9 +153,12 @@ export async function updateNodeForUser(
   }
 }
 
-export async function deleteNodeForUser(userId: string, nodeId: string): Promise<boolean> {
+export async function deleteMindmapNodeForUser(
+  userId: string,
+  mindmapNodeId: string,
+): Promise<boolean> {
   const result = await prisma.mindmapNode.deleteMany({
-    where: { id: nodeId, userId },
+    where: { id: mindmapNodeId, userId },
   });
   return result.count > 0;
 }

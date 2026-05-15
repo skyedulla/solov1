@@ -2,14 +2,14 @@ import Foundation
 
 /// Mind map canvas: appearance, grid snap, and viewport.
 struct MindmapCanvasModel: Codable, Sendable {
-    /// When **`snapToGrid`** is enabled, node positions are rounded to this increment (**5** pt).
+    /// When **`snapToGrid`** is enabled, **mindmap-node** positions are rounded to this increment (**5** pt).
     static let defaultSnapToGrid: Int = 5
 
     var id: String
     /// e.g. hex `"#1C1C1E"`; align with your color picker / `Color` mapping.
     var backgroundColor: String
     var backgroundDesign: BackgroundDesign
-    /// When **`true`**, node moves snap to **`defaultSnapToGrid`** (**5**).
+    /// When **`true`**, **mindmap-node** moves snap to **`defaultSnapToGrid`** (**5**).
     var snapToGrid: Bool
     var zoomLevel: Double
     var panPosition: PanPosition

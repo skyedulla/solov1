@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { connectionResponseBodySchema } from "../connections/connection.schema";
-import { nodeResponseBodySchema } from "../nodes/node.schema";
+import { mindmapConnectionResponseBodySchema } from "./mindmap-connection/mindmap-connection.schema";
+import { mindmapNodeResponseBodySchema } from "./mindmap-node/mindmap-node.schema";
 
 /** Express `req.query` values may be `string | string[] | undefined`. */
 function firstQueryString(value: unknown): string | undefined {
@@ -23,7 +23,7 @@ export const mindmapCreateBodySchema = z.object({
 
 export type MindmapCreateBody = z.infer<typeof mindmapCreateBodySchema>;
 
-/** Wire JSON for **`POST /mindmaps`** (Swift uses **`id`** as **`mindmapId`** on nodes / connections). */
+/** Wire JSON for **`POST /mindmaps`** (Swift uses **`id`** as **`mindmapId`** for **mindmap-nodes** / **mindmap-connections** APIs). */
 export const mindmapResponseBodySchema = z.object({
   id: z.string().uuid(),
   idea_id: z.string().uuid(),
@@ -62,13 +62,13 @@ const mindmapLastTransformSchema = z.object({
   translate_y: z.number(),
 });
 
-/** Full document for **`GET /mindmaps/:id`** — aligned with Swift **`MindmapModel`** wire JSON. */
+/** Full document for **`GET /mindmaps/:id`** — **mindmap-nodes** (**`nodes`** array) + **mindmap-connections** (**`connections`** array); aligned with Swift **`MindmapModel`**. */
 export const mindmapLoadDocumentResponseSchema = z.object({
   id: z.string().uuid(),
   idea_id: z.string().uuid(),
   title: z.string(),
-  nodes: z.array(nodeResponseBodySchema),
-  connections: z.array(connectionResponseBodySchema),
+  nodes: z.array(mindmapNodeResponseBodySchema),
+  connections: z.array(mindmapConnectionResponseBodySchema),
   last_transform: mindmapLastTransformSchema,
 });
 

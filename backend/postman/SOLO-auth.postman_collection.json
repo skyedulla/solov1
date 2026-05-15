@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "SOLO API",
-    "description": "Import this file in Postman: **Import** → **Upload Files** → choose `backend/postman/SOLO-auth.postman_collection.json`.\n\n**Setup — SOLO API:** Set **`baseUrl`**. **Auth (Supabase):** Set **`supabaseUrl`** (project URL, no trailing slash — same as **`SUPABASE_URL`** in **`.env`**) and **`supabaseAnonKey`** (**`SUPABASE_ANON_KEY`**). Set **`authEmail`** + **`authPassword`**. Run **Auth (Supabase) → Sign in** to fill **`accessToken`** (or **Sign up** first if the project returns a session; if email confirmation is enabled, confirm the user then **Sign in**).\n\n**Recommended API flow:** **Create idea** → **`ideaId`** saved → **AI → Send prompt** (optional; **`OPENAI_API_KEY`** on server) → **Create mindmap** → **`mindmapId`** saved → **Nodes** / **Connections** (both **require** that mind map id — query **`mindmap_id`** on **`GET`**, JSON **`mindmapId`** on **`POST`/`PATCH`**). **`nodeId`** / **`connectionId`** / **`objectiveId`** set on **`201`** via Tests scripts; **`GET /mindmaps/:id`** and **`DELETE /mindmaps/:id`** require query **`idea_id`** matching the map.\n\n**Swift / HTTP mapping**\n- **Ideas** → **`IdeaController`** / **`IdeasRemoteDataSource`**.\n- **Mindmaps** → **`POST/GET/DELETE /mindmaps`** (document load **`GET /mindmaps/:id?idea_id=`**).\n- **Nodes** → **`NodeController`** — **`mindmap_id`** (**required**) on **`GET /nodes?mindmap_id={{mindmapId}}`**; **`mindmapId`** (**required**) in create/update JSON.\n- **Connections** → **`ConnectionController`** — **`mindmap_id`** (**required**) on **`GET /connections?mindmap_id={{mindmapId}}`**; **`mindmapId`** (**required**) in create/update JSON.\n- **Objectives** → **`ObjectiveController`** — create (**`POST /objectives`**) requires **`ideaId`** in JSON (camelCase).\n- **`AuthController`** (Swift) uses Supabase only for auth; this collection’s **Auth (Supabase)** folder calls **`{{supabaseUrl}}/auth/v1/...`** (not **`{{baseUrl}}`**).\n\nIf **Update idea** fails, check **`ideaId`** in Postman Console or try **PUT** instead of **PATCH**.",
+    "description": "Import this file in Postman: **Import** → **Upload Files** → choose `backend/postman/SOLO-auth.postman_collection.json`.\n\n**Setup — SOLO API:** Set **`baseUrl`**. **Auth (Supabase):** Set **`supabaseUrl`** (project URL, no trailing slash — same as **`SUPABASE_URL`** in **`.env`**) and **`supabaseAnonKey`** (**`SUPABASE_ANON_KEY`**). Set **`authEmail`** + **`authPassword`**. Run **Auth (Supabase) → Sign in** to fill **`accessToken`** (or **Sign up** first if the project returns a session; if email confirmation is enabled, confirm the user then **Sign in**).\n\n**Recommended API flow:** **Create idea** → **`ideaId`** saved → **AI → Send prompt** (optional; **`OPENAI_API_KEY`** on server) → **Storage → Upload files** (optional; R2 + **`CLOUDFLARE_R2_*`** on server) → **Create mindmap** → **`mindmapId`** saved → **Mindmap-nodes** / **Mindmap-connections** (both **require** that mind map id — query **`mindmap_id`** on **`GET`**, JSON **`mindmapId`** on **`POST`/`PATCH`**). **`nodeId`** / **`connectionId`** / **`objectiveId`** set on **`201`** via Tests scripts; **`GET /mindmaps/:id`** and **`DELETE /mindmaps/:id`** require query **`idea_id`** matching the map.\n\n**Swift / HTTP mapping**\n- **Ideas** → **`IdeaController`** / **`IdeasRemoteDataSource`**.\n- **Storage** → **`StorageRemoteDataSource`** — **`POST /storage/presigned-put`**, **`PUT`** to signed URL, **`POST /storage/files`**.\n- **Mindmaps** → **`POST/GET/DELETE /mindmaps`** (document load **`GET /mindmaps/:id?idea_id=`**).\n- **Mindmap-nodes** → **`MindmapNodeController`** — **`mindmap_id`** (**required**) on **`GET /mindmap-node?mindmap_id={{mindmapId}}`**; **`mindmapId`** (**required**) in create/update JSON.\n- **Mindmap-connections** → **`MindmapConnectionController`** — **`mindmap_id`** (**required**) on **`GET /mindmap-connection?mindmap_id={{mindmapId}}`**; **`mindmapId`** (**required**) in create/update JSON.\n- **Objectives** → **`ObjectiveController`** — create (**`POST /objectives`**) requires **`ideaId`** in JSON (camelCase).\n- **`AuthController`** (Swift) uses Supabase only for auth; this collection’s **Auth (Supabase)** folder calls **`{{supabaseUrl}}/auth/v1/...`** (not **`{{baseUrl}}`**).\n\nIf **Update idea** fails, check **`ideaId`** in Postman Console or try **PUT** instead of **PATCH**.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -59,6 +59,22 @@
     },
     {
       "key": "aiConversationId",
+      "value": ""
+    },
+    {
+      "key": "storageUploadUrl",
+      "value": ""
+    },
+    {
+      "key": "storageObjectKey",
+      "value": ""
+    },
+    {
+      "key": "storagePublicUrl",
+      "value": ""
+    },
+    {
+      "key": "storedFileId",
       "value": ""
     }
   ],
@@ -461,6 +477,127 @@
       ]
     },
     {
+      "name": "Storage",
+      "description": "Authenticated **`{{baseUrl}}/storage/...`** routes.\n\n1. **Mint presigned PUT URL** — **`POST /storage/presigned-put`** with **`object_key`** + **`content_type`** (optional **`bucket_name`** if **`CLOUDFLARE_R2_BUCKET_NAME`** is unset). Saves **`storageUploadUrl`**, **`storageObjectKey`**, **`storagePublicUrl`** when returned.\n2. **Upload bytes** — **`PUT`** full URL **`{{storageUploadUrl}}`**. **Do not** send **`Authorization`**. **`Content-Type`** must match mint (**`text/plain`** in examples).\n3. **Record stored file metadata** — **`POST /storage/files`** after R2 has the object. Include **`upload_date`** (**`YYYY-MM-DD`**) and **`upload_time`** (**`HH:mm:ss`**) for the user’s locale (client). Omit **`public_url`** when the API has **`CLOUDFLARE_R2_PUBLIC_BASE_URL`** (derived automatically); otherwise add **`\\\"public_url\\\"`** manually or ensure mint returned one into **`storagePublicUrl`**.",
+      "item": [
+        {
+          "name": "Mint presigned PUT URL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  if (data.upload_url) {",
+                  "    pm.collectionVariables.set('storageUploadUrl', data.upload_url);",
+                  "  }",
+                  "  if (data.object_key) {",
+                  "    pm.collectionVariables.set('storageObjectKey', data.object_key);",
+                  "  }",
+                  "  if (data.public_url) {",
+                  "    pm.collectionVariables.set('storagePublicUrl', data.public_url);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"object_key\": \"postman/{{$guid}}.txt\",\n  \"content_type\": \"text/plain\"\n}"
+            },
+            "url": "{{baseUrl}}/storage/presigned-put",
+            "description": "Maps to **`mintPresignedPut`**. **`503`** if R2 env is missing on the server."
+          }
+        },
+        {
+          "name": "Upload bytes (PUT presigned URL)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "text/plain",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "hello solo"
+            },
+            "url": "{{storageUploadUrl}}",
+            "description": "Upload raw bytes to **`storageUploadUrl`** from **Mint presigned PUT URL**. Run mint first. Body **`hello solo`** is **11** bytes — **`Record stored file metadata`** uses **`file_size`: 11**."
+          }
+        },
+        {
+          "name": "Record stored file metadata",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  if (data.id) {",
+                  "    pm.collectionVariables.set('storedFileId', data.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"file_name\": \"postman-test\",\n  \"file_extension\": \"txt\",\n  \"file_size\": 11,\n  \"file_type\": \"document\",\n  \"object_key\": \"{{storageObjectKey}}\",\n  \"content_type\": \"text/plain\",\n  \"upload_date\": \"2026-05-12\",\n  \"upload_time\": \"14:30:00\"\n}"
+            },
+            "url": "{{baseUrl}}/storage/files",
+            "description": "Maps to **`recordStoredFile`** after **`PUT`** succeeds. **`file_type`**: **`document`** | **`presentation`** | **`spreadsheet`** | **`image`** | **`audio`**. If **`400`** mentions **`public_url`**, add **`\\\"public_url\\\": \\\"https://…\\\"`** (or set **`CLOUDFLARE_R2_PUBLIC_BASE_URL`** on the API)."
+          }
+        }
+      ]
+    },
+    {
       "name": "Mindmaps",
       "item": [
         {
@@ -505,7 +642,7 @@
               "raw": "{\n  \"ideaId\": \"{{ideaId}}\",\n  \"title\": \"\",\n  \"summary\": \"\"\n}"
             },
             "url": "{{baseUrl}}/mindmaps",
-            "description": "Creates a mind map for **`ideaId`**. Optional **`title`** / **`summary`** (default empty strings). Response **`201`** — **`id`**, **`idea_id`**, **`title`**, **`summary`**, timestamps — Tests script stores **`id`** in **`mindmapId`** (use this value for **Nodes** **`mindmap_id`/`mindmapId`** and **Connections** **`mindmap_id`/`mindmapId`**). Run **Create idea** first."
+            "description": "Creates a mind map for **`ideaId`**. Optional **`title`** / **`summary`** (default empty strings). Response **`201`** — **`id`**, **`idea_id`**, **`title`**, **`summary`**, timestamps — Tests script stores **`id`** in **`mindmapId`** (use this value for **mindmap-nodes** **`mindmap_id`/`mindmapId`** and **mindmap-connections** **`mindmap_id`/`mindmapId`**). Run **Create idea** first."
           }
         },
         {
@@ -567,7 +704,7 @@
                 }
               ]
             },
-            "description": "Full document: **`title`**, **`nodes`**, **`connections`**, **`last_transform`**. **`mindmapId`** in path; **`idea_id`** query required (**`404`** if mismatch or not found)."
+            "description": "Full document: **`title`**, **`nodes`** (**mindmap-nodes**), **`connections`** (**mindmap-connections**), **`last_transform`**. **`mindmapId`** in path; **`idea_id`** query required (**`404`** if mismatch or not found)."
           }
         },
         {
@@ -598,7 +735,7 @@
                 }
               ]
             },
-            "description": "**`OPENAI_API_KEY`** required on server. Loads graph + **`mindmapSummarizationPrompt`** → **`completeChat`**; persists **`mindmaps.summary`**. **`200`** **`{ summary }`**; **`404`** not found; **`503`** LLM / missing key."
+            "description": "**`OPENAI_API_KEY`** required on server. Loads **mindmap-nodes** + **mindmap-connections** + **`mindmapSummarizationPrompt`** → **`completeChat`**; persists **`mindmaps.summary`**. **`200`** **`{ summary }`**; **`404`** not found; **`503`** LLM / missing key."
           }
         },
         {
@@ -630,10 +767,10 @@
       ]
     },
     {
-      "name": "Nodes",
+      "name": "Mindmap-nodes",
       "item": [
         {
-          "name": "Search nodes (searchNodes)",
+          "name": "Search mindmap-nodes (searchMindmapNodes)",
           "request": {
             "method": "GET",
             "header": [
@@ -649,9 +786,9 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/nodes?mindmap_id={{mindmapId}}&q=",
+              "raw": "{{baseUrl}}/mindmap-node?mindmap_id={{mindmapId}}&q=",
               "host": ["{{baseUrl}}"],
-              "path": ["nodes"],
+              "path": ["mindmap-node"],
               "query": [
                 {
                   "key": "mindmap_id",
@@ -661,15 +798,15 @@
                 {
                   "key": "q",
                   "value": "",
-                  "description": "Optional; empty = first 5 nodes by text A–Z. Non-empty = substring match, up to 5, ordered by suffix after first match"
+                  "description": "Optional; empty = first 5 mindmap-nodes by text A–Z. Non-empty = substring match, up to 5, ordered by suffix after first match"
                 }
               ]
             },
-            "description": "**`GET /nodes?mindmap_id=`** — **`mindmap_id`** is **required** (use **`{{mindmapId}}`** after **Create mindmap**). Maps to **`NodeController.searchNodes`** — at most **5** nodes."
+            "description": "**`GET /mindmap-node?mindmap_id=`** — **`mindmap_id`** is **required** (use **`{{mindmapId}}`** after **Create mindmap**). Maps to **`MindmapNodeController.searchMindmapNodes`** — at most **5** mindmap-nodes."
           }
         },
         {
-          "name": "Sync node create (syncNodeToServer, isNew=true)",
+          "name": "Sync mindmap-node create (syncNodeToServer, isNew=true)",
           "event": [
             {
               "listen": "test",
@@ -709,12 +846,12 @@
               "mode": "raw",
               "raw": "{\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"position\": { \"x\": 0, \"y\": 0 },\n  \"text\": \"New node label\",\n  \"dimensions\": { \"height\": 40, \"width\": 120 }\n}"
             },
-            "url": "{{baseUrl}}/nodes",
+            "url": "{{baseUrl}}/mindmap-node",
             "description": "**`mindmapId`** in JSON is **required** (same UUID as **`mindmap_id`** on **GET**). Maps to **`syncNodeToServer`** **`POST`**. Set **`mindmapId`**; **`201`** saves **`nodeId`**."
           }
         },
         {
-          "name": "Sync node update (syncNodeToServer, isNew=false) PATCH",
+          "name": "Sync mindmap-node update (syncNodeToServer, isNew=false) PATCH",
           "request": {
             "method": "PATCH",
             "header": [
@@ -738,12 +875,12 @@
               "mode": "raw",
               "raw": "{\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"parentNodeId\": null,\n  \"position\": { \"x\": 10, \"y\": 20 },\n  \"text\": \"Updated node label\",\n  \"dimensions\": { \"height\": 48, \"width\": 140 }\n}"
             },
-            "url": "{{baseUrl}}/nodes/{{nodeId}}",
-            "description": "Keep **`mindmapId`** (required) aligned with the node’s map. Full snapshot **`PATCH`** (**`200`**)."
+            "url": "{{baseUrl}}/mindmap-node/{{nodeId}}",
+            "description": "Keep **`mindmapId`** (required) aligned with the mindmap-node’s map. Full snapshot **`PATCH`** (**`200`**)."
           }
         },
         {
-          "name": "Sync node update PUT",
+          "name": "Sync mindmap-node update PUT",
           "request": {
             "method": "PUT",
             "header": [
@@ -767,12 +904,12 @@
               "mode": "raw",
               "raw": "{\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"parentNodeId\": null,\n  \"position\": { \"x\": 10, \"y\": 20 },\n  \"text\": \"Updated node label\",\n  \"dimensions\": { \"height\": 48, \"width\": 140 }\n}"
             },
-            "url": "{{baseUrl}}/nodes/{{nodeId}}",
+            "url": "{{baseUrl}}/mindmap-node/{{nodeId}}",
             "description": "Same as **PATCH**; includes required **`mindmapId`** in body."
           }
         },
         {
-          "name": "Delete node (deleteNode)",
+          "name": "Delete mindmap-node (deleteNode)",
           "request": {
             "method": "DELETE",
             "header": [
@@ -782,17 +919,17 @@
                 "type": "text"
               }
             ],
-            "url": "{{baseUrl}}/nodes/{{nodeId}}",
-            "description": "Maps to **`NodeController.deleteNode`** — **`204`**. Path id only; mind map was established at create time."
+            "url": "{{baseUrl}}/mindmap-node/{{nodeId}}",
+            "description": "Maps to **`MindmapNodeController.deleteMindmapNode`** — **`204`**. Path id only; mind map was established at create time."
           }
         }
       ]
     },
     {
-      "name": "Connections",
+      "name": "Mindmap-connections",
       "item": [
         {
-          "name": "List connections (GET /connections)",
+          "name": "List mindmap-connections (GET /mindmap-connection)",
           "request": {
             "method": "GET",
             "header": [
@@ -808,22 +945,22 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/connections?mindmap_id={{mindmapId}}",
+              "raw": "{{baseUrl}}/mindmap-connection?mindmap_id={{mindmapId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["connections"],
+              "path": ["mindmap-connection"],
               "query": [
                 {
                   "key": "mindmap_id",
                   "value": "{{mindmapId}}",
-                  "description": "Required — UUID of the mind map (same as **Nodes** **`mindmap_id`**) (**{{mindmapId}}**)"
+                  "description": "Required — UUID of the mind map (same as **Mindmap-nodes** **`mindmap_id`**) (**{{mindmapId}}**)"
                 }
               ]
             },
-            "description": "**`GET /connections?mindmap_id=`** — **`mindmap_id`** is **required**. **`200`** — all edges for that map for the authenticated user."
+            "description": "**`GET /mindmap-connection?mindmap_id=`** — **`mindmap_id`** is **required**. **`200`** — all edges for that map for the authenticated user."
           }
         },
         {
-          "name": "Create connection draft (POST /connections, no target)",
+          "name": "Create mindmap-connection draft (POST /mindmap-connection, no target)",
           "event": [
             {
               "listen": "test",
@@ -863,12 +1000,12 @@
               "mode": "raw",
               "raw": "{\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"sourceAnchor\": \"right\"\n}"
             },
-            "url": "{{baseUrl}}/connections",
+            "url": "{{baseUrl}}/mindmap-connection",
             "description": "**`mindmapId`** in JSON is **required**. Omit **`targetNodeId`** / **`targetAnchor`** together for an open-ended link. **`sourceAnchor`**: **`top`** | **`right`** | **`left`** | **`bottom`**. **`201`** — Tests script stores **`connectionId`**."
           }
         },
         {
-          "name": "Create connection with target (POST /connections)",
+          "name": "Create mindmap-connection with target (POST /mindmap-connection)",
           "event": [
             {
               "listen": "test",
@@ -908,12 +1045,12 @@
               "mode": "raw",
               "raw": "{\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"sourceAnchor\": \"right\",\n  \"targetNodeId\": \"PASTE_SECOND_NODE_UUID\",\n  \"targetAnchor\": \"left\"\n}"
             },
-            "url": "{{baseUrl}}/connections",
-            "description": "**`targetNodeId`** and **`targetAnchor`** must both be set or both omitted. Replace **`PASTE_SECOND_NODE_UUID`** with another node on the same **`mindmapId`** (e.g. from **Search nodes** or a second **Create node**)."
+            "url": "{{baseUrl}}/mindmap-connection",
+            "description": "**`targetNodeId`** and **`targetAnchor`** must both be set or both omitted. Replace **`PASTE_SECOND_NODE_UUID`** with another mindmap-node on the same **`mindmapId`** (e.g. from **Search mindmap-nodes** or a second **Sync mindmap-node create**)."
           }
         },
         {
-          "name": "Update connection PATCH",
+          "name": "Update mindmap-connection PATCH",
           "request": {
             "method": "PATCH",
             "header": [
@@ -937,12 +1074,12 @@
               "mode": "raw",
               "raw": "{\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"targetNodeId\": null,\n  \"sourceAnchor\": \"bottom\",\n  \"targetAnchor\": null\n}"
             },
-            "url": "{{baseUrl}}/connections/{{connectionId}}",
+            "url": "{{baseUrl}}/mindmap-connection/{{connectionId}}",
             "description": "Partial update; **`null`** clears **`targetNodeId`** / **`targetAnchor`**. Include **`mindmapId`** when changing map membership. **`200`**."
           }
         },
         {
-          "name": "Update connection PUT",
+          "name": "Update mindmap-connection PUT",
           "request": {
             "method": "PUT",
             "header": [
@@ -966,12 +1103,12 @@
               "mode": "raw",
               "raw": "{\n  \"mindmapId\": \"{{mindmapId}}\",\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"targetNodeId\": null,\n  \"sourceAnchor\": \"bottom\",\n  \"targetAnchor\": null\n}"
             },
-            "url": "{{baseUrl}}/connections/{{connectionId}}",
+            "url": "{{baseUrl}}/mindmap-connection/{{connectionId}}",
             "description": "Same as **PATCH** if **`PATCH`** is blocked."
           }
         },
         {
-          "name": "Delete connection (DELETE /connections/:id)",
+          "name": "Delete mindmap-connection (DELETE /mindmap-connection/:id)",
           "request": {
             "method": "DELETE",
             "header": [
@@ -981,7 +1118,7 @@
                 "type": "text"
               }
             ],
-            "url": "{{baseUrl}}/connections/{{connectionId}}",
+            "url": "{{baseUrl}}/mindmap-connection/{{connectionId}}",
             "description": "**`204`** success; **`404`** if id not found."
           }
         }

@@ -1,6 +1,6 @@
 import Foundation
 
-private struct CreateConnectionRequestBody: Encodable {
+private struct CreateMindmapConnectionRequestBody: Encodable {
     let mindmapId: String
     let sourceNodeId: String
     let targetNodeId: String?
@@ -25,7 +25,7 @@ private struct CreateConnectionRequestBody: Encodable {
     }
 }
 
-private struct UpdateConnectionRequestBody: Encodable {
+private struct UpdateMindmapConnectionRequestBody: Encodable {
     var mindmapId: String?
     var sourceNodeId: String?
     var targetNodeId: String?
@@ -62,8 +62,8 @@ private struct UpdateConnectionRequestBody: Encodable {
     }
 }
 
-/// Mind map connection (**edge**) API I/O via **`URLSession`** (`POST` / **`PATCH …/connections/{id}`** / **`DELETE …/connections/{id}`**).
-final class ConnectionsRemoteDataSource: Sendable {
+/// **Mindmap-connection** (**`/mindmap-connection`**, edge) API I/O via **`URLSession`** (`POST` / **`PATCH …/mindmap-connection/{id}`** / **`DELETE …/mindmap-connection/{id}`**).
+final class MindmapConnectionRemoteDataSource: Sendable {
     private let session: URLSession
     private let baseURL: URL
 
@@ -72,7 +72,7 @@ final class ConnectionsRemoteDataSource: Sendable {
         self.baseURL = baseURL
     }
 
-    func addConnection(
+    func addMindmapConnection(
         sourceNodeId: String,
         sourceAnchor: ConnectionAnchor,
         targetNodeId: String? = nil,
@@ -80,8 +80,8 @@ final class ConnectionsRemoteDataSource: Sendable {
         mindmapId: String,
         accessToken: String
     ) async throws -> (Data, URLResponse) {
-        let url = baseURL.appendingPathComponent("connections", isDirectory: false)
-        let body = CreateConnectionRequestBody(
+        let url = baseURL.appendingPathComponent("mindmap-connection", isDirectory: false)
+        let body = CreateMindmapConnectionRequestBody(
             mindmapId: mindmapId,
             sourceNodeId: sourceNodeId,
             targetNodeId: targetNodeId,
@@ -101,9 +101,9 @@ final class ConnectionsRemoteDataSource: Sendable {
         return try await session.data(for: request)
     }
 
-    /// **`PATCH {base}/connections/{id}`** — only non-**`nil`** (or explicit null) fields are encoded; omit parameters to leave server fields unchanged. Expected response **`200`** with a **`ConnectionModel`** JSON body.
-    func updateConnection(
-        id: String,
+    /// **`PATCH {base}/mindmap-connection/{id}`** — only non-**`nil`** (or explicit null) fields are encoded; omit parameters to leave server fields unchanged. Expected response **`200`** with a **`ConnectionModel`** body (**mindmap-connection** wire JSON).
+    func updateMindmapConnection(
+        mindmapConnectionId: String,
         mindmapId: String? = nil,
         sourceNodeId: String? = nil,
         targetNodeId: String? = nil,
@@ -117,10 +117,10 @@ final class ConnectionsRemoteDataSource: Sendable {
         precondition(!(targetAnchor != nil && setTargetAnchorToNull), "targetAnchor and setTargetAnchorToNull cannot both be set")
 
         let url = baseURL
-            .appendingPathComponent("connections", isDirectory: false)
-            .appendingPathComponent(id, isDirectory: false)
+            .appendingPathComponent("mindmap-connection", isDirectory: false)
+            .appendingPathComponent(mindmapConnectionId, isDirectory: false)
 
-        let body = UpdateConnectionRequestBody(
+        let body = UpdateMindmapConnectionRequestBody(
             mindmapId: mindmapId,
             sourceNodeId: sourceNodeId,
             targetNodeId: targetNodeId,
@@ -142,10 +142,10 @@ final class ConnectionsRemoteDataSource: Sendable {
         return try await session.data(for: request)
     }
 
-    func deleteConnection(id: String, accessToken: String) async throws -> (Data, URLResponse) {
+    func deleteMindmapConnection(mindmapConnectionId: String, accessToken: String) async throws -> (Data, URLResponse) {
         let url = baseURL
-            .appendingPathComponent("connections", isDirectory: false)
-            .appendingPathComponent(id, isDirectory: false)
+            .appendingPathComponent("mindmap-connection", isDirectory: false)
+            .appendingPathComponent(mindmapConnectionId, isDirectory: false)
 
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"

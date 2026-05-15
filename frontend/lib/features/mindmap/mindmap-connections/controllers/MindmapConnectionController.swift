@@ -1,15 +1,15 @@
 import Foundation
 
-/// Coordinates mind map edge persistence between nodes against the API.
-final class ConnectionController: Sendable {
-    private let remote: ConnectionsRemoteDataSource
+/// Coordinates **mindmap-connection** persistence between **mindmap-nodes** against **`/mindmap-connection`**.
+final class MindmapConnectionController: Sendable {
+    private let remote: MindmapConnectionRemoteDataSource
 
-    init(remote: ConnectionsRemoteDataSource = ConnectionsRemoteDataSource()) {
+    init(remote: MindmapConnectionRemoteDataSource = MindmapConnectionRemoteDataSource()) {
         self.remote = remote
     }
 
-    /// Creates a directed link from **`sourceNodeId`** at **`sourceAnchor`**. Omit **`targetNodeId`** / **`targetAnchor`** together for an open-ended link; set both when the target is known. Returns the server **`ConnectionModel`** (**`201`**).
-    func addConnection(
+    /// Creates a directed **mindmap-connection** from **`sourceNodeId`** at **`sourceAnchor`**. Omit **`targetNodeId`** / **`targetAnchor`** together for an open-ended link; set both when the target is known. Returns the server **`ConnectionModel`** (**`201`**).
+    func addMindmapConnection(
         sourceNodeId: String,
         sourceAnchor: ConnectionAnchor,
         targetNodeId: String? = nil,
@@ -21,7 +21,7 @@ final class ConnectionController: Sendable {
             (targetNodeId == nil) == (targetAnchor == nil),
             "targetNodeId and targetAnchor must both be nil or both non-nil"
         )
-        let (data, response) = try await remote.addConnection(
+        let (data, response) = try await remote.addMindmapConnection(
             sourceNodeId: sourceNodeId,
             sourceAnchor: sourceAnchor,
             targetNodeId: targetNodeId,
@@ -36,9 +36,9 @@ final class ConnectionController: Sendable {
         return try decoder.decode(ConnectionModel.self, from: data)
     }
 
-    /// Applies a partial update (**`PATCH …/connections/{id}`**). Omit parameters to leave those fields unchanged. Use **`setTargetNodeIdToNull`** / **`setTargetAnchorToNull`** to clear target fields per the API. Returns the updated **`ConnectionModel`** (**`200`**).
-    func updateConnection(
-        id: String,
+    /// Applies a partial update (**`PATCH …/mindmap-connection/{id}`**) to a **mindmap-connection**. Omit parameters to leave those fields unchanged. Use **`setTargetNodeIdToNull`** / **`setTargetAnchorToNull`** to clear target fields per the API. Returns the updated **`ConnectionModel`** (**`200`**).
+    func updateMindmapConnection(
+        mindmapConnectionId: String,
         mindmapId: String? = nil,
         sourceNodeId: String? = nil,
         targetNodeId: String? = nil,
@@ -48,8 +48,8 @@ final class ConnectionController: Sendable {
         setTargetAnchorToNull: Bool = false,
         accessToken: String
     ) async throws -> ConnectionModel {
-        let (data, response) = try await remote.updateConnection(
-            id: id,
+        let (data, response) = try await remote.updateMindmapConnection(
+            mindmapConnectionId: mindmapConnectionId,
             mindmapId: mindmapId,
             sourceNodeId: sourceNodeId,
             targetNodeId: targetNodeId,
@@ -66,9 +66,12 @@ final class ConnectionController: Sendable {
         return try decoder.decode(ConnectionModel.self, from: data)
     }
 
-    /// Deletes the connection with **`id`**. **`204`** from the API is treated as success.
-    func deleteConnection(id: String, accessToken: String) async throws {
-        let (_, response) = try await remote.deleteConnection(id: id, accessToken: accessToken)
+    /// Deletes the **mindmap-connection** with **`mindmapConnectionId`**. **`204`** from the API is treated as success.
+    func deleteMindmapConnection(mindmapConnectionId: String, accessToken: String) async throws {
+        let (_, response) = try await remote.deleteMindmapConnection(
+            mindmapConnectionId: mindmapConnectionId,
+            accessToken: accessToken
+        )
         guard let http = response as? HTTPURLResponse, http.statusCode == 204 else {
             throw URLError(.badServerResponse)
         }

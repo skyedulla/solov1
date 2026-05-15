@@ -22,8 +22,8 @@ final class MindmapController: Sendable {
             id: created.id,
             ideaId: ideaId,
             title: created.title,
-            nodes: [],
-            connections: [],
+            mindmapNodes: [],
+            mindmapConnections: [],
             lastTransform: MindmapModel.MindmapViewTransform(scale: 1, translateX: 0, translateY: 0)
         )
     }
@@ -43,7 +43,7 @@ final class MindmapController: Sendable {
             throw MindmapControllerError.unexpectedLoadResponse
         }
         let decoder = JSONDecoder()
-        // Match **`MindmapModel`** and nested types: they use explicit snake_case **`CodingKeys`**; **`.convertFromSnakeCase`** would mis-resolve those keys.
+        // Match **`MindmapModel`**: **mindmap-nodes** / **mindmap-connections** use wire keys **`nodes`** / **`connections`** via explicit **`CodingKeys`**; **`.convertFromSnakeCase`** would mis-resolve those keys.
         return try decoder.decode(MindmapModel.self, from: data)
     }
 
@@ -62,7 +62,7 @@ final class MindmapController: Sendable {
         return try decoder.decode([MindmapSummaryModel].self, from: data)
     }
 
-    /// Regenerates **`summary`** from title + nodes + connections (**`POST …/mindmaps/{id}/generate-summary?idea_id=…`**) and returns the new text (**`200`**). Persists on the server.
+    /// Regenerates **`summary`** from title + **mindmap-nodes** + **mindmap-connections** (**`POST …/mindmaps/{id}/generate-summary?idea_id=…`**) and returns the new text (**`200`**). Persists on the server.
     func generateMindmapSummary(id: String, ideaId: String, accessToken: String) async throws -> String {
         let (data, response) = try await remote.generateMindmapSummary(id: id, ideaId: ideaId, accessToken: accessToken)
         guard let http = response as? HTTPURLResponse else {
@@ -84,7 +84,7 @@ final class MindmapController: Sendable {
         return body.summary
     }
 
-    /// Deletes a mind map and its nodes and connections (**`DELETE …/mindmaps/{id}?idea_id=…`**, **`204`**).
+    /// Deletes a mind map and its **mindmap-nodes** + **mindmap-connections** (**`DELETE …/mindmaps/{id}?idea_id=…`**, **`204`**).
     func deleteMindmap(id: String, ideaId: String, accessToken: String) async throws {
         let (_, response) = try await remote.deleteMindmap(id: id, ideaId: ideaId, accessToken: accessToken)
         guard let http = response as? HTTPURLResponse else {

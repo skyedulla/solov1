@@ -2,13 +2,13 @@ import type { Mindmap, MindmapConnection, MindmapNode } from "@prisma/client";
 import type { NextFunction, Request, Response } from "express";
 
 import {
-  connectionResponseBodySchema,
-  type ConnectionResponseBody,
-} from "../connections/connection.schema";
+  mindmapConnectionResponseBodySchema,
+  type MindmapConnectionResponseBody,
+} from "./mindmap-connection/mindmap-connection.schema";
 import {
-  nodeResponseBodySchema,
-  type NodeResponseBody,
-} from "../nodes/node.schema";
+  mindmapNodeResponseBodySchema,
+  type MindmapNodeResponseBody,
+} from "./mindmap-node/mindmap-node.schema";
 import {
   listMindmapsQuerySchema,
   loadMindmapQuerySchema,
@@ -32,8 +32,8 @@ function toMindmapResponseBody(row: Mindmap): MindmapResponseBody {
   });
 }
 
-function toNodeResponseBody(row: MindmapNode): NodeResponseBody {
-  return nodeResponseBodySchema.parse({
+function toMindmapNodeResponseBody(row: MindmapNode): MindmapNodeResponseBody {
+  return mindmapNodeResponseBodySchema.parse({
     id: row.id,
     mindmap_id: row.mindmapId,
     parent_node_id: row.parentNodeId,
@@ -43,8 +43,8 @@ function toNodeResponseBody(row: MindmapNode): NodeResponseBody {
   });
 }
 
-function toConnectionResponseBody(row: MindmapConnection): ConnectionResponseBody {
-  return connectionResponseBodySchema.parse({
+function toMindmapConnectionResponseBody(row: MindmapConnection): MindmapConnectionResponseBody {
+  return mindmapConnectionResponseBodySchema.parse({
     id: row.id,
     mindmap_id: row.mindmapId,
     source_node_id: row.sourceNodeId,
@@ -174,8 +174,8 @@ export async function loadMindmap(req: Request, res: Response, next: NextFunctio
       id: doc.id,
       idea_id: doc.ideaId,
       title: doc.title,
-      nodes: doc.nodes.map(toNodeResponseBody),
-      connections: doc.connections.map(toConnectionResponseBody),
+      nodes: doc.mindmapNodes.map(toMindmapNodeResponseBody),
+      connections: doc.mindmapConnections.map(toMindmapConnectionResponseBody),
       last_transform: { scale: 1, translate_x: 0, translate_y: 0 },
     });
 

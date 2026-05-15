@@ -3,10 +3,10 @@ import express, { type NextFunction, type Request, type Response } from "express
 import { apiAccessLoggingMiddleware, logApiError } from "./core/apiLogger";
 import { isPrismaError } from "./core/databaseLogger";
 import { aiRoutes } from "./routes/ai.routes";
-import { connectionRoutes } from "./routes/connection.routes";
+import { mindmapConnectionRoutes } from "./routes/mindmap-connection.routes";
 import { ideaRoutes } from "./routes/idea.routes";
 import { mindmapRoutes } from "./routes/mindmap.routes";
-import { nodeRoutes } from "./routes/node.routes";
+import { mindmapNodeRoutes } from "./routes/mindmap-node.routes";
 import { objectiveRoutes } from "./routes/objective.routes";
 import { storageRoutes } from "./routes/storage.routes";
 
@@ -26,8 +26,8 @@ export function createApp(): express.Application {
   app.use("/ai", aiRoutes);
   app.use("/ideas", ideaRoutes);
   app.use("/mindmaps", mindmapRoutes);
-  app.use("/nodes", nodeRoutes);
-  app.use("/connections", connectionRoutes);
+  app.use("/mindmap-node", mindmapNodeRoutes);
+  app.use("/mindmap-connection", mindmapConnectionRoutes);
   app.use("/objectives", objectiveRoutes);
   app.use("/storage", storageRoutes);
 

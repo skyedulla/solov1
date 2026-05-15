@@ -135,8 +135,8 @@ final class MindmapControllerFlowTests: XCTestCase {
 
         XCTAssertEqual(model.id, mindmapId)
         XCTAssertEqual(model.ideaId, ideaId)
-        XCTAssertTrue(model.nodes.isEmpty)
-        XCTAssertTrue(model.connections.isEmpty)
+        XCTAssertTrue(model.mindmapNodes.isEmpty)
+        XCTAssertTrue(model.mindmapConnections.isEmpty)
         XCTAssertEqual(model.title, "")
         XCTAssertEqual(model.lastTransform.scale, 1)
         XCTAssertEqual(model.lastTransform.translateX, 0)
@@ -164,8 +164,8 @@ final class MindmapControllerFlowTests: XCTestCase {
         XCTAssertEqual(model.id, mindmapId)
         XCTAssertEqual(model.ideaId, ideaId)
         XCTAssertEqual(model.title, "Roadmap")
-        XCTAssertTrue(model.nodes.isEmpty)
-        XCTAssertTrue(model.connections.isEmpty)
+        XCTAssertTrue(model.mindmapNodes.isEmpty)
+        XCTAssertTrue(model.mindmapConnections.isEmpty)
     }
 
     func testLoadMindmap_notFound_returnsMindmapNotFound() async {

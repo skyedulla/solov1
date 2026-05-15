@@ -1,6 +1,11 @@
 import Foundation
 
-private struct CreateNodeRequestBody: Encodable {
+private enum MindmapNodeRemoteDataSourceError: Error {
+    /// **`POST`** / **`PATCH`** **`/mindmap-node`** API (**mindmap-nodes** resource).
+    case onlyMindmapNodesSupported
+}
+
+private struct CreateMindmapNodeRequestBody: Encodable {
     let mindmapId: String
     let parentNodeId: String?
     let position: NodeModel.Position
@@ -25,7 +30,7 @@ private struct CreateNodeRequestBody: Encodable {
     }
 }
 
-private struct FullNodeSyncPatchBody: Encodable {
+private struct FullMindmapNodeSyncPatchBody: Encodable {
     let mindmapId: String
     let parentNodeId: String?
     let position: NodeModel.Position
@@ -54,8 +59,8 @@ private struct FullNodeSyncPatchBody: Encodable {
     }
 }
 
-/// Mind map node API I/O via **`URLSession`** only.
-final class NodesRemoteDataSource: Sendable {
+/// **Mindmap-node** (**`/mindmap-node`**) API I/O via **`URLSession`** only.
+final class MindmapNodeRemoteDataSource: Sendable {
     private let session: URLSession
     private let baseURL: URL
 
@@ -64,9 +69,9 @@ final class NodesRemoteDataSource: Sendable {
         self.baseURL = baseURL
     }
 
-    /// **`GET {base}/nodes?mindmap_id=…&q=…`** with **`Authorization: Bearer`**. Response is capped at **5** nodes (server). Empty **`query`** omits **`q`**.
-    func searchNodes(mindmapId: String, query: String, accessToken: String) async throws -> (Data, URLResponse) {
-        let resourceURL = baseURL.appendingPathComponent("nodes", isDirectory: false)
+    /// **`GET {base}/mindmap-node?mindmap_id=…&q=…`** with **`Authorization: Bearer`**. Response is capped at **5** **mindmap-nodes** (server). Empty **`query`** omits **`q`**.
+    func searchMindmapNodes(mindmapId: String, query: String, accessToken: String) async throws -> (Data, URLResponse) {
+        let resourceURL = baseURL.appendingPathComponent("mindmap-node", isDirectory: false)
         var components = URLComponents(url: resourceURL, resolvingAgainstBaseURL: false)!
         var queryItems: [URLQueryItem] = [URLQueryItem(name: "mindmap_id", value: mindmapId)]
         let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -84,15 +89,18 @@ final class NodesRemoteDataSource: Sendable {
         return try await session.data(for: request)
     }
 
-    /// Creates **`node`** via **`POST {base}/nodes`** (server assigns **`id`**).
-    func addNode(_ node: NodeModel, accessToken: String) async throws -> (Data, URLResponse) {
-        let url = baseURL.appendingPathComponent("nodes", isDirectory: false)
-        let body = CreateNodeRequestBody(
-            mindmapId: node.mindmapId,
-            parentNodeId: node.parentNodeId,
-            position: node.position,
-            text: node.text,
-            dimensions: node.dimensions
+    /// Creates **`mindmapNode`** via **`POST {base}/mindmap-node`** (server assigns **`id`**).
+    func addMindmapNode(_ mindmapNode: NodeModel, accessToken: String) async throws -> (Data, URLResponse) {
+        guard case let .mindmapNode(mindmapId, text) = mindmapNode.nodeType else {
+            throw MindmapNodeRemoteDataSourceError.onlyMindmapNodesSupported
+        }
+        let url = baseURL.appendingPathComponent("mindmap-node", isDirectory: false)
+        let body = CreateMindmapNodeRequestBody(
+            mindmapId: mindmapId,
+            parentNodeId: mindmapNode.parentNodeId,
+            position: mindmapNode.position,
+            text: text,
+            dimensions: mindmapNode.dimensions
         )
         let encoder = JSONEncoder()
         let json = try encoder.encode(body)
@@ -107,18 +115,21 @@ final class NodesRemoteDataSource: Sendable {
         return try await session.data(for: request)
     }
 
-    /// Updates **`node`** via **`PATCH {base}/nodes/{id}`** with a full field snapshot.
-    func editNode(_ node: NodeModel, accessToken: String) async throws -> (Data, URLResponse) {
+    /// Updates **`mindmapNode`** via **`PATCH {base}/mindmap-node/{id}`** with a full field snapshot.
+    func editMindmapNode(_ mindmapNode: NodeModel, accessToken: String) async throws -> (Data, URLResponse) {
+        guard case let .mindmapNode(mindmapId, text) = mindmapNode.nodeType else {
+            throw MindmapNodeRemoteDataSourceError.onlyMindmapNodesSupported
+        }
         let url = baseURL
-            .appendingPathComponent("nodes", isDirectory: false)
-            .appendingPathComponent(node.id, isDirectory: false)
+            .appendingPathComponent("mindmap-node", isDirectory: false)
+            .appendingPathComponent(mindmapNode.id, isDirectory: false)
 
-        let patch = FullNodeSyncPatchBody(
-            mindmapId: node.mindmapId,
-            parentNodeId: node.parentNodeId,
-            position: node.position,
-            text: node.text,
-            dimensions: node.dimensions
+        let patch = FullMindmapNodeSyncPatchBody(
+            mindmapId: mindmapId,
+            parentNodeId: mindmapNode.parentNodeId,
+            position: mindmapNode.position,
+            text: text,
+            dimensions: mindmapNode.dimensions
         )
         let encoder = JSONEncoder()
         let json = try encoder.encode(patch)
@@ -133,11 +144,11 @@ final class NodesRemoteDataSource: Sendable {
         return try await session.data(for: request)
     }
 
-    /// **`DELETE {base}/nodes/{id}`** with **`Authorization: Bearer`**.
-    func deleteNode(id: String, accessToken: String) async throws -> (Data, URLResponse) {
+    /// **`DELETE {base}/mindmap-node/{id}`** with **`Authorization: Bearer`** (**mindmap-node** row).
+    func deleteMindmapNode(mindmapNodeId: String, accessToken: String) async throws -> (Data, URLResponse) {
         let url = baseURL
-            .appendingPathComponent("nodes", isDirectory: false)
-            .appendingPathComponent(id, isDirectory: false)
+            .appendingPathComponent("mindmap-node", isDirectory: false)
+            .appendingPathComponent(mindmapNodeId, isDirectory: false)
 
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"

@@ -1,13 +1,15 @@
 import Foundation
 
-/// Full mind map document: graph plus last-known viewport.
+/// Full mind map document: **mindmap-nodes** + **mindmap-connections** (wire keys **`nodes`** / **`connections`**) plus last-known viewport.
 struct MindmapModel: Codable, Sendable {
     var id: String
     var ideaId: String
     /// Display title from **`mindmaps.title`** (same key in **`GET`** / **`POST`** JSON).
     var title: String
-    var nodes: [NodeModel]
-    var connections: [ConnectionModel]
+    /// **Mindmap-nodes** — JSON key **`nodes`**.
+    var mindmapNodes: [NodeModel]
+    /// **Mindmap-connections** — JSON key **`connections`**.
+    var mindmapConnections: [ConnectionModel]
     var lastTransform: MindmapViewTransform
 
     /// Last pan and zoom for restoring the canvas view.
@@ -27,8 +29,8 @@ struct MindmapModel: Codable, Sendable {
         case id
         case ideaId = "idea_id"
         case title
-        case nodes
-        case connections
+        case mindmapNodes = "nodes"
+        case mindmapConnections = "connections"
         case lastTransform = "last_transform"
     }
 }

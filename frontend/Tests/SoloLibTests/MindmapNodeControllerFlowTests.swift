@@ -2,12 +2,12 @@ import XCTest
 
 @testable import SoloLib
 
-/// Exercises **`NodeController`** → **`NodesRemoteDataSource`** → **`URLSession`** with **`MockURLProtocol`**.
-final class NodeControllerFlowTests: XCTestCase {
+/// Exercises **`MindmapNodeController`** → **`MindmapNodeRemoteDataSource`** → **`URLSession`** with **`MockURLProtocol`**.
+final class MindmapNodeControllerFlowTests: XCTestCase {
     private let baseURL = URL(string: "https://solo.test")!
     private let accessToken = "test-access-token"
     private let mindmapId = "00000000-0000-4000-8000-0000000000c3"
-    private let nodeId = "00000000-0000-4000-8000-0000000000d4"
+    private let mindmapNodeId = "00000000-0000-4000-8000-0000000000d4"
 
     override func tearDown() {
         MockURLProtocol.requestHandler = nil
@@ -20,12 +20,12 @@ final class NodeControllerFlowTests: XCTestCase {
         return URLSession(configuration: configuration)
     }
 
-    private func makeController() -> NodeController {
-        let remote = NodesRemoteDataSource(session: makeSession(), baseURL: baseURL)
-        return NodeController(remote: remote)
+    private func makeController() -> MindmapNodeController {
+        let remote = MindmapNodeRemoteDataSource(session: makeSession(), baseURL: baseURL)
+        return MindmapNodeController(remote: remote)
     }
 
-    private static func nodeResponseJSONObject(
+    private static func mindmapNodeResponseJSONObject(
         id: String,
         mindmapId: String,
         parentNodeId: String? = nil,
@@ -85,24 +85,23 @@ final class NodeControllerFlowTests: XCTestCase {
         return data
     }
 
-    private func sampleNode(isNewId: Bool = false) -> NodeModel {
+    private func sampleMindmapNode(isNewId: Bool = false) -> NodeModel {
         NodeModel(
-            id: isNewId ? "00000000-0000-4000-8000-000000009999" : nodeId,
-            mindmapId: mindmapId,
+            id: isNewId ? "00000000-0000-4000-8000-000000009999" : mindmapNodeId,
+            nodeType: .mindmapNode(mindmapId: mindmapId, text: "Mind map node body"),
             parentNodeId: nil,
             position: NodeModel.Position(x: 5, y: 8),
-            text: "Node text",
             dimensions: NodeModel.Dimensions(height: 32, width: 100)
         )
     }
 
-    func testSearchNodes_fullStack_GETsQueryAndDecodes() async throws {
-        let row = Self.nodeResponseJSONObject(id: nodeId, mindmapId: mindmapId, text: "Alpha")
+    func testSearchMindmapNodes_fullStack_GETsQueryAndDecodes() async throws {
+        let row = Self.mindmapNodeResponseJSONObject(id: mindmapNodeId, mindmapId: mindmapId, text: "Alpha")
         let body = try Self.jsonData([row])
 
         MockURLProtocol.requestHandler = { request in
             XCTAssertEqual(request.httpMethod, "GET")
-            XCTAssertEqual(request.url?.path, "/nodes")
+            XCTAssertEqual(request.url?.path, "/mindmap-node")
             let items = try XCTUnwrap(URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?.queryItems)
             XCTAssertEqual(items.first { $0.name == "mindmap_id" }?.value, self.mindmapId)
             XCTAssertEqual(items.first { $0.name == "q" }?.value, "al")
@@ -112,14 +111,22 @@ final class NodeControllerFlowTests: XCTestCase {
         }
 
         let controller = makeController()
-        let list = try await controller.searchNodes(mindmapId: mindmapId, query: "al", accessToken: accessToken)
+        let list = try await controller.searchMindmapNodes(
+            mindmapId: mindmapId,
+            query: "al",
+            accessToken: accessToken
+        )
 
         XCTAssertEqual(list.count, 1)
-        XCTAssertEqual(list[0].id, nodeId)
-        XCTAssertEqual(list[0].text, "Alpha")
+        XCTAssertEqual(list[0].id, mindmapNodeId)
+        guard case let .mindmapNode(_, text) = list[0].nodeType else {
+            XCTFail("expected mindmap-node")
+            return
+        }
+        XCTAssertEqual(text, "Alpha")
     }
 
-    func testSearchNodes_emptyQuery_omitsQParameter() async throws {
+    func testSearchMindmapNodes_emptyQuery_omitsQParameter() async throws {
         let body = try Self.jsonData([Any]())
 
         MockURLProtocol.requestHandler = { request in
@@ -131,17 +138,25 @@ final class NodeControllerFlowTests: XCTestCase {
         }
 
         let controller = makeController()
-        let list = try await controller.searchNodes(mindmapId: mindmapId, query: "   ", accessToken: accessToken)
+        let list = try await controller.searchMindmapNodes(
+            mindmapId: mindmapId,
+            query: "   ",
+            accessToken: accessToken
+        )
         XCTAssertTrue(list.isEmpty)
     }
 
-    func testAddNode_POSTsJSONAndDecodes() async throws {
-        let row = Self.nodeResponseJSONObject(id: nodeId, mindmapId: mindmapId, text: "Node text")
+    func testAddMindmapNode_POSTsJSONAndDecodes() async throws {
+        let row = Self.mindmapNodeResponseJSONObject(
+            id: mindmapNodeId,
+            mindmapId: mindmapId,
+            text: "Mind map node body"
+        )
         let body = try Self.jsonData(row)
 
         MockURLProtocol.requestHandler = { request in
             XCTAssertEqual(request.httpMethod, "POST")
-            XCTAssertEqual(request.url?.path, "/nodes")
+            XCTAssertEqual(request.url?.path, "/mindmap-node")
             XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
             XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer \(self.accessToken)")
 
@@ -149,27 +164,31 @@ final class NodeControllerFlowTests: XCTestCase {
             let obj = try XCTUnwrap(try JSONSerialization.jsonObject(with: posted) as? [String: Any])
             XCTAssertEqual(obj["mindmapId"] as? String, self.mindmapId)
             XCTAssertNil(obj["ideaId"] as? String)
-            XCTAssertEqual(obj["text"] as? String, "Node text")
+            XCTAssertEqual(obj["text"] as? String, "Mind map node body")
 
             let res = Self.httpResponse(for: request, statusCode: 201)
             return (res, body)
         }
 
         let controller = makeController()
-        let saved = try await controller.addNode(sampleNode(isNewId: true), accessToken: accessToken)
+        let saved = try await controller.addMindmapNode(sampleMindmapNode(isNewId: true), accessToken: accessToken)
 
-        XCTAssertEqual(saved.id, nodeId)
-        XCTAssertEqual(saved.mindmapId, mindmapId)
-        XCTAssertEqual(saved.text, "Node text")
+        XCTAssertEqual(saved.id, mindmapNodeId)
+        guard case let .mindmapNode(savedMindmapId, savedText) = saved.nodeType else {
+            XCTFail("expected mindmap-node")
+            return
+        }
+        XCTAssertEqual(savedMindmapId, mindmapId)
+        XCTAssertEqual(savedText, "Mind map node body")
     }
 
-    func testEditNode_PATCHesJSONAndDecodes() async throws {
-        let row = Self.nodeResponseJSONObject(id: nodeId, mindmapId: mindmapId, text: "Updated")
+    func testEditMindmapNode_PATCHesJSONAndDecodes() async throws {
+        let row = Self.mindmapNodeResponseJSONObject(id: mindmapNodeId, mindmapId: mindmapId, text: "Updated")
         let body = try Self.jsonData(row)
 
         MockURLProtocol.requestHandler = { request in
             XCTAssertEqual(request.httpMethod, "PATCH")
-            XCTAssertEqual(request.url?.path, "/nodes/\(self.nodeId)")
+            XCTAssertEqual(request.url?.path, "/mindmap-node/\(self.mindmapNodeId)")
 
             let posted = Self.httpBodyData(from: request)
             let obj = try XCTUnwrap(try JSONSerialization.jsonObject(with: posted) as? [String: Any])
@@ -179,26 +198,34 @@ final class NodeControllerFlowTests: XCTestCase {
             return (res, body)
         }
 
-        var node = sampleNode(isNewId: false)
-        node.text = "Updated"
+        var mindmapNode = sampleMindmapNode(isNewId: false)
+        guard case let .mindmapNode(mid, _) = mindmapNode.nodeType else {
+            XCTFail("expected mindmap-node")
+            return
+        }
+        mindmapNode.nodeType = .mindmapNode(mindmapId: mid, text: "Updated")
 
         let controller = makeController()
-        let saved = try await controller.editNode(node, accessToken: accessToken)
+        let saved = try await controller.editMindmapNode(mindmapNode, accessToken: accessToken)
 
-        XCTAssertEqual(saved.id, nodeId)
-        XCTAssertEqual(saved.text, "Updated")
+        XCTAssertEqual(saved.id, mindmapNodeId)
+        guard case let .mindmapNode(_, updatedText) = saved.nodeType else {
+            XCTFail("expected mindmap-node")
+            return
+        }
+        XCTAssertEqual(updatedText, "Updated")
     }
 
-    func testDeleteNode_fullStack_DELETEsAndAccepts204() async throws {
+    func testDeleteMindmapNode_fullStack_DELETEsAndAccepts204() async throws {
         MockURLProtocol.requestHandler = { request in
             XCTAssertEqual(request.httpMethod, "DELETE")
-            XCTAssertEqual(request.url?.path, "/nodes/\(self.nodeId)")
+            XCTAssertEqual(request.url?.path, "/mindmap-node/\(self.mindmapNodeId)")
             XCTAssertTrue(Self.httpBodyData(from: request).isEmpty)
             let res = Self.httpResponse(for: request, statusCode: 204)
             return (res, Data())
         }
 
         let controller = makeController()
-        try await controller.deleteNode(id: nodeId, accessToken: accessToken)
+        try await controller.deleteMindmapNode(mindmapNodeId: mindmapNodeId, accessToken: accessToken)
     }
 }

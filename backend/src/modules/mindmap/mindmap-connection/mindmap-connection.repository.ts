@@ -1,14 +1,14 @@
 import { Prisma, type MindmapConnection, type MindmapConnectionAnchor } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
-import { prisma } from "../../core/prisma";
-import type { ConnectionCreateBody, ConnectionUpdateBody } from "./connection.schema";
+import { prisma } from "../../../core/prisma";
+import type { MindmapConnectionCreateBody, MindmapConnectionUpdateBody } from "./mindmap-connection.schema";
 
 function toDbAnchor(value: string): MindmapConnectionAnchor {
   return value as MindmapConnectionAnchor;
 }
 
-export async function findConnectionsForUserMindmap(
+export async function findMindmapConnectionsForUserMindmap(
   userId: string,
   mindmapId: string,
 ): Promise<MindmapConnection[]> {
@@ -18,9 +18,9 @@ export async function findConnectionsForUserMindmap(
   });
 }
 
-export async function createConnectionForUser(
+export async function createMindmapConnectionForUser(
   userId: string,
-  body: ConnectionCreateBody,
+  body: MindmapConnectionCreateBody,
 ): Promise<MindmapConnection> {
   return prisma.mindmapConnection.create({
     data: {
@@ -34,19 +34,19 @@ export async function createConnectionForUser(
   });
 }
 
-export async function findConnectionByIdForUser(
+export async function findMindmapConnectionByIdForUser(
   userId: string,
-  connectionId: string,
+  mindmapConnectionId: string,
 ): Promise<MindmapConnection | null> {
   return prisma.mindmapConnection.findFirst({
-    where: { id: connectionId, userId },
+    where: { id: mindmapConnectionId, userId },
   });
 }
 
-export async function updateConnectionForUser(
+export async function updateMindmapConnectionForUser(
   userId: string,
-  connectionId: string,
-  body: ConnectionUpdateBody,
+  mindmapConnectionId: string,
+  body: MindmapConnectionUpdateBody,
 ): Promise<MindmapConnection | null> {
   const data: Prisma.MindmapConnectionUpdateInput = {};
 
@@ -68,13 +68,13 @@ export async function updateConnectionForUser(
 
   if (Object.keys(data).length === 0) {
     return prisma.mindmapConnection.findFirst({
-      where: { id: connectionId, userId },
+      where: { id: mindmapConnectionId, userId },
     });
   }
 
   try {
     return await prisma.mindmapConnection.update({
-      where: { id: connectionId, userId },
+      where: { id: mindmapConnectionId, userId },
       data,
     });
   } catch (error) {
@@ -85,9 +85,12 @@ export async function updateConnectionForUser(
   }
 }
 
-export async function deleteConnectionForUser(userId: string, connectionId: string): Promise<boolean> {
+export async function deleteMindmapConnectionForUser(
+  userId: string,
+  mindmapConnectionId: string,
+): Promise<boolean> {
   const result = await prisma.mindmapConnection.deleteMany({
-    where: { id: connectionId, userId },
+    where: { id: mindmapConnectionId, userId },
   });
   return result.count > 0;
 }

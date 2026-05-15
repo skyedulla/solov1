@@ -55,7 +55,7 @@ export async function updateMindmapSummaryForUser(
 }
 
 /**
- * Deletes **`mindmap_connections`**, **`mindmap_nodes`**, then **`mindmaps`** when a row exists for **`userId`** + **`mindmapId`** + **`ideaId`**.
+ * Deletes **mindmap-connections** (`mindmap_connections`), **mindmap-nodes** (`mindmap_nodes`), then **`mindmaps`** when a row exists for **`userId`** + **`mindmapId`** + **`ideaId`**.
  * Returns **`false`** when no such mind map row exists.
  */
 export async function deleteMindmapCascadeForUser(

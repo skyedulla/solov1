@@ -1,8 +1,8 @@
 import type { MindmapConnection, MindmapNode } from "@prisma/client";
 
 import { completeChat } from "../../core/llm_service/chatCompletion";
-import * as connectionRepository from "../connections/connection.repository";
-import * as nodeRepository from "../nodes/node.repository";
+import * as mindmapConnectionRepository from "./mindmap-connection/mindmap-connection.repository";
+import * as mindmapNodeRepository from "./mindmap-node/mindmap-node.repository";
 import type { MindmapCreateBody, ListMindmapsQuery } from "./mindmap.schema";
 import {
   buildMindmapSummarizationMessages,
@@ -14,8 +14,8 @@ export type MindmapLoadDocument = {
   id: string;
   ideaId: string;
   title: string;
-  nodes: MindmapNode[];
-  connections: MindmapConnection[];
+  mindmapNodes: MindmapNode[];
+  mindmapConnections: MindmapConnection[];
 };
 
 export async function createMindmapForUser(authUserId: string, body: MindmapCreateBody): Promise<
@@ -32,7 +32,7 @@ export async function listMindmapsForUser(
 }
 
 /**
- * Loads graph data when **`mindmaps`** row exists for **`authUserId`** + **`mindmapId`** + **`ideaId`**.
+ * Loads **mindmap-nodes** + **mindmap-connections** when **`mindmaps`** row exists for **`authUserId`** + **`mindmapId`** + **`ideaId`**.
  * Returns **`null`** if that row is missing (caller maps to **`404`**).
  */
 export async function loadMindmapDocumentForUser(
@@ -45,12 +45,18 @@ export async function loadMindmapDocumentForUser(
     return null;
   }
 
-  const [nodes, connections] = await Promise.all([
-    nodeRepository.findAllNodesForUserMindmap(authUserId, mindmapId),
-    connectionRepository.findConnectionsForUserMindmap(authUserId, mindmapId),
+  const [mindmapNodes, mindmapConnections] = await Promise.all([
+    mindmapNodeRepository.findAllMindmapNodesForUserMindmap(authUserId, mindmapId),
+    mindmapConnectionRepository.findMindmapConnectionsForUserMindmap(authUserId, mindmapId),
   ]);
 
-  return { id: mindmap.id, ideaId: mindmap.ideaId, title: mindmap.title, nodes, connections };
+  return {
+    id: mindmap.id,
+    ideaId: mindmap.ideaId,
+    title: mindmap.title,
+    mindmapNodes,
+    mindmapConnections,
+  };
 }
 
 export async function deleteMindmapForUser(
@@ -67,7 +73,7 @@ export type GenerateMindmapSummaryResult =
   | { ok: false; kind: "llm_error"; message: string };
 
 /**
- * Loads the mind map graph, builds summarization messages, runs **`completeChat`**, persists **`summary`**, returns new text.
+ * Loads **mindmap-nodes** / **mindmap-connections**, builds summarization messages, runs **`completeChat`**, persists **`summary`**, returns new text.
  */
 export async function generateMindmapSummaryForUser(
   authUserId: string,
@@ -79,16 +85,16 @@ export async function generateMindmapSummaryForUser(
     return { ok: false, kind: "not_found" };
   }
 
-  const [nodes, connections] = await Promise.all([
-    nodeRepository.findAllNodesForUserMindmap(authUserId, mindmapId),
-    connectionRepository.findConnectionsForUserMindmap(authUserId, mindmapId),
+  const [mindmapNodes, mindmapConnections] = await Promise.all([
+    mindmapNodeRepository.findAllMindmapNodesForUserMindmap(authUserId, mindmapId),
+    mindmapConnectionRepository.findMindmapConnectionsForUserMindmap(authUserId, mindmapId),
   ]);
 
   const promptInput = mindmapSummarizationInputFromPersisted({
     title: mindmap.title,
     currentSummary: mindmap.summary.trim().length > 0 ? mindmap.summary : null,
-    nodes,
-    connections,
+    mindmapNodes,
+    mindmapConnections,
   });
 
   const messages = buildMindmapSummarizationMessages(promptInput);

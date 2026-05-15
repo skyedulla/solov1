@@ -48,7 +48,7 @@ final class MindmapsRemoteDataSource: Sendable {
         return try await session.data(for: request)
     }
 
-    /// **`GET {base}/mindmaps/{id}?idea_id=…`** with **`Authorization: Bearer`** — returns raw **`URLSession`** result.
+    /// **`GET {base}/mindmaps/{id}?idea_id=…`** with **`Authorization: Bearer`** — full document (**wire** **`nodes`** / **`connections`** = **mindmap-nodes** / **mindmap-connections**); returns raw **`URLSession`** result.
     func loadMindmap(id: String, ideaId: String, accessToken: String) async throws -> (Data, URLResponse) {
         let pathURL = baseURL
             .appendingPathComponent("mindmaps", isDirectory: false)
