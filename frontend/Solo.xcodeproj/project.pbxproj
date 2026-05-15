@@ -14,11 +14,11 @@
 		12836DE7FE5D050D74619A48 /* AuthRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73776EA9912809367381ECB3 /* AuthRootView.swift */; };
 		18A940E7CC1E66D34BC2E9F5 /* AuthModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10CFD5B68FADD3FF11D2500 /* AuthModel.swift */; };
 		193286BD96BE8633CBC1FA85 /* MindmapConnectionRemoteDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339C1C4648B2F40A4C048B6C /* MindmapConnectionRemoteDataSource.swift */; };
-		1DE38D517B2B3D7CB6D4FE5C /* ai_tool_types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3799D85D92BBB08761761070 /* ai_tool_types.swift */; };
+		1DE38D517B2B3D7CB6D4FE5C /* AIToolTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3799D85D92BBB08761761070 /* AIToolTypes.swift */; };
 		20D2FE4A3E9B4548924950E2 /* AIMessageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5669823198BA80ACFEF314E8 /* AIMessageModel.swift */; };
-		26203605859685118ED1D7E4 /* mindmap_canvas_background_design_options.swift in Sources */ = {isa = PBXBuildFile; fileRef = D130A4C012F951DEB542D63A /* mindmap_canvas_background_design_options.swift */; };
+		26203605859685118ED1D7E4 /* MindmapCanvasOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D130A4C012F951DEB542D63A /* MindmapCanvasOptions.swift */; };
 		296145E65E3E38F638876E14 /* AuthLabeledTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922EE1CA0E9EE28C769C5A83 /* AuthLabeledTextField.swift */; };
-		2FBE7E5380701FA6CBF98A34 /* sort_by_constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88118C2F528F0435F68846AE /* sort_by_constants.swift */; };
+		2FBE7E5380701FA6CBF98A34 /* SortByConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88118C2F528F0435F68846AE /* SortByConstants.swift */; };
 		31B06C99229CACE3823BE1DC /* ObjectiveModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B067CDCD5555C3192295A19A /* ObjectiveModel.swift */; };
 		350A05955F034825556131AA /* MockURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD541BF99B01E8D6520F96B3 /* MockURLProtocol.swift */; };
 		35E1F9E4A329F0EAD30EF0DD /* AuthFlowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC158C35D3542F5B8FE8C5B6 /* AuthFlowViewModel.swift */; };
@@ -30,7 +30,7 @@
 		82F7E6D5C4B3A29170605443 /* StorageRemoteDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F8E7D6C5B4A39281706554 /* StorageRemoteDataSource.swift */; };
 		B2C3D4E5F6A718293A4B5C6D7 /* StorageUploadViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C6 /* StorageUploadViewModel.swift */; };
 		461348277E46B9608D864093 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F8433D4ADD65E76D3A34EDA /* AppConfiguration.swift */; };
-		E3D7C8B1A2948576F5E4D3C2B /* stored_upload_instant_formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E8D1C92A3B4C5D6E7F8091 /* stored_upload_instant_formatting.swift */; };
+		E3D7C8B1A2948576F5E4D3C2B /* DatetimeTimezoneRetrieval.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E8D1C92A3B4C5D6E7F8091 /* DatetimeTimezoneRetrieval.swift */; };
 		4C1664AAA54E369F2397EEAE /* MindmapNodeRemoteDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 648BF7E4BBB7A70EAF336CF8 /* MindmapNodeRemoteDataSource.swift */; };
 		4CD4E0BA9833195437555BF9 /* ObjectivesRemoteDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 804D648738E55682EBFCC171 /* ObjectivesRemoteDataSource.swift */; };
 		520DFE6119EEF54118891ED0 /* IdeasRemoteDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99634E87102D20BF8F47BC4E /* IdeasRemoteDataSource.swift */; };
@@ -68,7 +68,7 @@
 		CE939A33F954C2038E709662 /* AIViewModelFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01F6AD8F8FD98C5194DDF8EF /* AIViewModelFlowTests.swift */; };
 		D744743A5C4805B46B6188E7 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 257CF2BB763C0A1D893EDD66 /* Supabase */; };
 		DA2D2F56B8EAC6E7C1247F98 /* MindmapConnectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41283DEC1295AD97CDD178A /* MindmapConnectionController.swift */; };
-		DFCCFF36BC6DE9CABE30CD79 /* llm_response_settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E837169166638FB423B946E /* llm_response_settings.swift */; };
+		DFCCFF36BC6DE9CABE30CD79 /* LLMResponseSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E837169166638FB423B946E /* LLMResponseSettings.swift */; };
 		B7C8D9012E453A6F8091BBC1 /* UIPlaygroundScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7C8D9012E453A6F8091BBC0 /* UIPlaygroundScreen.swift */; };
 		B2E4F68091C304152637D1A6 /* DecisionMapController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E4F68091C304152637D1A5 /* DecisionMapController.swift */; };
 		B2E4F68091C304152637D1A2 /* DecisionMapModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E4F68091C304152637D1A1 /* DecisionMapModel.swift */; };
@@ -108,7 +108,7 @@
 		311109FA1388BCCF8A8E9659 /* SoloLibTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SoloLibTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		339C1C4648B2F40A4C048B6C /* MindmapConnectionRemoteDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindmapConnectionRemoteDataSource.swift; sourceTree = "<group>"; };
 		33DCE5141B3E1B4B8BF03B9A /* AuthTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTheme.swift; sourceTree = "<group>"; };
-		3799D85D92BBB08761761070 /* ai_tool_types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ai_tool_types.swift; sourceTree = "<group>"; };
+		3799D85D92BBB08761761070 /* AIToolTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIToolTypes.swift; sourceTree = "<group>"; };
 		3EB1FDF010C58C5BB9DD4DFD /* MindmapController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindmapController.swift; sourceTree = "<group>"; };
 		A8F3C2D110E54B7C9A2D8E1F403B6C9A /* MindmapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindmapViewModel.swift; sourceTree = "<group>"; };
 		D1E2F3A4B5C6D7E890ABCDEF /* MindmapManagementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindmapManagementViewModel.swift; sourceTree = "<group>"; };
@@ -117,7 +117,7 @@
 		B2E4F68091C304152637D1A3 /* DecisionMapsRemoteDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionMapsRemoteDataSource.swift; sourceTree = "<group>"; };
 		42FF1CB07D8B2EB8763B6D5F /* AuthFormContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFormContainer.swift; sourceTree = "<group>"; };
 		44844BDF7C89CBF97797E261 /* ConnectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionModel.swift; sourceTree = "<group>"; };
-		4E837169166638FB423B946E /* llm_response_settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = llm_response_settings.swift; sourceTree = "<group>"; };
+		4E837169166638FB423B946E /* LLMResponseSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMResponseSettings.swift; sourceTree = "<group>"; };
 		50E1C0ABCA2E2ED5EFFB6F08 /* MindmapSummaryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindmapSummaryModel.swift; sourceTree = "<group>"; };
 		5669823198BA80ACFEF314E8 /* AIMessageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIMessageModel.swift; sourceTree = "<group>"; };
 		589A4DA2B997E3AD0E310513 /* AuthPrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthPrimaryButton.swift; sourceTree = "<group>"; };
@@ -132,9 +132,9 @@
 		7E59431232B41CE5250A5933 /* AIRemoteDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIRemoteDataSource.swift; sourceTree = "<group>"; };
 		7ED9866A4106AE1772DF8760 /* IdeaControllerFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdeaControllerFlowTests.swift; sourceTree = "<group>"; };
 		7F8433D4ADD65E76D3A34EDA /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
-		F4E8D1C92A3B4C5D6E7F8091 /* stored_upload_instant_formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = stored_upload_instant_formatting.swift; sourceTree = "<group>"; };
+		F4E8D1C92A3B4C5D6E7F8091 /* DatetimeTimezoneRetrieval.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatetimeTimezoneRetrieval.swift; sourceTree = "<group>"; };
 		804D648738E55682EBFCC171 /* ObjectivesRemoteDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectivesRemoteDataSource.swift; sourceTree = "<group>"; };
-		88118C2F528F0435F68846AE /* sort_by_constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sort_by_constants.swift; sourceTree = "<group>"; };
+		88118C2F528F0435F68846AE /* SortByConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortByConstants.swift; sourceTree = "<group>"; };
 		8E6D075C8E7E0CD017C49DC8 /* Solo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Solo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		91F3B40D273236B5E270C850 /* MindmapCanvasModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindmapCanvasModel.swift; sourceTree = "<group>"; };
 		922EE1CA0E9EE28C769C5A83 /* AuthLabeledTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthLabeledTextField.swift; sourceTree = "<group>"; };
@@ -154,7 +154,7 @@
 		C4CDCD90422B360094ED7CC1 /* ObjectiveController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectiveController.swift; sourceTree = "<group>"; };
 		C5AB64D0E3D59B10039FB0C4 /* libSoloLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSoloLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		CCBC8EF7305B3396C379BEAF /* MindmapNodeControllerFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindmapNodeControllerFlowTests.swift; sourceTree = "<group>"; };
-		D130A4C012F951DEB542D63A /* mindmap_canvas_background_design_options.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mindmap_canvas_background_design_options.swift; sourceTree = "<group>"; };
+		D130A4C012F951DEB542D63A /* MindmapCanvasOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindmapCanvasOptions.swift; sourceTree = "<group>"; };
 		D5DA32090895F0D561579F16 /* AuthControllerFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthControllerFlowTests.swift; sourceTree = "<group>"; };
 		DCB62665DBE6FA0F32786E41 /* IdeaFilterModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdeaFilterModel.swift; sourceTree = "<group>"; };
 		DDED07D8F129B4E0F819B4F0 /* IdeaSearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdeaSearchController.swift; sourceTree = "<group>"; };
@@ -212,8 +212,8 @@
 		1F14A39951829FCF437663A9 /* settings */ = {
 			isa = PBXGroup;
 			children = (
-				4E837169166638FB423B946E /* llm_response_settings.swift */,
-				D130A4C012F951DEB542D63A /* mindmap_canvas_background_design_options.swift */,
+				4E837169166638FB423B946E /* LLMResponseSettings.swift */,
+				D130A4C012F951DEB542D63A /* MindmapCanvasOptions.swift */,
 			);
 			path = settings;
 			sourceTree = "<group>";
@@ -457,7 +457,7 @@
 		A9B8C7D6E5F4039281726354 /* datetime */ = {
 			isa = PBXGroup;
 			children = (
-				F4E8D1C92A3B4C5D6E7F8091 /* stored_upload_instant_formatting.swift */,
+				F4E8D1C92A3B4C5D6E7F8091 /* DatetimeTimezoneRetrieval.swift */,
 			);
 			path = datetime;
 			sourceTree = "<group>";
@@ -692,8 +692,8 @@
 		DAF913836E94103BCF7E0EFC /* constants */ = {
 			isa = PBXGroup;
 			children = (
-				3799D85D92BBB08761761070 /* ai_tool_types.swift */,
-				88118C2F528F0435F68846AE /* sort_by_constants.swift */,
+				3799D85D92BBB08761761070 /* AIToolTypes.swift */,
+				88118C2F528F0435F68846AE /* SortByConstants.swift */,
 				1F14A39951829FCF437663A9 /* settings */,
 			);
 			path = constants;
@@ -859,7 +859,7 @@
 				A03A2B5DF347E5094C318559 /* AIRemoteDataSource.swift in Sources */,
 				AEC22E0F16F12BBF1BF5D4CB /* AIViewModel.swift in Sources */,
 				461348277E46B9608D864093 /* AppConfiguration.swift in Sources */,
-				E3D7C8B1A2948576F5E4D3C2B /* stored_upload_instant_formatting.swift in Sources */,
+				E3D7C8B1A2948576F5E4D3C2B /* DatetimeTimezoneRetrieval.swift in Sources */,
 				B7F0CE410B0FFED739CCDC5A /* AuthController.swift in Sources */,
 				35E1F9E4A329F0EAD30EF0DD /* AuthFlowViewModel.swift in Sources */,
 				55206925033504D6AF741B55 /* AuthFormContainer.swift in Sources */,
@@ -905,10 +905,10 @@
 				B2C3D4E5F6A718293A4B5C6D7 /* StorageUploadViewModel.swift in Sources */,
 				6FE3B99E5B3BF6DFD81B98B0 /* SupabaseClientProvider.swift in Sources */,
 				B7C8D9012E453A6F8091BBC1 /* UIPlaygroundScreen.swift in Sources */,
-				1DE38D517B2B3D7CB6D4FE5C /* ai_tool_types.swift in Sources */,
-				DFCCFF36BC6DE9CABE30CD79 /* llm_response_settings.swift in Sources */,
-				26203605859685118ED1D7E4 /* mindmap_canvas_background_design_options.swift in Sources */,
-				2FBE7E5380701FA6CBF98A34 /* sort_by_constants.swift in Sources */,
+				1DE38D517B2B3D7CB6D4FE5C /* AIToolTypes.swift in Sources */,
+				DFCCFF36BC6DE9CABE30CD79 /* LLMResponseSettings.swift in Sources */,
+				26203605859685118ED1D7E4 /* MindmapCanvasOptions.swift in Sources */,
+				2FBE7E5380701FA6CBF98A34 /* SortByConstants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
