@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Snapshot the repo root and POST FULL_SOLO.zip to the Cloudflare Worker used by
+# `.github/workflows/*buffer*.yml`. Skips .git, build caches, node_modules, dist, __pycache__.
+#
+# Env:
+#   SOLO_BUFFER_WORKER_URL — destination (default matches repo workflows).
+#   SOLO_REPO_NAME         — X-Repo-Name header (default: basename of repo root).
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORK="${SOLO_BUFFER_WORKER_URL:-https://gitrepopushdata.sohanyedulla.workers.dev}"
+REPO_NAME="${SOLO_REPO_NAME:-$(basename "$ROOT")}"
+ZIP_ARTIFACT="$(mktemp "${TMPDIR:-/tmp}/full_solo_zip.XXXXXX.zip")"
+
+cleanup() { rm -f "$ZIP_ARTIFACT"; }
+trap cleanup EXIT
+
+dry_run=""
+if [[ "${1:-}" == "--dry-run" ]]; then
+  dry_run="1"
+fi
+
+# Paths aligned with .gitignore / local heavy dirs (see repo size audit).
+ZIP_EXCLUDES=(
+  "*.git*"
+  "frontend/.build/*"
+  "frontend/.derivedData/*"
+  "backend/node_modules/*"
+  "frontend/.swiftpm/*"
+  "backend/dist/*"
+  "*__pycache__*"
+)
+
+echo "Zipping repo root → $ZIP_ARTIFACT (excludes .git, build caches, node_modules, dist, __pycache__)"
+(
+  cd "$ROOT"
+  zip -rq "$ZIP_ARTIFACT" . -x "${ZIP_EXCLUDES[@]}"
+)
+
+if [[ -n "$dry_run" ]]; then
+  echo "(dry-run) Skipping POST. Archive size: $(du -h "$ZIP_ARTIFACT" | cut -f1)"
+  exit 0
+fi
+
+echo "POSTing FULL_SOLO.zip to $WORK"
+curl --fail-with-body -sS \
+  -X POST \
+  -H "X-Repo-Name: ${REPO_NAME}" \
+  -H "Content-Type: application/zip" \
+  -H 'Content-Disposition: attachment; filename=FULL_SOLO.zip' \
+  --data-binary @"$ZIP_ARTIFACT" \
+  "$WORK"
+
+echo ""
+echo "Done."

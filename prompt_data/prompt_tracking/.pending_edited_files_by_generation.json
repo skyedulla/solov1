@@ -1,0 +1,10 @@
+{
+  "1262f9bc-06ee-4348-92da-b36f4b7bf24c": [
+    ".cursor/prompt_tracking/data/conversation_id_map.json",
+    ".cursor/prompt_tracking/log_prompt_workflow.py"
+  ],
+  "37be2a27-cf21-45a5-9177-64921f4588aa": [
+    ".cursor/prompt_tracking/log_prompt_workflow.py",
+    "prompt_data/prompts.txt"
+  ]
+}

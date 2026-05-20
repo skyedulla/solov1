@@ -1,0 +1,677 @@
+# Append-only composer log (`prompt_data/prompts.txt`). Records use **`Date:`** / **`Time:`**, numeric **`conversation_id`**, edit metadata; body below the rule fence. Companion: **`prompt_data/long-term-prompt-tracking.txt`**. State/scripts: **`prompt_data/prompt_tracking/`**.
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-17T21:00:56+00:00
+hook_event: 'stop'
+conversation_id: 'c1'
+generation_id: 'g1'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+hello
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-17T21:05:32+00:00
+hook_event: 'stop'
+conversation_id: 'c9f233d7-12e6-4d98-8c83-07725933b3e1'
+generation_id: '496aab8f-6058-4ce0-9d83-147f42518a2b'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+how do I confirm that I'm using a flow that fires beforeSumbitPrompt?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-18T01:59:13+00:00
+hook_event: 'stop'
+conversation_id: '1fa108e6-7407-4613-ab97-ab443c4f5b4e'
+generation_id: '6ef532f1-b346-429e-97fc-645b35b21a04'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+what is the git repo associated with this project?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-18T01:59:31+00:00
+hook_event: 'stop'
+conversation_id: '1fa108e6-7407-4613-ab97-ab443c4f5b4e'
+generation_id: '30cdef1c-18fd-4191-952f-4e638ceb64ea'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+what was the last push to main?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-18T01:59:47+00:00
+hook_event: 'stop'
+conversation_id: '1fa108e6-7407-4613-ab97-ab443c4f5b4e'
+generation_id: '3fba5d4a-638d-4131-80d9-bf52b956f3a5'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+how many commits have been there since?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-18T02:01:08+00:00
+hook_event: 'stop'
+conversation_id: '1fa108e6-7407-4613-ab97-ab443c4f5b4e'
+generation_id: 'd95d22b8-151f-4cdf-b2c2-adfe5c18a025'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+how do i get a git clone token for this repo?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-18T02:02:03+00:00
+hook_event: 'stop'
+conversation_id: '1fa108e6-7407-4613-ab97-ab443c4f5b4e'
+generation_id: '883093ab-46db-4392-bc14-5cfa54d9610c'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+a clone token can perform read and writes? so it can add new files and code?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-18T02:02:31+00:00
+hook_event: 'stop'
+conversation_id: '1fa108e6-7407-4613-ab97-ab443c4f5b4e'
+generation_id: '352ce489-98bd-41a0-9fb5-0355c5fd5e26'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+can I create a system that automatically reads new commits to my codebase?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-18T02:03:11+00:00
+hook_event: 'stop'
+conversation_id: '1fa108e6-7407-4613-ab97-ab443c4f5b4e'
+generation_id: '5939bc20-b7d7-44d3-9aff-6abaaf6250e6'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+can I define a workflow with on commit?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-18T02:03:56+00:00
+hook_event: 'stop'
+conversation_id: '1fa108e6-7407-4613-ab97-ab443c4f5b4e'
+generation_id: '460e8318-ce15-4843-84a8-d4acfdb9b86d'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+is there any git commands that I can use to send new data just from a commit directly from the codebase?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-18T02:05:31+00:00
+hook_event: 'stop'
+conversation_id: '1fa108e6-7407-4613-ab97-ab443c4f5b4e'
+generation_id: 'fe47acb0-fba7-4f19-b4da-8dc435d17747'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+so I would have to create a hook linked to a script every time a git commit occurs in my codebase
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-18T02:07:37+00:00
+hook_event: 'stop'
+conversation_id: '1fa108e6-7407-4613-ab97-ab443c4f5b4e'
+generation_id: '16a7a468-d543-4b12-b34e-58b69ee06750'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+My goal is to store all the editted files within a git commit and send that data over to another server.
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-18T04:01:32+00:00
+hook_event: 'stop'
+conversation_id: '1fa108e6-7407-4613-ab97-ab443c4f5b4e'
+generation_id: '7760bb20-e42e-436a-b4f7-6ba034099a34'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+when i create a git commit can I view only the changes made in that git commit?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-18T04:03:20+00:00
+hook_event: 'stop'
+conversation_id: '1fa108e6-7407-4613-ab97-ab443c4f5b4e'
+generation_id: 'ad4fdc08-d5fb-46b4-b81c-abfe492ab979'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+can I see the data of the code changes or can I save a zip file of the code changes?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-18T04:07:45+00:00
+hook_event: 'stop'
+conversation_id: '1fa108e6-7407-4613-ab97-ab443c4f5b4e'
+generation_id: 'a176554f-146c-43c0-adb4-52e6079b1d25'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+create a folder called git-commit-history and create a nested folder called zipped contents inside the root folder
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-19T03:16:38+00:00
+hook_event: 'stop'
+conversation_id: '9658ab7e-dc5b-43cf-acaf-312a228f9fbd'
+generation_id: 'a48a4cae-f775-48c9-b496-e097c627eede'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+can i move gitignore inside the .github folder without changing any code?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-19T03:24:04+00:00
+hook_event: 'stop'
+conversation_id: '9658ab7e-dc5b-43cf-acaf-312a228f9fbd'
+generation_id: 'cd9b7e1b-630a-47b2-8039-cefc3b25e35d'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+will push-buffer.yml send a zip file of the push content to the cloudflare worker everytime a branch is pushed to main?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-19T03:25:53+00:00
+hook_event: 'stop'
+conversation_id: '9658ab7e-dc5b-43cf-acaf-312a228f9fbd'
+generation_id: '40b5fc56-8e28-46b6-ac94-70f5a7ba1855'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+how many mb is this codebase?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-19T03:27:20+00:00
+hook_event: 'stop'
+conversation_id: '9658ab7e-dc5b-43cf-acaf-312a228f9fbd'
+generation_id: 'cc537743-c6fe-46c8-a760-c9cf4f5cbc8f'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+so the repo code excluding build and dependencies is 1MB?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-19T04:33:26+00:00
+hook_event: 'stop'
+conversation_id: '9658ab7e-dc5b-43cf-acaf-312a228f9fbd'
+generation_id: '26b966c9-9270-49d3-a8f9-8ba99f92c820'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+I just updated @.github/workflows/push-buffer.yml . does the zip file get named SOLO.zip?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-19T04:35:43+00:00
+hook_event: 'stop'
+conversation_id: '9658ab7e-dc5b-43cf-acaf-312a228f9fbd'
+generation_id: 'ac5c22ce-6ffa-48fb-aaa5-f0029196d398'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+ok does it send it as SOLO.zip now? what is the X-Repo_name set as? is that solo since it is pulled from github?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-19T05:13:01+00:00
+hook_event: 'stop'
+conversation_id: '9658ab7e-dc5b-43cf-acaf-312a228f9fbd'
+generation_id: 'ab01dc5e-464c-4105-90ee-7ced77ea0a8e'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+what is the link to the website?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-19T05:22:01+00:00
+hook_event: 'stop'
+conversation_id: 'c9f233d7-12e6-4d98-8c83-07725933b3e1'
+generation_id: 'e4ad4703-04c3-4bc8-95dc-04d5a6535047'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+can you create an on request buffer that sends the same data but just by requesting it instead of on every push.
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-19T05:22:47+00:00
+hook_event: 'stop'
+conversation_id: 'c9f233d7-12e6-4d98-8c83-07725933b3e1'
+generation_id: 'cb682982-182a-474a-9cb9-1dfcdd55dc97'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+create two workflows keep push-buffer and create a new file with the name you made up just now
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-19T05:23:04+00:00
+hook_event: 'stop'
+conversation_id: 'c9f233d7-12e6-4d98-8c83-07725933b3e1'
+generation_id: '63c30da4-e21a-45c2-b8e5-0cdfa4372c97'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+how do i initiate buffer on request?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-19T05:23:53+00:00
+hook_event: 'stop'
+conversation_id: 'c9f233d7-12e6-4d98-8c83-07725933b3e1'
+generation_id: '2502cbad-2e7b-458d-bea7-c6072a473f7c'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+how do i use authenticate with github cli?
+
+--------------------------------------------------------------------------------
+at (UTC) 2026-05-19T05:42:46+00:00
+hook_event: 'stop'
+conversation_id: '153a9795-1dbd-4cd8-83b9-1337dabb691d'
+generation_id: '682b5958-6029-486f-8962-73a554d8717f'
+stop_status: 'completed'
+--------------------------------------------------------------------------------
+don't implement this yet but answer whether or not this can be implemented. In the prompt logging workflow can you add 1)logging for whether or not a file was editted from the prompt. 2) if yes, can you create a list of the files editted, 3) if a file name is editted can you search prompts.txt to change the file name
+
+--------------------------------------------------------------------------------
+logged_at (UTC): 2026-05-19T05:49:41+00:00
+conversation_id: '153a9795-1dbd-4cd8-83b9-1337dabb691d'
+files_edited: yes
+edited_files:
+  - .cursor/prompt_tracking/log_prompt_workflow.py
+  - docs/prompts.txt
+--------------------------------------------------------------------------------
+
+can you implement the first 2 functionalities and connect it to the existing workflow so new prompts include both. also remove hook_event and generation_id and stop status. Create a field for date and time.
+
+--------------------------------------------------------------------------------
+logged_at (UTC): 2026-05-19T05:50:05+00:00
+conversation_id: '153a9795-1dbd-4cd8-83b9-1337dabb691d'
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+will after file edit include files I edit manually after an output is generated or only those files editted with the ai tool?
+
+--------------------------------------------------------------------------------
+logged_at (UTC): 2026-05-19T05:51:35+00:00
+conversation_id: '153a9795-1dbd-4cd8-83b9-1337dabb691d'
+files_edited: yes
+edited_files:
+  - .cursor/prompt_tracking/data/prompts.txt
+  - .cursor/prompt_tracking/log_prompt_workflow.py
+--------------------------------------------------------------------------------
+
+can you move prompts.txt to inside the prompt tracking folder inside a new folder called data
+
+--------------------------------------------------------------------------------
+logged_at (UTC): 2026-05-19T05:52:40+00:00
+conversation_id: '153a9795-1dbd-4cd8-83b9-1337dabb691d'
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+can you use the datetime file in frontend/lib/core in any directory or do you have to add exports?
+
+--------------------------------------------------------------------------------
+logged_date (UTC): 2026-05-19
+logged_time (UTC): 05:54:04
+conversation_id: '153a9795-1dbd-4cd8-83b9-1337dabb691d'
+files_edited: yes
+edited_files:
+  - .cursor/prompt_tracking/data/prompts.txt
+  - .cursor/prompt_tracking/log_prompt_workflow.py
+--------------------------------------------------------------------------------
+
+can you use that file in the prompt tracking funcitonality to parse the time and date text and create two separate data entries? 
+
+--------------------------------------------------------------------------------
+logged_date (UTC): 2026-05-19
+logged_time (UTC): 05:55:03
+conversation_id: '153a9795-1dbd-4cd8-83b9-1337dabb691d'
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+why is the time 05:54;04? the current time for my timezone(EST) is 1:54. Is the timezone pulling the time for est?
+
+--------------------------------------------------------------------------------
+logged_date (UTC): 2026-05-19
+logged_time (UTC): 05:57:23
+logged_date (local): 2026-05-19
+logged_time (local): 01:57:23
+timezone_note: system local (EDT)
+conversation_id: '153a9795-1dbd-4cd8-83b9-1337dabb691d'
+files_edited: yes
+edited_files:
+  - .cursor/prompt_tracking/data/prompts.txt
+  - .cursor/prompt_tracking/log_prompt_workflow.py
+  - frontend/lib/core/datetime/DatetimeTimezoneRetrieval.swift
+--------------------------------------------------------------------------------
+
+add functionality in date time to convert UTC to the user's timezone. 
+
+--------------------------------------------------------------------------------
+logged_date: 2026-05-19
+logged_time: 02:00:07
+timezone_note: system local (EDT)
+conversation_title: ''
+files_edited: yes
+edited_files:
+  - .cursor/prompt_tracking/data/prompts.txt
+  - .cursor/prompt_tracking/log_prompt_workflow.py
+--------------------------------------------------------------------------------
+
+only include local time in the prompt data and replace conversation_id with conversation_title. Also, what is the format that you used for prompt.txt called?
+
+--------------------------------------------------------------------------------
+logged_date: 2026-05-20
+logged_time: 16:47:31
+timezone_note: system local (EDT)
+conversation_title: ''
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+asking for confirmation purposes, their is buffer on request which sends the cloudflare worker a zip of the entire repo(does this include .cursor and .vscode folders?) and after every push a zip is sent to? do both workflows send SOLO.zip as the name?
+
+--------------------------------------------------------------------------------
+logged_date: 2026-05-20
+logged_time: 16:50:02
+timezone_note: system local (EDT)
+conversation_title: ''
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+they both only send files that git is tracking? 
+
+--------------------------------------------------------------------------------
+logged_date: 2026-05-20
+logged_time: 16:50:32
+timezone_note: system local (EDT)
+conversation_title: ''
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+is it possible to have the push-buffer track files that aren't tracked?
+
+--------------------------------------------------------------------------------
+logged_date: 2026-05-20
+logged_time: 16:50:48
+timezone_note: system local (EDT)
+conversation_title: ''
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+sorry i meant for the buffer on reqest
+
+--------------------------------------------------------------------------------
+logged_date: 2026-05-20
+logged_time: 16:51:58
+timezone_note: system local (EDT)
+conversation_title: ''
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+is it possible to create as workflow separate from git that sends the entire repo data - the heavy data(build, derived data, nodemodules, etc)
+
+--------------------------------------------------------------------------------
+logged_date: 2026-05-20
+logged_time: 16:57:46
+timezone_note: system local (EDT)
+conversation_title: ''
+files_edited: yes
+edited_files:
+  - zip_repo
+--------------------------------------------------------------------------------
+
+create a zip_repo script in the root folder that zips the entire directory and sends it to the cloudflare worker as FULL_SOLO.zip
+
+--------------------------------------------------------------------------------
+logged_date: 2026-05-20
+logged_time: 17:01:16
+timezone_note: system local (EDT)
+conversation_title: ''
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+is their a hook for git commits?
+
+--------------------------------------------------------------------------------
+logged_date: 2026-05-20
+logged_time: 17:03:37
+timezone_note: system local (EDT)
+conversation_title: ''
+files_edited: yes
+edited_files:
+  - .githooks/post-commit
+--------------------------------------------------------------------------------
+
+can you create a git hook for post-commit.
+
+--------------------------------------------------------------------------------
+logged_date: 2026-05-20
+logged_time: 17:05:12
+timezone_note: system local (EDT)
+conversation_title: ''
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+can you place the githooks folder in github
+
+--------------------------------------------------------------------------------
+logged_date: 2026-05-20
+logged_time: 17:07:31
+timezone_note: system local (EDT)
+conversation_title: ''
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+can I order the events of what happens after the hook in order of how I want them?
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 17:11:47
+conversation_title: ''
+files_edited: yes
+edited_files:
+  - .cursor/prompt_tracking/data/prompts.txt
+  - .cursor/prompt_tracking/log_prompt_workflow.py
+--------------------------------------------------------------------------------
+
+within prompt_tracking change the data. add a new file called long-term-prompt-tracking. This file should simply display Date: \n Prompt: and there should be a new entry after every prompt. In prompts.txt change logged_date to Date:, changed logged_time to Time:, remove timezone
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 17:12:48
+conversation_title: "why isn't conversation title printing?"
+files_edited: yes
+edited_files:
+  - .cursor/prompt_tracking/log_prompt_workflow.py
+  - /Users/sohanyedulla/.cursor/projects/Users-sohanyedulla-SOLO/agent-tools/7947a3fd-2a91-458f-8817-d12d242bd925.txt
+--------------------------------------------------------------------------------
+
+why isn't conversation title printing?
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 17:13:46
+conversation_title: ''
+files_edited: yes
+edited_files:
+  - .cursor/prompt_tracking/log_prompt_workflow.py
+--------------------------------------------------------------------------------
+
+the conversation_title is now printing the prompt not the conversation_title
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 17:16:34
+conversation_id: 1
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+rename to data in prompt_tracking to prompt_data and move it to the root folder.
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 17:27:36
+conversation_id: 1
+files_edited: yes
+edited_files:
+  - .githooks/post-commit
+--------------------------------------------------------------------------------
+
+after a commit, when the post-commit hook is hit can you do the following things in order 1) create a 10 space gap in prompts.txt and write commit made with commit id and message and files. Then run zip_repo and create a terminal output that says zip file sent.
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 17:28:49
+conversation_id: 1
+files_edited: yes
+edited_files:
+  - .cursor/prompt_tracking/log_prompt_workflow.py
+  - prompt_data/long-term-prompt-tracking.txt
+  - prompt_data/prompt_counter.json
+  - prompt_data/prompts.txt
+--------------------------------------------------------------------------------
+
+number the prompts in long-term-prompt-tracking.txt
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 17:30:58
+conversation_id: 1
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+can I move rules and skills outside of the cursor file? will they still work?
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 17:33:03
+conversation_id: 1
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+what about prompt_tracking since that is separate from cursor commands. can you move prompt_tracking to inside prompt_data and place conversation_id_map.json inside of it and prompt_counter.json inside of it.
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 17:40:07
+conversation_id: 1
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+@
+:1-10 does this file do anything? if not delete it
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 17:44:52
+conversation_id: 1
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+so the cloudflare worker recieves a copy of the codebase after every commit called FULL_SOLO after every commit and a copy of the commit called SOLO after every push?
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 17:46:49
+conversation_id: 1
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+show me a layout of the data within the directory. Point out the large data folders then we can configure the script to not include some folders
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 17:48:34
+conversation_id: 1
+files_edited: yes
+edited_files:
+  - zip_repo
+--------------------------------------------------------------------------------
+
+don't include the first 6 table entries in zip_repo
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 17:50:21
+conversation_id: 1
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+how do I run buffer on request?
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 17:53:21
+conversation_id: 1
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+@/Users/sohanyedulla/.cursor/projects/Users-sohanyedulla-SOLO/terminals/2.txt:103-105 
+
+
+
+
+
+
+
+
+
+
+Commit made
+Commit id: 7daac9c884c1fe93b3c251156d98ef631dd164ef (7daac9c)
+Message:
+Create github workflows for sending the source code and non-build/packages to a cloudflare worker. Also created a githook that sends the repo after each commit. I also created a prompt tracking modules with time data and conversation numbers. The prompt tracking data has checkpoints for each commit. If the data gets to large I'll erase the file after every push or commit since the old commit data past 5 commits is useless and I can create stored data of commits on the other server.
+
+Co-authored-by: Cursor <cursoragent@cursor.com>
+Files:
+  - .githooks/post-commit
+  - .github/workflows/buffer-on-request.yml
+  - .github/workflows/push-buffer.yml
+  - prompt_data/long-term-prompt-tracking.txt
+  - prompt_data/prompt_tracking/.pending_edited_files_by_generation.json
+  - prompt_data/prompt_tracking/.pending_prompts_by_generation.json
+  - prompt_data/prompt_tracking/conversation_id_map.json
+  - prompt_data/prompt_tracking/log_prompt_workflow.py
+  - prompt_data/prompt_tracking/prompt_counter.json
+  - prompt_data/prompts.txt
+  - zip_repo
+
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 17:57:16
+conversation_id: 1
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+commit the github workflows, prompt_data, githooks, and zip_repo file. The comment is "Create github workflows for sending the source code and non-build/packages to a cloudflare worker. Also created a githook that sends the repo after each commit. I also created a prompt tracking modules with time data and conversation numbers. The prompt tracking data has checkpoints for each commit. If the data gets to large I'll erase the file after every push or commit since the old commit data past 5 commits is useless and I can create stored data of commits on the other server.
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 17:58:42
+conversation_id: 1
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+git push origin main
+
+
+
+
+
+
+
+
+
+
+Commit made
+Commit id: 88b1d29f731ed5230eec96e67ee12f4af7bea461 (88b1d29)
+Message:
+Create github workflows for sending the source code and non-build/packages to a cloudflare worker. Also created a githook that sends the repo after each commit. I also created a prompt tracking modules with time data and conversation numbers. The prompt tracking data has checkpoints for each commit. If the data gets to large I'll erase the file after every push or commit since the old commit data past 5 commits is useless and I can create stored data of commits on the other server.
+
+Co-authored-by: Cursor <cursoragent@cursor.com>
+Files:
+  - .githooks/post-commit
+  - .github/workflows/buffer-on-request.yml
+  - .github/workflows/push-buffer.yml
+  - prompt_data/long-term-prompt-tracking.txt
+  - prompt_data/prompt_tracking/.pending_edited_files_by_generation.json
+  - prompt_data/prompt_tracking/.pending_prompts_by_generation.json
+  - prompt_data/prompt_tracking/conversation_id_map.json
+  - prompt_data/prompt_tracking/log_prompt_workflow.py
+  - prompt_data/prompt_tracking/prompt_counter.json
+  - prompt_data/prompts.txt
+  - zip_repo
+

@@ -1,0 +1,112 @@
+Prompt #1
+
+Date: 2026-05-20 17:11:47
+
+Prompt:
+within prompt_tracking change the data. add a new file called long-term-prompt-tracking. This file should simply display Date: \n Prompt: and there should be a new entry after every prompt. In prompts.txt change logged_date to Date:, changed logged_time to Time:, remove timezone
+
+Prompt #2
+
+Date: 2026-05-20 17:12:48
+
+Prompt:
+why isn't conversation title printing?
+
+Prompt #3
+
+Date: 2026-05-20 17:13:46
+
+Prompt:
+the conversation_title is now printing the prompt not the conversation_title
+
+Prompt #4
+
+Date: 2026-05-20 17:16:34
+
+Prompt:
+rename to data in prompt_tracking to prompt_data and move it to the root folder.
+
+Prompt #5
+
+Date: 2026-05-20 17:27:36
+
+Prompt:
+after a commit, when the post-commit hook is hit can you do the following things in order 1) create a 10 space gap in prompts.txt and write commit made with commit id and message and files. Then run zip_repo and create a terminal output that says zip file sent.
+Prompt #6
+
+Date: 2026-05-20 17:28:49
+
+Prompt:
+number the prompts in long-term-prompt-tracking.txt
+
+Prompt #7
+
+Date: 2026-05-20 17:30:58
+
+Prompt:
+can I move rules and skills outside of the cursor file? will they still work?
+
+Prompt #8
+
+Date: 2026-05-20 17:33:03
+
+Prompt:
+what about prompt_tracking since that is separate from cursor commands. can you move prompt_tracking to inside prompt_data and place conversation_id_map.json inside of it and prompt_counter.json inside of it.
+
+Prompt #9
+
+Date: 2026-05-20 17:40:07
+
+Prompt:
+@
+:1-10 does this file do anything? if not delete it
+
+Prompt #10
+
+Date: 2026-05-20 17:44:52
+
+Prompt:
+so the cloudflare worker recieves a copy of the codebase after every commit called FULL_SOLO after every commit and a copy of the commit called SOLO after every push?
+
+Prompt #11
+
+Date: 2026-05-20 17:46:49
+
+Prompt:
+show me a layout of the data within the directory. Point out the large data folders then we can configure the script to not include some folders
+
+Prompt #12
+
+Date: 2026-05-20 17:48:34
+
+Prompt:
+don't include the first 6 table entries in zip_repo
+
+Prompt #13
+
+Date: 2026-05-20 17:50:21
+
+Prompt:
+how do I run buffer on request?
+
+Prompt #14
+
+Date: 2026-05-20 17:53:21
+
+Prompt:
+@/Users/sohanyedulla/.cursor/projects/Users-sohanyedulla-SOLO/terminals/2.txt:103-105 
+
+Prompt #15
+
+Date: 2026-05-20 17:57:16
+
+Prompt:
+commit the github workflows, prompt_data, githooks, and zip_repo file. The comment is "Create github workflows for sending the source code and non-build/packages to a cloudflare worker. Also created a githook that sends the repo after each commit. I also created a prompt tracking modules with time data and conversation numbers. The prompt tracking data has checkpoints for each commit. If the data gets to large I'll erase the file after every push or commit since the old commit data past 5 commits is useless and I can create stored data of commits on the other server.
+
+Prompt #16
+
+Date: 2026-05-20 17:58:42
+
+Prompt:
+git push origin main
+

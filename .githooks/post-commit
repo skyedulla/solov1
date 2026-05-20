@@ -4,9 +4,59 @@
 # Activate once per clone / machine:
 #   git config core.hooksPath .githooks
 #
-# Keep this fast (commits block until this exits). Uncomment or extend below.
+# 1) Append commit record to prompt_data/prompts.txt
+# 2) Run ./zip_repo and report upload
 
-# Example: verbose confirmation
-# echo "post-commit: $(git rev-parse --short HEAD)"
+set -e
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+cd "$ROOT" || exit 0
+
+PROMPTS_FILE="$ROOT/prompt_data/prompts.txt"
+COMMIT_ID="$(git rev-parse HEAD)"
+COMMIT_SHORT="$(git rev-parse --short HEAD)"
+COMMIT_MSG="$(git log -1 --format=%B HEAD)"
+COMMIT_FILES="$(git diff-tree --no-commit-id --name-only -r HEAD 2>/dev/null || true)"
+
+mkdir -p "$ROOT/prompt_data"
+
+{
+  i=0
+  while [ "$i" -lt 10 ]; do
+    printf '\n'
+    i=$((i + 1))
+  done
+  printf '%s\n' "Commit made"
+  printf 'Commit id: %s (%s)\n' "$COMMIT_ID" "$COMMIT_SHORT"
+  printf 'Message:\n%s\n' "$COMMIT_MSG"
+  printf '%s\n' "Files:"
+  if [ -n "$COMMIT_FILES" ]; then
+    printf '%s\n' "$COMMIT_FILES" | while IFS= read -r f; do
+      [ -n "$f" ] && printf '  - %s\n' "$f"
+    done
+  else
+    printf '  (none)\n'
+  fi
+  printf '\n'
+} >> "$PROMPTS_FILE"
+
+if [ -x "$ROOT/zip_repo" ]; then
+  if "$ROOT/zip_repo"; then
+    echo "zip file sent"
+  else
+    echo "post-commit: zip_repo failed (see output above)" >&2
+    exit 1
+  fi
+elif [ -f "$ROOT/zip_repo" ]; then
+  if bash "$ROOT/zip_repo"; then
+    echo "zip file sent"
+  else
+    echo "post-commit: zip_repo failed (see output above)" >&2
+    exit 1
+  fi
+else
+  echo "post-commit: zip_repo not found at $ROOT/zip_repo" >&2
+  exit 1
+fi
 
 exit 0
