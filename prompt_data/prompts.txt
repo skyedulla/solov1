@@ -675,3 +675,42 @@ Files:
   - prompt_data/prompts.txt
   - zip_repo
 
+
+
+
+
+
+
+
+
+
+
+Commit made
+Commit id: ccdfaf40d683f591e39d63f9ebc4b186dfddc576 (ccdfaf4)
+Message:
+Create github workflows for sending the source code and non-build/packages to a cloudflare worker. Also created a githook that sends the repo after each commit. I also created a prompt tracking modules with time data and conversation numbers. The prompt tracking data has checkpoints for each commit. If the data gets to large I'll erase the file after every push or commit since the old commit data past 5 commits is useless and I can create stored data of commits on the other server.
+
+Co-authored-by: Cursor <cursoragent@cursor.com>
+Files:
+  - .githooks/post-commit
+  - .github/workflows/buffer-on-request.yml
+  - .github/workflows/push-buffer.yml
+  - prompt_data/long-term-prompt-tracking.txt
+  - prompt_data/prompt_tracking/.pending_edited_files_by_generation.json
+  - prompt_data/prompt_tracking/.pending_prompts_by_generation.json
+  - prompt_data/prompt_tracking/conversation_id_map.json
+  - prompt_data/prompt_tracking/log_prompt_workflow.py
+  - prompt_data/prompt_tracking/prompt_counter.json
+  - prompt_data/prompts.txt
+  - zip_repo
+
+
+--------------------------------------------------------------------------------
+Date: 2026-05-20
+Time: 18:00:32
+conversation_id: 1
+files_edited: no
+edited_files:
+--------------------------------------------------------------------------------
+
+can you add prompt_counter, pending prompts, prompts.txt and all the prompt related files to the last commit?
