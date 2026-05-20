@@ -4,6 +4,7 @@ import { apiAccessLoggingMiddleware, logApiError } from "./core/apiLogger";
 import { isPrismaError } from "./core/databaseLogger";
 import { aiRoutes } from "./routes/ai.routes";
 import { mindmapConnectionRoutes } from "./routes/mindmap-connection.routes";
+import { decisionMapRoutes } from "./routes/decision_map.routes";
 import { ideaRoutes } from "./routes/idea.routes";
 import { mindmapRoutes } from "./routes/mindmap.routes";
 import { mindmapNodeRoutes } from "./routes/mindmap-node.routes";
@@ -25,6 +26,7 @@ export function createApp(): express.Application {
 
   app.use("/ai", aiRoutes);
   app.use("/ideas", ideaRoutes);
+  app.use("/decision-maps", decisionMapRoutes);
   app.use("/mindmaps", mindmapRoutes);
   app.use("/mindmap-node", mindmapNodeRoutes);
   app.use("/mindmap-connection", mindmapConnectionRoutes);

@@ -38,6 +38,43 @@ enum StoredUploadInstantFormatting {
         return withoutFractional.date(from: combined)
     }
 
+    /// Formats an absolute **`Date`** (typically a UTC instant from the backend) into
+    /// **`yyyy-MM-dd`** and **`HH:mm:ss`** wall-clock parts for **`timeZone`**. Use **`TimeZone.current`**
+    /// for the device's local timezone, or **`TimeZone(identifier: "America/New_York")`** etc.
+    static func utcInstantToTimezoneDisplayParts(
+        _ instant: Date,
+        timeZone: TimeZone = .current,
+        calendarLocale: Locale = .current
+    ) -> (calendarDate: String, wallClockTime: String) {
+        let u = clientUploadDisplayStrings(at: instant, timeZone: timeZone, calendarLocale: calendarLocale)
+        return (calendarDate: u.uploadDate, wallClockTime: u.uploadTime)
+    }
+
+    /// Parses **`isoUtc`** (e.g. **`2026-05-19T05:54:31Z`** / **`...+00:00`**) then returns **`utcInstantToTimezoneDisplayParts`**
+    /// as wall clock in **`timeZone`** (**`TimeZone.current`** = user locale).
+    static func utcIsoStringToTimezoneDisplayParts(
+        _ isoUtc: String,
+        timeZone: TimeZone = .current,
+        calendarLocale: Locale = .current
+    ) -> (calendarDate: String, wallClockTime: String)? {
+        let trimmed = isoUtc.trimmingCharacters(in: .whitespacesAndNewlines)
+        let withFractional = ISO8601DateFormatter()
+        withFractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        var instant = withFractional.date(from: trimmed)
+        if instant == nil {
+            let plain = ISO8601DateFormatter()
+            plain.formatOptions = [.withInternetDateTime]
+            instant = plain.date(from: trimmed)
+        }
+        guard let instant else { return nil }
+        let parts = utcInstantToTimezoneDisplayParts(
+            instant,
+            timeZone: timeZone,
+            calendarLocale: calendarLocale
+        )
+        return parts
+    }
+
     static func formattedDateTime(
         uploadDate: String,
         uploadTime: String,

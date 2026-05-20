@@ -51,6 +51,20 @@ model Mindmap {
   @@map("mindmaps")
 }
 
+/// User-owned decision maps for an idea; **`userId`** is the Supabase auth subject (**`req.authUser.id`**).
+model DecisionMap {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  ideaId    String   @map("idea_id")
+  title     String   @default("")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([userId, ideaId])
+  @@map("decision_maps")
+}
+
 /// User-owned workshop objectives; `userId` is the Supabase Auth user id from `req.authUser.id`.
 model Objective {
   id          String   @id @default(uuid())
@@ -114,6 +128,7 @@ enum StoredFileType {
   presentation
   spreadsheet
   image
+  audio
 }
 
 /// User-owned file metadata after R2 upload; **`userId`** is the Supabase Auth subject (**`req.authUser.id`**).
@@ -129,6 +144,10 @@ model StoredFile {
   contentType   String         @map("content_type")
   publicUrl     String?        @map("public_url")
   uploadedAt    DateTime       @default(now()) @map("uploaded_at")
+  /// Client-formatted calendar date at upload (**`YYYY-MM-DD`** in the user’s time zone).
+  displayUploadDate String     @default("") @map("display_upload_date")
+  /// Client-formatted time of day at upload (**`HH:mm:ss`** in the user’s time zone).
+  displayUploadTime String     @default("") @map("display_upload_time")
 
   @@index([userId])
   @@map("stored_files")
