@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+# SOLO repo — runs after each successful commit.
+#
+# Activate once per clone / machine:
+#   git config core.hooksPath .githooks
+#
+# Keep this fast (commits block until this exits). Uncomment or extend below.
+
+# Example: verbose confirmation
+# echo "post-commit: $(git rev-parse --short HEAD)"
+
+exit 0
